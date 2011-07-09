@@ -1,4 +1,8 @@
-name: MultiVerse-Portals
-main: com.onarandombox.MultiVersePortals.MultiVersePortals
-authors: ['Rigby']
+name: Multiverse-Portals
+main: com.onarandombox.MultiversePortals.MultiversePortals
+authors: ['Rigby', 'fernferret']
 version: 2.0
+commands:
+  mvp:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
