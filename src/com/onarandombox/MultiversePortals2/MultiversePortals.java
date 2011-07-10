@@ -1,15 +1,18 @@
-package com.onarandombox.MultiversePortals;
+package com.onarandombox.MultiversePortals2;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.command.CommandManager;
-import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.MultiverseCore.command.commands.ListCommand;
 import com.onarandombox.utils.DebugLog;
+import com.pneumaticraft.commandhandler.CommandHandler;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class MultiversePortals extends JavaPlugin{
@@ -21,7 +24,7 @@ public class MultiversePortals extends JavaPlugin{
 
     protected Configuration MVPconfig;
 
-    private CommandManager commandManager;
+    private CommandHandler commandHandler;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -41,7 +44,7 @@ public class MultiversePortals extends JavaPlugin{
 
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
 
-        commandManager = core.getCommandManager();
+        this.commandHandler = this.core.getCommandHandler();
         registerCommands();
     }
 
@@ -54,7 +57,7 @@ public class MultiversePortals extends JavaPlugin{
      */
     private void registerCommands() {
         // Page 1
-        this.commandManager.addCommand(new ListCommand(this.core, this));
+        //this.commandHandler.registerCommand(new ListCommand(this));
     }
 
     /**
@@ -66,7 +69,9 @@ public class MultiversePortals extends JavaPlugin{
             sender.sendMessage("This plugin is Disabled!");
             return true;
         }
-        return this.commandManager.dispatch(sender, command, commandLabel, args);
+        ArrayList<String> allArgs = new ArrayList<String>(Arrays.asList(args));
+        allArgs.add(0, command.getName());
+        return this.commandHandler.locateAndRunCommand(sender, allArgs);
     }
 
     /**
