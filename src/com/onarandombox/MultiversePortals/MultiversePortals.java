@@ -1,7 +1,7 @@
 package com.onarandombox.MultiversePortals;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.command.commands.ListCommand;
+import com.onarandombox.MultiversePortals.commands.ListCommand;
 import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
 
@@ -57,7 +57,7 @@ public class MultiversePortals extends JavaPlugin{
      */
     private void registerCommands() {
         // Page 1
-        //this.commandHandler.registerCommand(new ListCommand(this));
+        this.commandHandler.registerCommand(new ListCommand(this));
     }
 
     /**
