@@ -1,4 +1,4 @@
-package com.onarandombox.MultiversePortals2.commands;
+package com.onarandombox.MultiversePortals.commands;
 
 
 

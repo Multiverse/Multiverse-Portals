@@ -1,4 +1,4 @@
-package com.onarandombox.MultiversePortals2;
+package com.onarandombox.MultiversePortals;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.command.commands.ListCommand;
