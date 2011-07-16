@@ -1,12 +1,15 @@
 package com.onarandombox.MultiversePortals;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.MultiversePortals.commands.*;
 import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
+import com.sk89q.worldedit.bukkit.WorldEditAPI;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
@@ -25,6 +28,9 @@ public class MultiversePortals extends JavaPlugin{
     protected Configuration MVPconfig;
 
     private CommandHandler commandHandler;
+    protected WorldEditAPI worldEditAPI = null;
+    private MVPPluginListener pluginListener;
+    private MVPPlayerListener playerListener;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -41,10 +47,14 @@ public class MultiversePortals extends JavaPlugin{
         }
         // As soon as we know MVCore was found, we can use the debug log!
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
-
+        this.pluginListener = new MVPPluginListener(this);
+        this.playerListener = new MVPPlayerListener(this);
+        // Register the PLUGIN_ENABLE Event as we will need to keep an eye out for the Core Enabling if we don't find it initially.
+        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
 
-        this.commandHandler = this.core.getCommandHandler();
+        
         registerCommands();
     }
 
@@ -53,19 +63,17 @@ public class MultiversePortals extends JavaPlugin{
     }
 
     /**
-     * Register Multiverse-Core commands to DThielke's Command Manager.
+     * Register commands to Multiverse's CommandHandler so we get a super sexy single menu 
      */
     private void registerCommands() {
-        // Page 1
+        this.commandHandler = this.core.getCommandHandler();
         this.commandHandler.registerCommand(new ListCommand(this));
+        this.commandHandler.registerCommand(new CreateCommand(this));
     }
 
-    /**
-     * onCommand
-     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if (this.isEnabled() == false) {
+        if (!this.isEnabled()) {
             sender.sendMessage("This plugin is Disabled!");
             return true;
         }
@@ -89,5 +97,13 @@ public class MultiversePortals extends JavaPlugin{
             }
         }
         return authors.substring(2);
+    }
+    
+    public WorldEditAPI getWEAPI() {
+        return this.worldEditAPI;
+    }
+
+    public MultiverseCore getCore() {
+        return this.core;
     }
 }
