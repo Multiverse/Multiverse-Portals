@@ -6,3 +6,21 @@ commands:
   mvp:
     description: Generic Multiverse-Portals Command
     usage: /<command>
+  mvpc:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpcreate:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpl:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvplist:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpm:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpmodify:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>

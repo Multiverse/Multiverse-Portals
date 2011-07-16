@@ -1,22 +1,28 @@
 package com.onarandombox.MultiversePortals;
 
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiversePortals.commands.*;
-import com.onarandombox.utils.DebugLog;
-import com.pneumaticraft.commandhandler.CommandHandler;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.logging.Logger;
+import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiversePortals.commands.CreateCommand;
+import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.utils.DebugLog;
+import com.pneumaticraft.commandhandler.CommandHandler;
+import com.sk89q.worldedit.bukkit.WorldEditAPI;
 
 public class MultiversePortals extends JavaPlugin{
 
@@ -31,6 +37,7 @@ public class MultiversePortals extends JavaPlugin{
     protected WorldEditAPI worldEditAPI = null;
     private MVPPluginListener pluginListener;
     private MVPPlayerListener playerListener;
+    private Map<String, MVPortal> portals;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -53,9 +60,22 @@ public class MultiversePortals extends JavaPlugin{
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
-
+        this.portals = new HashMap<String,MVPortal>();
+        this.loadPortals();
         
         registerCommands();
+    }
+
+    private void loadPortals() {
+        this.MVPconfig = new Configuration(new File(getDataFolder(), "portals.yml"));
+        this.MVPconfig.load();
+        List<String> keys = this.MVPconfig.getKeys("portals");
+        if(keys != null) {
+            for(String pname : keys) {
+                this.portals.put(pname, MVPortal.loadMVPortalFromConfig(this, pname));
+            }
+        }
+        
     }
 
     public void onDisable() {
@@ -105,5 +125,24 @@ public class MultiversePortals extends JavaPlugin{
 
     public MultiverseCore getCore() {
         return this.core;
+    }
+    
+    public boolean addPortal(MVWorld world, String name, String owner, PortalLocation location){
+        if(!this.portals.containsKey(name)) {
+            this.portals.put(name, new MVPortal(this, name, owner, location));
+            return true;
+        }
+        return false;
+    }
+
+    public List<MVPortal> getAllPortals() {
+        return new ArrayList<MVPortal>(this.portals.values());
+    }
+    
+    public List<MVPortal> getPortals(CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            return this.getAllPortals();
+        }
+        return null;
     }
 }

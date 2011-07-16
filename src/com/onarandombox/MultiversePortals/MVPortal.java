@@ -3,7 +3,6 @@ package com.onarandombox.MultiversePortals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.util.Vector;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
@@ -11,7 +10,6 @@ import com.onarandombox.utils.Destination;
 
 public class MVPortal {
     private String name;
-    private MVWorld world;
     private PortalLocation location;
     private Destination destination;
     private Configuration config;
@@ -21,18 +19,38 @@ public class MVPortal {
     private List<String> whitelist;
     private List<String> blacklist;
 
-    public MVPortal(MVWorld world, MultiversePortals instance, String name) {
-        this.world = world;
+    public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
         this.config = this.plugin.MVPconfig;
-        this.setName(name);
-        this.portalConfigString = "worlds." + this.world.getName() + ".portals." + this.name;
-        this.setDestination(this.config.getString(this.portalConfigString + ".destination", ""));
-        this.setPortalLocation(this.config.getString(this.portalConfigString + ".location", ""));
-        this.setOwner(this.config.getString(this.portalConfigString + ".owner", ""));
-        this.setWhitelist(this.config.getStringList(this.portalConfigString + ".whitelist", new ArrayList<String>()));
-        this.setBlacklist(this.config.getStringList(this.portalConfigString + ".blacklist", new ArrayList<String>()));
-        
+        this.name = name;
+        this.portalConfigString = "portals." + this.name;
+
+    }
+
+    public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
+        MVPortal portal = new MVPortal(instance, name);
+        portal.setDestination(portal.config.getString(portal.portalConfigString + ".destination", ""));
+
+        String portalLocString = portal.config.getString(portal.portalConfigString + ".location", "");
+        String worldString = portal.config.getString(portal.portalConfigString + ".world", "");
+        portal.setPortalLocation(portalLocString, worldString);
+
+        portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
+        portal.setWhitelist(portal.config.getStringList(portal.portalConfigString + ".whitelist", new ArrayList<String>()));
+        portal.setBlacklist(portal.config.getStringList(portal.portalConfigString + ".blacklist", new ArrayList<String>()));
+        return portal;
+    }
+
+    public MVPortal(MVWorld world, MultiversePortals instance, String name, String owner, String location) {
+        this(instance, name);
+        this.setOwner(owner);
+        this.setPortalLocation(location, world);
+    }
+
+    public MVPortal(MultiversePortals instance, String name, String owner, PortalLocation location) {
+        this(instance, name);
+        this.setOwner(owner);
+        this.setPortalLocation(location);
     }
 
     private void setWhitelist(List<String> stringList) {
@@ -40,17 +58,40 @@ public class MVPortal {
         this.config.setProperty(this.portalConfigString + ".whitelist", this.whitelist);
         this.config.save();
     }
-    
+
     private void setBlacklist(List<String> stringList) {
         this.blacklist = stringList;
         this.config.setProperty(this.portalConfigString + ".blacklist", this.blacklist);
         this.config.save();
     }
 
-    private void setPortalLocation(String locationString) {
-        this.location = PortalLocation.parseLocation(locationString);
+    public void setPortalLocation(String locationString, String worldString) {
+        MVWorld world = null;
+        if (((MultiversePortals) this.plugin).getCore().isMVWorld(worldString)) {
+            world = ((MultiversePortals) this.plugin).getCore().getMVWorld(worldString);
+        }
+        this.setPortalLocation(locationString, world);
     }
 
+    public void setPortalLocation(String locationString, MVWorld world) {
+        this.setPortalLocation(PortalLocation.parseLocation(locationString, world));
+    }
+
+    public void setPortalLocation(PortalLocation location) {
+        this.location = location;
+        if(!this.location.isValidLocation()) {
+            System.out.print("Invalid location!");
+        }
+        this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
+        MVWorld world = this.location.getMVWorld();
+        if (world != null) {
+            
+            this.config.setProperty(this.portalConfigString + ".world", world.getName());
+        } else {
+            System.out.print("World was not valid!!");
+        }
+        this.config.save();
+    }
 
     private void setOwner(String owner) {
         this.owner = owner;
@@ -67,9 +108,10 @@ public class MVPortal {
 
     private void setName(String name) {
         this.name = name;
+        // TODO: Move values when a rename happens
     }
 
-    public String getName(String name) {
+    public String getName() {
         return this.name;
     }
 

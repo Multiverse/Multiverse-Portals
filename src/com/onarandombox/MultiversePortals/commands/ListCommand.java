@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.pneumaticraft.commandhandler.Command;
 
@@ -29,10 +30,8 @@ public class ListCommand extends Command {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        Player p = null;
-        if (sender instanceof Player) {
-            p = (Player) sender;
+        for(MVPortal p : ((MultiversePortals)this.plugin).getAllPortals()) {
+            sender.sendMessage(p.getName());
         }
-        // Got lazy...
     }
 }
