@@ -60,24 +60,24 @@ public class MVPortal {
     }
 
     private void setWhitelist(List<String> stringList) {
-        for(String s : stringList) {
-            if(s.length() > 1 && s.substring(0, 2).equals("G:")) {
+        for (String s : stringList) {
+            if (s.length() > 1 && s.substring(0, 2).equals("G:")) {
                 s.replaceFirst("G:", "g:");
             }
         }
-        
+
         this.whitelist = stringList;
         this.config.setProperty(this.portalConfigString + ".whitelist", this.whitelist);
         this.config.save();
     }
 
     private void setBlacklist(List<String> stringList) {
-        for(String s : stringList) {
-            if(s.length() > 1 && s.substring(0, 2).equals("G:")) {
+        for (String s : stringList) {
+            if (s.length() > 1 && s.substring(0, 2).equals("G:")) {
                 s.replaceFirst("G:", "g:");
             }
         }
-        
+
         this.blacklist = stringList;
         this.config.setProperty(this.portalConfigString + ".blacklist", this.blacklist);
         this.config.save();
@@ -122,7 +122,7 @@ public class MVPortal {
 
     public boolean setDestination(String destinationString) {
         this.destination = Destination.parseDestination(destinationString, this.plugin.core);
-        if(this.destination.getType() == DestinationType.Invalid) {
+        if (this.destination.getType() == DestinationType.Invalid) {
             this.plugin.core.log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid DESTINATION!");
             return false;
         }
@@ -147,34 +147,9 @@ public class MVPortal {
     }
 
     public boolean playerCanEnterPortal(Player player) {
-        // First check against the whitelist
-        if (this.whitelist.contains(player.getName())) {
-            return true;
-        }
-        List<String> groups = this.plugin.core.getPermissions().getGroups(this.location.getMVWorld().getName(), player.getName());
-        for (String group : groups) {
-            if (this.whitelist.contains("g:" + group)) {
-                return true;
-            }
-        }
-        // We've searched the whitelist, if there was one, and a player was not allowed through
-        // we don't need to check any further
-        if (this.whitelist.size() > 0) {
-            return false;
-        }
-        // Now check against blacklists
-        if (this.blacklist.contains(player.getName())) {
-            return false;
-        }
-        for (String group : groups) {
-            if (this.blacklist.contains("g:" + group)) {
-                return false;
-            }
-        }
-        
-        return true;
+        return (this.plugin.getCore().getPermissions().hasPermission(player, "multiverse.portals.access." + this.name, false));
     }
-    
+
     public Destination getDestination() {
         return this.destination;
     }

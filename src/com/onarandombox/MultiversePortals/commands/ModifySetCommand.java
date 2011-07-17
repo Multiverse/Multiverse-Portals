@@ -32,10 +32,7 @@ public class ModifySetCommand extends PortalCommand {
             return;
         }
         
-        if(!validCommand(args)) {
-            sender.sendMessage("Looks like you forgot your -p or [PORTAL]! Please type the command again!");
-            return;
-        }
+        
         
         Player player = (Player) sender;
         if (!ModifyCommand.validateAction(Action.Set, args.get(0))) {
@@ -43,7 +40,23 @@ public class ModifySetCommand extends PortalCommand {
                     ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ".");
             return;
         }
+        
+        if(!validCommand(args, SetProperties.valueOf(args.get(0)))) {
+            sender.sendMessage("Looks like you forgot your -p or [PORTAL],");
+            sender.sendMessage("or you did not specify the value you wanted to set!");
+            sender.sendMessage("or you did not specify the value you wanted to set!");
+            
+            return;
+        }
         String portalName = extractPortalName(args);
+        if(valueRequired(SetProperties.valueOf(args.get(0).toLowerCase()))) {
+            if(portalName != null && args.size() == 3) {
+                
+            }
+        }
+        
+        
+        
         //TODO: Resume work here!
         if (portalName == null && !userHasPortalSelected(player)) {
             sender.sendMessage("You need to select a portal using" + ChatColor.AQUA + "/mvp select {NAME}");
@@ -58,12 +71,12 @@ public class ModifySetCommand extends PortalCommand {
     }
 
     private boolean valueRequired(SetProperties property) {
-        return (property != SetProperties.location && property != SetProperties.dest && property != SetProperties.destination);
+        return (property != SetProperties.location);
     }
 
-    private boolean validCommand(List<String> args) {
+    private boolean validCommand(List<String> args, SetProperties property) {
         // This means that they did not specify the -p or forgot the [PORTAL]
-        return (args.size() == 3);
+        return !(args.size() == 3 && property == SetProperties.location);
     }
 
     private String extractPortalName(List<String> args) {
