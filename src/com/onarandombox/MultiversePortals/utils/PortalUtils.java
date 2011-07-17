@@ -28,21 +28,22 @@ public class PortalUtils {
             return null;
         }
         for (MVPortal portal : portals) {
-            PortalLocation l = portal.getLocation(); 
-            Vector min = this.plugin.MVPortals.get(key).min;
-            Vector max = this.plugin.MVPortals.get(key).max;
-            String w = wcheck.getName();
-            if (l.getWorld().getName().equalsIgnoreCase(w)) {
-                for (int x = min.getBlockX(); x <= max.getBlockX(); x++) {
-                    for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
-                        for (int z = min.getBlockZ(); z <= max.getBlockZ(); z++) {
-                            if (l.getBlockX() == x && l.getBlockY() == y && l.getBlockZ() == z) {
-                                return this.plugin.MVPortals.get(key).getName();
-                            }
-                        }
-                    }
+            PortalLocation portalLoc = portal.getLocation();
+            if (portalLoc.isValidLocation()) {
+                Vector min = portalLoc.getMinimum();
+                Vector max = portalLoc.getMaximum();
+                if(!(l.getBlockX() >= min.getBlockX() && l.getBlockX() <= max.getBlockX())) {
+                    return null;
                 }
+                if(!(l.getBlockZ() >= min.getBlockZ() && l.getBlockZ() <= max.getBlockZ())) {
+                    return null;
+                }
+                if(!(l.getBlockY() >= min.getBlockY() && l.getBlockY() <= max.getBlockY())) {
+                    return null;
+                }
+                return portal.getName();
             }
+
         }
         return null;
     }

@@ -20,6 +20,7 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.MultiversePortals.utils.PortalUtils;
 import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
@@ -38,6 +39,7 @@ public class MultiversePortals extends JavaPlugin{
     private MVPPluginListener pluginListener;
     private MVPPlayerListener playerListener;
     private Map<String, MVPortal> portals;
+    private PortalUtils portalUtils;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -52,6 +54,7 @@ public class MultiversePortals extends JavaPlugin{
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        this.portalUtils = new PortalUtils(this);
         // As soon as we know MVCore was found, we can use the debug log!
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
         this.pluginListener = new MVPPluginListener(this);
@@ -172,10 +175,15 @@ public class MultiversePortals extends JavaPlugin{
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         for(MVPortal p : all) {
-            if(p.getLocation().getMVWorld().equals(world) && p.playerCanEnterPortal((Player)sender)) {
+            if(p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) && 
+                    p.playerCanEnterPortal((Player)sender)) {
                 validItems.add(p);
             }
         }
         return validItems;
+    }
+
+    public PortalUtils getPortalUtils() {
+        return this.portalUtils;
     }
 }

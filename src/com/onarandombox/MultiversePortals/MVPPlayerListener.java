@@ -21,6 +21,10 @@ public class MVPPlayerListener extends PlayerListener {
         }
         
         // Otherwise, they actually moved. Check to see if their loc is inside a portal!
+        String portalName = this.plugin.getPortalUtils().isPortal(event.getPlayer(), event.getTo());
+        if(portalName != null) {
+            System.out.print("I FOUND A PORTAL: " + portalName);
+        }
     }
 
 }

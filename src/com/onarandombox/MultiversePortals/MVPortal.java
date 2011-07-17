@@ -2,13 +2,16 @@ package com.onarandombox.MultiversePortals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.DestinationType;
 
 public class MVPortal {
     private String name;
@@ -26,6 +29,8 @@ public class MVPortal {
         this.config = this.plugin.MVPconfig;
         this.name = name;
         this.portalConfigString = "portals." + this.name;
+        this.whitelist = new ArrayList<String>();
+        this.blacklist = new ArrayList<String>();
 
     }
 
@@ -67,22 +72,24 @@ public class MVPortal {
         this.config.save();
     }
 
-    public void setPortalLocation(String locationString, String worldString) {
+    public boolean setPortalLocation(String locationString, String worldString) {
         MVWorld world = null;
+        System.out.println(worldString);
         if (((MultiversePortals) this.plugin).getCore().isMVWorld(worldString)) {
             world = ((MultiversePortals) this.plugin).getCore().getMVWorld(worldString);
         }
-        this.setPortalLocation(locationString, world);
+        return this.setPortalLocation(locationString, world);
     }
 
-    public void setPortalLocation(String locationString, MVWorld world) {
-        this.setPortalLocation(PortalLocation.parseLocation(locationString, world));
+    public boolean setPortalLocation(String locationString, MVWorld world) {
+        return this.setPortalLocation(PortalLocation.parseLocation(locationString, world));
     }
 
-    public void setPortalLocation(PortalLocation location) {
+    public boolean setPortalLocation(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
-            System.out.print("Invalid location!");
+            this.plugin.core.log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid LOCATION!");
+            return false;
         }
         this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
         MVWorld world = this.location.getMVWorld();
@@ -90,9 +97,11 @@ public class MVPortal {
 
             this.config.setProperty(this.portalConfigString + ".world", world.getName());
         } else {
-            System.out.print("World was not valid!!");
+            this.plugin.core.log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid WORLD");
+            return false;
         }
         this.config.save();
+        return true;
     }
 
     private void setOwner(String owner) {
@@ -101,10 +110,15 @@ public class MVPortal {
         this.config.save();
     }
 
-    private void setDestination(String destinationString) {
+    private boolean setDestination(String destinationString) {
         this.destination = Destination.parseDestination(destinationString, this.plugin.core);
+        if(this.destination.getType() == DestinationType.Invalid) {
+            this.plugin.core.log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid DESTINATION!");
+            return false;
+        }
         this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
         this.config.save();
+        return true;
 
     }
 
