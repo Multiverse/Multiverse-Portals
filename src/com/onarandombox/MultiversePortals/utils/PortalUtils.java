@@ -18,7 +18,7 @@ public class PortalUtils {
         this.plugin = plugin;
     }
 
-    public String isPortal(CommandSender sender, Location l) {
+    public MVPortal isPortal(CommandSender sender, Location l) {
         if (!this.plugin.getCore().isMVWorld(l.getWorld().getName())) {
             return null;
         }
@@ -41,7 +41,7 @@ public class PortalUtils {
                 if(!(l.getBlockY() >= min.getBlockY() && l.getBlockY() <= max.getBlockY())) {
                     return null;
                 }
-                return portal.getName();
+                return portal;
             }
 
         }

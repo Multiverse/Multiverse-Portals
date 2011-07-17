@@ -74,7 +74,6 @@ public class MVPortal {
 
     public boolean setPortalLocation(String locationString, String worldString) {
         MVWorld world = null;
-        System.out.println(worldString);
         if (((MultiversePortals) this.plugin).getCore().isMVWorld(worldString)) {
             world = ((MultiversePortals) this.plugin).getCore().getMVWorld(worldString);
         }
@@ -162,6 +161,10 @@ public class MVPortal {
         }
         
         return true;
+    }
+    
+    public Destination getDestination() {
+        return this.destination;
     }
 
 }

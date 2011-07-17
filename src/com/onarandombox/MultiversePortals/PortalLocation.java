@@ -52,7 +52,6 @@ public class PortalLocation {
     }
 
     private static PortalLocation getInvalidPortalLocation() {
-        System.out.print("getting invalid location");
         return new PortalLocation();
     }
 
