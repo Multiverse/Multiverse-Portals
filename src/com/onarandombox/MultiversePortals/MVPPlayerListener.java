@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.MVPlayerSession;
 import com.onarandombox.MultiverseCore.MVWorld;
@@ -27,7 +28,7 @@ public class MVPPlayerListener extends PlayerListener {
         }
         
         // Otherwise, they actually moved. Check to see if their loc is inside a portal!
-        MVPortal portal = this.plugin.getPortalUtils().isPortal(event.getPlayer(), event.getTo());
+        MVPortal portal = this.plugin.getPortalManager().isPortal(event.getPlayer(), event.getTo());
         // If the portal is not null
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
@@ -52,6 +53,11 @@ public class MVPPlayerListener extends PlayerListener {
             if(l == null) {
                 return;
             }
+            Vector v = event.getPlayer().getVelocity();
+            System.out.print("Vector: " + v.toString());
+            System.out.print("Fall Distance: " + event.getPlayer().getFallDistance());
+            System.out.print("Is inside vehicle: " + event.getPlayer().isInsideVehicle());
+            event.getPlayer().setFallDistance(0);
             event.getPlayer().teleport(l);
         }
     }

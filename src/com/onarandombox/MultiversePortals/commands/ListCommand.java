@@ -1,12 +1,9 @@
 package com.onarandombox.MultiversePortals.commands;
 
-
-
 import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -30,7 +27,7 @@ public class ListCommand extends Command {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        for(MVPortal p : ((MultiversePortals)this.plugin).getAllPortals()) {
+        for (MVPortal p : ((MultiversePortals) this.plugin).getPortalManager().getAllPortals()) {
             sender.sendMessage(p.getName());
         }
     }

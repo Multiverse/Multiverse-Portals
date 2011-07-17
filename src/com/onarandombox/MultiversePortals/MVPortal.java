@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
@@ -61,12 +60,24 @@ public class MVPortal {
     }
 
     private void setWhitelist(List<String> stringList) {
+        for(String s : stringList) {
+            if(s.length() > 1 && s.substring(0, 2).equals("G:")) {
+                s.replaceFirst("G:", "g:");
+            }
+        }
+        
         this.whitelist = stringList;
         this.config.setProperty(this.portalConfigString + ".whitelist", this.whitelist);
         this.config.save();
     }
 
     private void setBlacklist(List<String> stringList) {
+        for(String s : stringList) {
+            if(s.length() > 1 && s.substring(0, 2).equals("G:")) {
+                s.replaceFirst("G:", "g:");
+            }
+        }
+        
         this.blacklist = stringList;
         this.config.setProperty(this.portalConfigString + ".blacklist", this.blacklist);
         this.config.save();
@@ -121,9 +132,10 @@ public class MVPortal {
 
     }
 
-    private void setName(String name) {
+    public void setName(String name) {
+        this.config.setProperty("portals." + name, this.config.getProperty("portals." + this.name));
+        this.config.save();
         this.name = name;
-        // TODO: Move values when a rename happens
     }
 
     public String getName() {
