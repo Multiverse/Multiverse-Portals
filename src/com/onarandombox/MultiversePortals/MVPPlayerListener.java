@@ -1,8 +1,9 @@
 package com.onarandombox.MultiversePortals;
 
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerMoveEvent;
+
+import com.onarandombox.MultiverseCore.MVPlayerSession;
 
 public class MVPPlayerListener extends PlayerListener {
     private MultiversePortals plugin;
@@ -11,12 +12,15 @@ public class MVPPlayerListener extends PlayerListener {
     }
     
     @Override
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Action act = event.getAction();
-        if(act == Action.LEFT_CLICK_BLOCK || act == Action.RIGHT_CLICK_BLOCK) {
-            
+    public void onPlayerMove(PlayerMoveEvent event) {
+        MVPlayerSession ps = this.plugin.core.getPlayerSession(event.getPlayer());
+        
+        // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
+        if(ps != null && ps.isStaleLocation()) {
+            return;
         }
-        super.onPlayerInteract(event);
+        
+        // Otherwise, they actually moved. Check to see if their loc is inside a portal!
     }
 
 }

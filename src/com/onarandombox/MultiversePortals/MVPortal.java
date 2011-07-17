@@ -3,6 +3,8 @@ package com.onarandombox.MultiversePortals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
@@ -79,13 +81,13 @@ public class MVPortal {
 
     public void setPortalLocation(PortalLocation location) {
         this.location = location;
-        if(!this.location.isValidLocation()) {
+        if (!this.location.isValidLocation()) {
             System.out.print("Invalid location!");
         }
         this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
         MVWorld world = this.location.getMVWorld();
         if (world != null) {
-            
+
             this.config.setProperty(this.portalConfigString + ".world", world.getName());
         } else {
             System.out.print("World was not valid!!");
@@ -113,6 +115,39 @@ public class MVPortal {
 
     public String getName() {
         return this.name;
+    }
+
+    public PortalLocation getLocation() {
+        return this.location;
+    }
+
+    public boolean playerCanEnterPortal(Player player) {
+        // First check against the whitelist
+        if (this.whitelist.contains(player.getName())) {
+            return true;
+        }
+        List<String> groups = this.plugin.core.getPermissions().getGroups(this.location.getMVWorld().getName(), player.getName());
+        for (String group : groups) {
+            if (this.whitelist.contains("g:" + group)) {
+                return true;
+            }
+        }
+        // We've searched the whitelist, if there was one, and a player was not allowed through
+        // we don't need to check any further
+        if (this.whitelist.size() > 0) {
+            return false;
+        }
+        // Now check against blacklists
+        if (this.blacklist.contains(player.getName())) {
+            return false;
+        }
+        for (String group : groups) {
+            if (this.blacklist.contains("g:" + group)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
 }

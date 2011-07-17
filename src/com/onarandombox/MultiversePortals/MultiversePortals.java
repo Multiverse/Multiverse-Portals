@@ -59,6 +59,7 @@ public class MultiversePortals extends JavaPlugin{
         // Register the PLUGIN_ENABLE Event as we will need to keep an eye out for the Core Enabling if we don't find it initially.
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
         this.portals = new HashMap<String,MVPortal>();
         this.loadPortals();
@@ -143,6 +144,38 @@ public class MultiversePortals extends JavaPlugin{
         if(!(sender instanceof Player)) {
             return this.getAllPortals();
         }
-        return null;
+        List<MVPortal> all = this.getAllPortals();
+        List<MVPortal> validItems = new ArrayList<MVPortal>();
+        for(MVPortal p : all) {
+            if(p.playerCanEnterPortal((Player)sender)) {
+                validItems.add(p);
+            }
+        }
+        return validItems;
+    }
+    
+    private List<MVPortal> getPortals(MVWorld world) {
+        List<MVPortal> all = this.getAllPortals();
+        List<MVPortal> validItems = new ArrayList<MVPortal>();
+        for(MVPortal p : all) {
+            if(p.getLocation().getMVWorld().equals(world)) {
+                validItems.add(p);
+            }
+        }
+        return validItems;
+    }
+    
+    public List<MVPortal> getPortals(CommandSender sender, MVWorld world) {
+        if(!(sender instanceof Player)) {
+            return this.getPortals(world);
+        }
+        List<MVPortal> all = this.getAllPortals();
+        List<MVPortal> validItems = new ArrayList<MVPortal>();
+        for(MVPortal p : all) {
+            if(p.getLocation().getMVWorld().equals(world) && p.playerCanEnterPortal((Player)sender)) {
+                validItems.add(p);
+            }
+        }
+        return validItems;
     }
 }
