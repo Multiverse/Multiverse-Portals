@@ -7,9 +7,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.utils.Destination;
 import com.pneumaticraft.commandhandler.Command;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -24,7 +25,7 @@ public class CreateCommand extends Command {
         this.commandDesc = "Creates a new portal, assuming you have a region selected.";
         this.commandUsage = "/mvp create {NAME}" + ChatColor.GOLD + " [DESTINATION]";
         this.minimumArgLength = 1;
-        this.maximumArgLength = 1;
+        this.maximumArgLength = 2;
         this.commandKeys.add("mvp create");
         this.commandKeys.add("mvpcreate");
         this.commandKeys.add("mvpc");
@@ -40,14 +41,14 @@ public class CreateCommand extends Command {
             return;
         }
         p = (Player) sender;
-        
-        if(!((MultiversePortals)this.plugin).getCore().isMVWorld(p.getWorld().getName())) {
-            ((MultiversePortals)this.plugin).getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
+
+        if (!((MultiversePortals) this.plugin).getCore().isMVWorld(p.getWorld().getName())) {
+            ((MultiversePortals) this.plugin).getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
             return;
         }
-        MVWorld world =((MultiversePortals)this.plugin).getCore().getMVWorld(p.getWorld().getName()); 
-        
-        WorldEditAPI api = ((MultiversePortals)this.plugin).getWEAPI();
+        MVWorld world = ((MultiversePortals) this.plugin).getCore().getMVWorld(p.getWorld().getName());
+
+        WorldEditAPI api = ((MultiversePortals) this.plugin).getWEAPI();
         if (api == null) {
             sender.sendMessage("Did not find the WorldEdit API...");
             sender.sendMessage("It is currently required to use Multiverse-Portals.");
@@ -61,11 +62,22 @@ public class CreateCommand extends Command {
             sender.sendMessage("You haven't finished your selection");
             return;
         }
-
+        MVPortal portal = ((MultiversePortals) this.plugin).getPortal(args.get(0));
         PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
-        ((MultiversePortals)this.plugin).addPortal(world, args.get(0), p.getName(), location);
-        sender.sendMessage("New portal created!");
-        
+        if (((MultiversePortals) this.plugin).addPortal(world, args.get(0), p.getName(), location)) {
+            sender.sendMessage("New portal(" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") created and selected!");
+            // If the portal did not exist, ie: we're creating it.
+            // we have to re select it, because it would be null
+            portal = ((MultiversePortals) this.plugin).getPortal(args.get(0));
+        } else {
+            sender.sendMessage("New portal(" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") was NOT created!");
+            sender.sendMessage("It already existed and has been selected.");
+
+        }
+        ((MultiversePortals) this.plugin).getPortalSession(p).selectPortal(portal);
+        if (args.size() > 1 && portal!=null) {
+            portal.setDestination(args.get(1));
+        }
 
     }
 }

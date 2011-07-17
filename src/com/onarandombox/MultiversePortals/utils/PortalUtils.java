@@ -32,16 +32,19 @@ public class PortalUtils {
             if (portalLoc.isValidLocation()) {
                 Vector min = portalLoc.getMinimum();
                 Vector max = portalLoc.getMaximum();
+                boolean playerIsInPortal = true;
                 if(!(l.getBlockX() >= min.getBlockX() && l.getBlockX() <= max.getBlockX())) {
-                    return null;
+                    playerIsInPortal = false;
                 }
                 if(!(l.getBlockZ() >= min.getBlockZ() && l.getBlockZ() <= max.getBlockZ())) {
-                    return null;
+                    playerIsInPortal = false;
                 }
                 if(!(l.getBlockY() >= min.getBlockY() && l.getBlockY() <= max.getBlockY())) {
-                    return null;
+                    playerIsInPortal = false;
                 }
-                return portal;
+                if(playerIsInPortal) {
+                    return portal;
+                }
             }
 
         }

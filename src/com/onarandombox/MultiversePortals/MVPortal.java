@@ -109,7 +109,7 @@ public class MVPortal {
         this.config.save();
     }
 
-    private boolean setDestination(String destinationString) {
+    public boolean setDestination(String destinationString) {
         this.destination = Destination.parseDestination(destinationString, this.plugin.core);
         if(this.destination.getType() == DestinationType.Invalid) {
             this.plugin.core.log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid DESTINATION!");

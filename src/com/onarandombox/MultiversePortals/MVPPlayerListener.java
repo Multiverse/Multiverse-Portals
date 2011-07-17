@@ -1,6 +1,8 @@
 package com.onarandombox.MultiversePortals;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -26,8 +28,10 @@ public class MVPPlayerListener extends PlayerListener {
         
         // Otherwise, they actually moved. Check to see if their loc is inside a portal!
         MVPortal portal = this.plugin.getPortalUtils().isPortal(event.getPlayer(), event.getTo());
-        if(portal != null) {
-            System.out.print("I FOUND A PORTAL: " + portal);
+        // If the portal is not null
+        // AND if we did not show debug info, do the stuff
+        // The debug is meant to toggle.
+        if(portal != null && !this.showDebugInfo(event.getPlayer(), portal)) {
             //TODO: Money
             Destination d = portal.getDestination();
             Location l = null;
@@ -41,6 +45,8 @@ public class MVPPlayerListener extends PlayerListener {
                 }
             } else if(d.getType() == DestinationType.Portal) {
                 
+            } else if(d.getType() == DestinationType.Exact) {
+                
             }
             
             if(l == null) {
@@ -48,6 +54,18 @@ public class MVPPlayerListener extends PlayerListener {
             }
             event.getPlayer().teleport(l);
         }
+    }
+
+    private boolean showDebugInfo(Player player, MVPortal portal) {
+        PortalPlayerSession ps = this.plugin.getPortalSession(player);
+        if(!ps.isDebugModeOn()) {
+            return false;
+        }
+        
+        player.sendMessage("You are currently standing in " + ChatColor.DARK_AQUA + portal.getName());
+        player.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
+        player.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
+        return true;
     }
 
 }

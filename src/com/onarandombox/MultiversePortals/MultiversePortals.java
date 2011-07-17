@@ -18,14 +18,13 @@ import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiversePortals.commands.CreateCommand;
-import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.MultiversePortals.commands.*;
 import com.onarandombox.MultiversePortals.utils.PortalUtils;
 import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 
-public class MultiversePortals extends JavaPlugin{
+public class MultiversePortals extends JavaPlugin {
 
     public static final Logger log = Logger.getLogger("Minecraft");
     public static final String logPrefix = "[MultiVerse-Portals] ";
@@ -40,6 +39,7 @@ public class MultiversePortals extends JavaPlugin{
     private MVPPlayerListener playerListener;
     private Map<String, MVPortal> portals;
     private PortalUtils portalUtils;
+    private Map<Player, PortalPlayerSession> portalSessions;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -64,22 +64,32 @@ public class MultiversePortals extends JavaPlugin{
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
-        this.portals = new HashMap<String,MVPortal>();
+        this.portals = new HashMap<String, MVPortal>();
         this.loadPortals();
-        
+
         registerCommands();
+        this.portalSessions = new HashMap<Player, PortalPlayerSession>();
+    }
+
+    public PortalPlayerSession getPortalSession(Player p) {
+        if (this.portalSessions.containsKey(p)) {
+            return this.portalSessions.get(p);
+        }
+        PortalPlayerSession session = new PortalPlayerSession(this, p);
+        this.portalSessions.put(p, session);
+        return session;
     }
 
     private void loadPortals() {
         this.MVPconfig = new Configuration(new File(getDataFolder(), "portals.yml"));
         this.MVPconfig.load();
         List<String> keys = this.MVPconfig.getKeys("portals");
-        if(keys != null) {
-            for(String pname : keys) {
+        if (keys != null) {
+            for (String pname : keys) {
                 this.portals.put(pname, MVPortal.loadMVPortalFromConfig(this, pname));
             }
         }
-        
+
     }
 
     public void onDisable() {
@@ -87,12 +97,13 @@ public class MultiversePortals extends JavaPlugin{
     }
 
     /**
-     * Register commands to Multiverse's CommandHandler so we get a super sexy single menu 
+     * Register commands to Multiverse's CommandHandler so we get a super sexy single menu
      */
     private void registerCommands() {
         this.commandHandler = this.core.getCommandHandler();
         this.commandHandler.registerCommand(new ListCommand(this));
         this.commandHandler.registerCommand(new CreateCommand(this));
+        this.commandHandler.registerCommand(new DebugCommand(this));
     }
 
     @Override
@@ -108,7 +119,7 @@ public class MultiversePortals extends JavaPlugin{
 
     /**
      * Parse the Authors Array into a readable String with ',' and 'and'.
-     *
+     * 
      * @return String containing all the authors formatted correctly with ',' and 'and'.
      */
     private String getAuthors() {
@@ -122,7 +133,7 @@ public class MultiversePortals extends JavaPlugin{
         }
         return authors.substring(2);
     }
-    
+
     public WorldEditAPI getWEAPI() {
         return this.worldEditAPI;
     }
@@ -130,9 +141,9 @@ public class MultiversePortals extends JavaPlugin{
     public MultiverseCore getCore() {
         return this.core;
     }
-    
-    public boolean addPortal(MVWorld world, String name, String owner, PortalLocation location){
-        if(!this.portals.containsKey(name)) {
+
+    public boolean addPortal(MVWorld world, String name, String owner, PortalLocation location) {
+        if (!this.portals.containsKey(name)) {
             this.portals.put(name, new MVPortal(this, name, owner, location));
             return true;
         }
@@ -142,41 +153,41 @@ public class MultiversePortals extends JavaPlugin{
     public List<MVPortal> getAllPortals() {
         return new ArrayList<MVPortal>(this.portals.values());
     }
-    
+
     public List<MVPortal> getPortals(CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             return this.getAllPortals();
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        for(MVPortal p : all) {
-            if(p.playerCanEnterPortal((Player)sender)) {
+        for (MVPortal p : all) {
+            if (p.playerCanEnterPortal((Player) sender)) {
                 validItems.add(p);
             }
         }
         return validItems;
     }
-    
+
     private List<MVPortal> getPortals(MVWorld world) {
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        for(MVPortal p : all) {
-            if(p.getLocation().getMVWorld().equals(world)) {
+        for (MVPortal p : all) {
+            if (p.getLocation().getMVWorld().equals(world)) {
                 validItems.add(p);
             }
         }
         return validItems;
     }
-    
+
     public List<MVPortal> getPortals(CommandSender sender, MVWorld world) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             return this.getPortals(world);
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        for(MVPortal p : all) {
-            if(p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) && 
-                    p.playerCanEnterPortal((Player)sender)) {
+        for (MVPortal p : all) {
+            if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
+                    p.playerCanEnterPortal((Player) sender)) {
                 validItems.add(p);
             }
         }
@@ -185,5 +196,12 @@ public class MultiversePortals extends JavaPlugin{
 
     public PortalUtils getPortalUtils() {
         return this.portalUtils;
+    }
+
+    public MVPortal getPortal(String portalName) {
+        if (this.portals.containsKey(portalName)) {
+            return this.portals.get(portalName);
+        }
+        return null;
     }
 }
