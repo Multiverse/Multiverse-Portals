@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
@@ -19,16 +20,13 @@ public class CreateCommand extends PortalCommand {
 
     public CreateCommand(MultiversePortals plugin) {
         super(plugin);
-        this.commandName = "Create a Portal";
-        this.commandDesc = "Creates a new portal, assuming you have a region selected.";
-        this.commandUsage = "/mvp create {NAME}" + ChatColor.GOLD + " [DESTINATION]";
-        this.minimumArgLength = 1;
-        this.maximumArgLength = 2;
-        this.commandKeys.add("mvp create");
-        this.commandKeys.add("mvpcreate");
-        this.commandKeys.add("mvpc");
-        this.permission = "multiverse.portal.create";
-        this.opRequired = true;
+        this.setName("Create a Portal");
+        this.setCommandUsage("/mvp create {NAME}" + ChatColor.GOLD + " [DESTINATION]");
+        this.setArgRange(1, 2);
+        this.addKey("mvp create");
+        this.addKey("mvpc");
+        this.addKey("mvpcreate");
+        this.setPermission("multiverse.portals.create", "Creates a new portal, assuming you have a region selected.", PermissionDefault.OP);
     }
 
     @Override

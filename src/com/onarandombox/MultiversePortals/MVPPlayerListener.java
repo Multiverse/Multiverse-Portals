@@ -20,7 +20,15 @@ public class MVPPlayerListener extends PlayerListener {
     
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
-        MVPlayerSession ps = this.plugin.core.getPlayerSession(event.getPlayer());
+        Player p = event.getPlayer(); // Grab Player
+        Location loc = p.getLocation(); // Grab Location
+        /**
+         * Check the Player has actually moved a block to prevent unneeded calculations... This is to prevent huge performance drops on high player count servers.
+         */
+        PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
+        ps.setStaleLocation(loc);
+        
+        
         
         // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
         if(ps != null && ps.isStaleLocation()) {

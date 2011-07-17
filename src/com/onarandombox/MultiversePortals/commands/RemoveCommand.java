@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -12,16 +13,14 @@ public class RemoveCommand extends PortalCommand {
 
     public RemoveCommand(MultiversePortals plugin) {
         super(plugin);
-        this.commandName = "Removes a Portal";
-        this.commandDesc = "Removes the portal with the specified name";
-        this.commandUsage = "/mvp remove {NAME}";
-        this.minimumArgLength = 1;
-        this.maximumArgLength = 1;
-        this.commandKeys.add("mvp remove");
-        this.commandKeys.add("mvpremove");
-        this.commandKeys.add("mvpr");
-        this.permission = "multiverse.portal.remove";
-        this.opRequired = true;
+        this.setName("Remove a Portal");
+        this.setCommandUsage("/mvp remove" + ChatColor.GREEN + " {NAME}");
+        // make it so no one can ever execute this.
+        this.setArgRange(1, 0);
+        this.addKey("mvp remove");
+        this.addKey("mvpremove");
+        this.addKey("mvpr");
+        this.setPermission("multiverse.portals.remove", "Allows you to modify all existing portal.", PermissionDefault.OP);
     }
 
     @Override

@@ -5,25 +5,22 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.pneumaticraft.commandhandler.Command;
 
-public class DebugCommand extends Command {
+public class DebugCommand extends PortalCommand {
 
     public DebugCommand(MultiversePortals plugin) {
         super(plugin);
-        this.commandName = "Shows you portal details while you walk";
-        this.commandDesc = "Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.";
-        this.commandUsage = "/mvp debug" + ChatColor.GOLD + " [on|off]";
-        this.minimumArgLength = 0;
-        this.maximumArgLength = 1;
-        this.commandKeys.add("mvp debug");
-        this.commandKeys.add("mvpdebug");
-        this.commandKeys.add("mvpd");
-        this.permission = "multiverse.portal.debug";
-        this.opRequired = true;
+        this.setName("Portal Debug Mode");
+        this.setCommandUsage("/mvp debug" + ChatColor.GOLD + " [on|off]");
+        this.setArgRange(0, 1);
+        this.addKey("mvp debug");
+        this.addKey("mvpd");
+        this.addKey("mvpdebug");
+        this.setPermission("multiverse.portals.debug", "Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.", PermissionDefault.OP);
     }
 
     @Override
@@ -35,12 +32,12 @@ public class DebugCommand extends Command {
         }
         p = (Player) sender;
 
-        if (!((MultiversePortals) this.plugin).getCore().isMVWorld(p.getWorld().getName())) {
-            ((MultiversePortals) this.plugin).getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
+        if (!this.plugin.getCore().isMVWorld(p.getWorld().getName())) {
+            this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
             return;
         }
         
-        PortalPlayerSession ps = ((MultiversePortals) this.plugin).getPortalSession(p);
+        PortalPlayerSession ps = this.plugin.getPortalSession(p);
         if (args.size() == 1) {
             ps.setDebugMode(args.get(0).equalsIgnoreCase("on"));
             return;

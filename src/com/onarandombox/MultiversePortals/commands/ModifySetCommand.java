@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
@@ -14,17 +15,14 @@ public class ModifySetCommand extends PortalCommand {
 
     public ModifySetCommand(MultiversePortals plugin) {
         super(plugin);
-        this.commandName = "Modify a Portal (Set a value)";
-        this.commandDesc = "Creates a new portal, assuming you have a region selected.";
-        this.commandUsage = "/mvp modify" + ChatColor.GREEN + "set {PROPERTY}" + ChatColor.GOLD + " [VALUE] -p [PORTAL]";
-        this.minimumArgLength = 1;
-        this.maximumArgLength = 4;
-        this.commandKeys.add("mvp modify set");
-        this.commandKeys.add("mvpmodify set");
-        this.commandKeys.add("mvpm set");
-        this.commandKeys.add("mvpms");
-        this.permission = "multiverse.portal.modify";
-        this.opRequired = true;
+        this.setName("Modify a Portal (Set a value)");
+        this.setCommandUsage("/mvp modify" + ChatColor.GREEN + "set {PROPERTY}" + ChatColor.GOLD + " [VALUE] -p [PORTAL]");
+        this.setArgRange(1, 4);
+        this.addKey("mvp modify set");
+        this.addKey("mvpmodify set");
+        this.addKey("mvpm set");
+        this.addKey("mvpms");
+        this.setPermission("multiverse.portals.modify.set", "Allows you to modify all values that can be set.", PermissionDefault.OP);
     }
 
     @Override
