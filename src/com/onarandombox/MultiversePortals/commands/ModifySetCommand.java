@@ -49,11 +49,6 @@ public class ModifySetCommand extends PortalCommand {
             return;
         }
         String portalName = extractPortalName(args);
-        if(valueRequired(SetProperties.valueOf(args.get(0).toLowerCase()))) {
-            if(portalName != null && args.size() == 3) {
-                
-            }
-        }
         
         
         
@@ -68,10 +63,6 @@ public class ModifySetCommand extends PortalCommand {
     private boolean userHasPortalSelected(Player player) {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
         return ps.getSelectedPortal() != null;
-    }
-
-    private boolean valueRequired(SetProperties property) {
-        return (property != SetProperties.location);
     }
 
     private boolean validCommand(List<String> args, SetProperties property) {
