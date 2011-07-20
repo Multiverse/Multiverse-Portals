@@ -1,2 +1,0 @@
-wget -N http://ci.bukkit.org/job/dev-CraftBukkit/lastSuccessfulBuild/artifact/target/craftbukkit-0.0.1-SNAPSHOT.jar
-wget -N http://jenkins.onarandombox.com/job/Multiverse-Core/lastSuccessfulBuild/artifact/build/Multiverse-Core.jar
