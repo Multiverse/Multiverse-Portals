@@ -11,6 +11,7 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
@@ -44,18 +45,10 @@ public class CreateCommand extends PortalCommand {
         }
         MVWorld world = this.plugin.getCore().getMVWorld(p.getWorld().getName());
 
-        WorldEditAPI api = this.plugin.getWEAPI();
-        if (api == null) {
-            sender.sendMessage("Did not find the WorldEdit API...");
-            sender.sendMessage("It is currently required to use Multiverse-Portals.");
-            return;
-        }
-        LocalSession s = api.getSession(p);
-        Region r = null;
-        try {
-            r = s.getSelection(s.getSelectionWorld());
-        } catch (IncompleteRegionException e) {
-            sender.sendMessage("You haven't finished your selection");
+        PortalPlayerSession ps = this.plugin.getPortalSession(p);
+        
+        Region r = ps.getSelectedRegion();
+        if (r == null) {
             return;
         }
         MVPortal portal = this.plugin.getPortalManager().getPortal(args.get(0));

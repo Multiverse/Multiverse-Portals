@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
 
@@ -29,10 +28,10 @@ public class ModifyCommand extends PortalCommand {
         this.setCommandUsage("/mvp modify" + ChatColor.GREEN + " {set|add|remove|clear} ...");
         // make it so no one can ever execute this.
         this.setArgRange(1, 0);
-        this.addKey("mvnp link");
-        this.addKey("mvnpl");
-        this.addKey("mvnplink");
-        this.setPermission("multiverse.portals.modify", "Allows you to modify all existing portal.", PermissionDefault.OP);
+        this.addKey("mvnp modify");
+        this.addKey("mvnpm");
+        this.addKey("mvnpmodify");
+        // Don't need this perm, it'll get added automatically! 
     }
 
     protected static boolean validateAction(Action action, String property) {

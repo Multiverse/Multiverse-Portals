@@ -4,6 +4,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import com.sk89q.worldedit.regions.Region;
+
 public class PortalPlayerSession {
     private MultiversePortals plugin;
     private Player player;
@@ -68,5 +73,23 @@ public class PortalPlayerSession {
             this.setStaleLocation(false);
         }
         
+    }
+    
+    public Region getSelectedRegion() {
+        WorldEditAPI api = this.plugin.getWEAPI();
+        if (api == null) {
+            this.player.sendMessage("Did not find the WorldEdit API...");
+            this.player.sendMessage("It is currently required to use Multiverse-Portals.");
+            return null;
+        }
+        LocalSession s = api.getSession(this.player);
+        Region r = null;
+        try {
+            r = s.getSelection(s.getSelectionWorld());
+        } catch (IncompleteRegionException e) {
+            this.player.sendMessage("You haven't finished your selection.");
+            return null;
+        }
+        return r;
     }
 }

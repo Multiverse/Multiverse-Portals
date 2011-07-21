@@ -17,11 +17,12 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.DebugCommand;
 import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.MultiversePortals.commands.ModifyCommand;
+import com.onarandombox.MultiversePortals.commands.ModifySetCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
@@ -33,7 +34,7 @@ public class MultiversePortals extends JavaPlugin {
     public static final Logger log = Logger.getLogger("Minecraft");
     public static final String logPrefix = "[MultiVerse-Portals] ";
     protected static DebugLog debugLog;
-    protected MultiverseCore core;
+    private MultiverseCore core;
 
     protected Configuration MVPconfig;
 
@@ -112,6 +113,8 @@ public class MultiversePortals extends JavaPlugin {
         this.commandHandler.registerCommand(new CreateCommand(this));
         this.commandHandler.registerCommand(new DebugCommand(this));
         this.commandHandler.registerCommand(new RemoveCommand(this));
+        this.commandHandler.registerCommand(new ModifySetCommand(this));
+        this.commandHandler.registerCommand(new ModifyCommand(this));
     }
 
     @Override
@@ -156,5 +159,9 @@ public class MultiversePortals extends JavaPlugin {
 
     public Configuration getMVPConfig() {
         return this.MVPconfig;
+    }
+
+    public void setCore(MultiverseCore multiverseCore) {
+        this.core = multiverseCore;
     }
 }

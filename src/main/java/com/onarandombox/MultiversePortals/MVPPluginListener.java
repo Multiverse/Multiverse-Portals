@@ -19,7 +19,7 @@ public class MVPPluginListener extends ServerListener {
     @Override
     public void onPluginEnable(PluginEnableEvent event) {
         if (event.getPlugin().getDescription().getName().equals("Multiverse-Core")) {
-            this.plugin.core = ((MultiverseCore) this.plugin.getServer().getPluginManager().getPlugin("Multiverse-Core"));
+            this.plugin.setCore(((MultiverseCore) this.plugin.getServer().getPluginManager().getPlugin("Multiverse-Core")));
             this.plugin.getServer().getPluginManager().enablePlugin(this.plugin);
         } else if(event.getPlugin().getDescription().getName().equals("WorldEdit")) {
             this.plugin.worldEditAPI = new WorldEditAPI((WorldEditPlugin)this.plugin.getServer().getPluginManager().getPlugin("WorldEdit"));
@@ -30,7 +30,7 @@ public class MVPPluginListener extends ServerListener {
     @Override
     public void onPluginDisable(PluginDisableEvent event) {
         if (event.getPlugin().getDescription().getName().equals("Multiverse-Core")) {
-            this.plugin.core = null;
+            this.plugin.setCore(null);
             this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);
         }
     }

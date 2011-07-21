@@ -46,8 +46,8 @@ public class MVPPlayerListener extends PlayerListener {
             Location l = null;
             if(d.getType() == DestinationType.World) {
                 
-                if(this.plugin.core.isMVWorld(d.getName())) {
-                    MVWorld w = this.plugin.core.getMVWorld(d.getName());
+                if(this.plugin.getCore().isMVWorld(d.getName())) {
+                    MVWorld w = this.plugin.getCore().getMVWorld(d.getName());
                     l = w.getCBWorld().getSpawnLocation();
                 } else if(this.plugin.getServer().getWorld(d.getName()) != null) {
                     l = this.plugin.getServer().getWorld(d.getName()).getSpawnLocation();
