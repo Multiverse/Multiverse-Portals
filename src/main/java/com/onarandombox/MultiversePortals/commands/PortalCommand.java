@@ -6,7 +6,11 @@ import org.bukkit.command.CommandSender;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.pneumaticraft.commandhandler.Command;
-
+/**
+ * Convenience class so we don't have to cast each time.
+ * @author fernferret
+ *
+ */
 public class PortalCommand extends Command {
 
     protected MultiversePortals plugin;

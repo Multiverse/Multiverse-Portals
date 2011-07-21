@@ -8,7 +8,11 @@ import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
-
+/**
+ * Allows removal of portals.
+ * @author fernferret
+ *
+ */
 public class RemoveCommand extends PortalCommand {
 
     public RemoveCommand(MultiversePortals plugin) {

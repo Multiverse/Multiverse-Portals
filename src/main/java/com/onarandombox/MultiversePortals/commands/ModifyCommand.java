@@ -4,60 +4,144 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
 
+import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.sk89q.worldedit.regions.Region;
 
-enum AddProperties {
-    blacklist, whitelist
-}
-
-enum Action {
-    Set, Add, Remove, Clear
-}
-
-// Color == Aliascolor
 enum SetProperties {
-    name, destination, dest, owner, location
+    destination, dest, owner, loc, location
 }
-
+/**
+ * Allows modification of portal location, destination and owner. NOT name at this time.
+ * @author fernferret
+ *
+ */
 public class ModifyCommand extends PortalCommand {
 
     public ModifyCommand(MultiversePortals plugin) {
         super(plugin);
-        this.setName("Modify a Portal");
-        this.setCommandUsage("/mvp modify" + ChatColor.GREEN + " {set|add|remove|clear} ...");
-        // make it so no one can ever execute this.
-        this.setArgRange(1, 0);
-        this.addKey("mvnp modify");
-        this.addKey("mvnpm");
-        this.addKey("mvnpmodify");
-        // Don't need this perm, it'll get added automatically! 
-    }
-
-    protected static boolean validateAction(Action action, String property) {
-        if (action == Action.Set) {
-            try {
-                SetProperties.valueOf(property);
-                return true;
-            } catch (IllegalArgumentException e) {
-                return false;
-            }
-        } else {
-            try {
-                AddProperties.valueOf(property);
-                return true;
-            } catch (IllegalArgumentException e) {
-                return false;
-            }
-        }
+        this.setName("Modify a Portal (Set a value)");
+        this.setCommandUsage("/mvp modify" + ChatColor.GREEN + " set {PROPERTY}" + ChatColor.GOLD + " [VALUE] -p [PORTAL]");
+        this.setArgRange(1, 4);
+        this.addKey("mvp modify set");
+        this.addKey("mvpmodify set");
+        this.addKey("mvpm set");
+        this.addKey("mvpms");
+        this.setPermission("multiverse.portals.modify.set", "Allows you to modify all values that can be set.", PermissionDefault.OP);
     }
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        // This is just a place holder. The real commands are in:
-        // ModifyAddCommand
-        // ModifyRemoveCommand
-        // ModifySetCommand
-        // ModifyClearCommand
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Sorry, right now this command is player only :(");
+            return;
+        }
+
+        Player player = (Player) sender;
+        if (!validateAction(args.get(0))) {
+            sender.sendMessage("Sorry, you cannot " + ChatColor.AQUA + "SET" + ChatColor.WHITE + " the property " +
+                    ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ".");
+            return;
+        }
+
+        if (!validCommand(args, SetProperties.valueOf(args.get(0)))) {
+            sender.sendMessage("Looks like you forgot or added an extra parameter.");
+            sender.sendMessage("Please try again, or see our Wiki for help!");
+            return;
+        }
+        String portalName = extractPortalName(args);
+        MVPortal selectedPortal = null;
+        // If they provided -p PORTALNAME, try to retrieve it
+        if (portalName != null) {
+            selectedPortal = this.plugin.getPortalManager().getPortal(portalName);
+            if (selectedPortal == null) {
+                sender.sendMessage("Sorry, the portal " + ChatColor.RED + portalName + ChatColor.WHITE + " did not exist!");
+                return;
+            }
+        }
+        // If they didn't provide -p, then try to use their selected portal
+        if (selectedPortal == null) {
+            selectedPortal = this.getUserSelectedPortal(player);
+        }
+
+        if (selectedPortal == null) {
+            sender.sendMessage("You need to select a portal using " + ChatColor.AQUA + "/mvp select {NAME}");
+            sender.sendMessage("or append " + ChatColor.DARK_AQUA + "-p {PORTAL}" + ChatColor.WHITE + " to this command.");
+            return;
+        }
+
+        if (portalName != null) {
+            // Simply chop off the rest, if they have loc, that's good enough!
+            if (SetProperties.valueOf(args.get(0).substring(0,3)) == SetProperties.loc) {
+                this.setLocation(selectedPortal, player);
+                return;
+            }
+
+            if (this.setProperty(selectedPortal, args.get(0), args.get(1))) {
+                sender.sendMessage("Property " + args.get(0) + " of Portal " + selectedPortal.getName() + " was set to " + args.get(1));
+            } else {
+                sender.sendMessage("Property " + args.get(0) + " of Portal " + selectedPortal.getName() + " was set to " + args.get(1));
+            }
+        }
+    }
+
+    private boolean setProperty(MVPortal selectedPortal, String property, String value) {
+        return selectedPortal.setProperty(property, value);
+    }
+
+    private void setLocation(MVPortal selectedPortal, Player player) {
+        PortalPlayerSession ps = this.plugin.getPortalSession(player);
+        Region r = ps.getSelectedRegion();
+        if (r != null) {
+            MVWorld world = this.plugin.getCore().getMVWorld(player.getWorld().getName());
+            PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
+            selectedPortal.setPortalLocation(location);
+            player.sendMessage("Portal location is not set to your selection!");
+        }
+    }
+
+    private MVPortal getUserSelectedPortal(Player player) {
+        PortalPlayerSession ps = this.plugin.getPortalSession(player);
+        return ps.getSelectedPortal();
+    }
+
+    private boolean validCommand(List<String> args, SetProperties property) {
+        // This means that they did not specify the -p or forgot the [PORTAL]
+
+        if (property == SetProperties.loc && args.size() % 2 == 0) {
+            System.out.print("Invalid params!" + args);
+            return false;
+        } else if (property != SetProperties.loc && args.size() % 2 != 0) {
+            System.out.print("Invalid params!" + args);
+            return false;
+        }
+        System.out.print("VALID params!" + args);
+        return true;
+    }
+
+    private String extractPortalName(List<String> args) {
+        if (!args.contains("-p")) {
+            return null;
+        }
+        int index = args.indexOf("-p");
+        // Now we remove the -p
+        args.remove(index);
+        // Now we remove and return the portalname
+        return args.remove(index);
+    }
+
+    protected static boolean validateAction(String property) {
+        try {
+            SetProperties.valueOf(property);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

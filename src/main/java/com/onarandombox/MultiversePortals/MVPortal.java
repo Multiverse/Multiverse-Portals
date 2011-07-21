@@ -1,11 +1,11 @@
 package com.onarandombox.MultiversePortals;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
@@ -20,17 +20,33 @@ public class MVPortal {
     private MultiversePortals plugin;
     private String owner;
     private String portalConfigString;
-    private List<String> whitelist;
-    private List<String> blacklist;
+    private Permission permission;
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
         this.config = this.plugin.MVPconfig;
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.whitelist = new ArrayList<String>();
-        this.blacklist = new ArrayList<String>();
+        this.setPermission("multiverse.portal.access." + this.name);
+    }
 
+    private void setPermission(String portalName) {
+        Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
+        Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
+        Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
+        if (this.permission != null) {
+            this.plugin.getServer().getPluginManager().removePermission(this.permission.getName());
+            all.getChildren().remove(this.permission.getName());
+            allPortals.getChildren().remove(this.permission.getName());
+            allPortalAccess.getChildren().remove(this.permission.getName());
+        }
+        this.permission = new Permission("multiverse.portal.access." + portalName, PermissionDefault.TRUE);
+        all.getChildren().put("multiverse.portal.access." + portalName, true);
+        allPortals.getChildren().put("multiverse.portal.access." + portalName, true);
+        allPortalAccess.getChildren().put("multiverse.portal.access." + portalName, true);
+        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
+        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
+        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
     }
 
     public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
@@ -42,8 +58,7 @@ public class MVPortal {
         portal.setPortalLocation(portalLocString, worldString);
 
         portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
-        portal.setWhitelist(portal.config.getStringList(portal.portalConfigString + ".whitelist", new ArrayList<String>()));
-        portal.setBlacklist(portal.config.getStringList(portal.portalConfigString + ".blacklist", new ArrayList<String>()));
+
         return portal;
     }
 
@@ -57,30 +72,6 @@ public class MVPortal {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location);
-    }
-
-    private void setWhitelist(List<String> stringList) {
-        for (String s : stringList) {
-            if (s.length() > 1 && s.substring(0, 2).equals("G:")) {
-                s.replaceFirst("G:", "g:");
-            }
-        }
-
-        this.whitelist = stringList;
-        this.config.setProperty(this.portalConfigString + ".whitelist", this.whitelist);
-        this.config.save();
-    }
-
-    private void setBlacklist(List<String> stringList) {
-        for (String s : stringList) {
-            if (s.length() > 1 && s.substring(0, 2).equals("G:")) {
-                s.replaceFirst("G:", "g:");
-            }
-        }
-
-        this.blacklist = stringList;
-        this.config.setProperty(this.portalConfigString + ".blacklist", this.blacklist);
-        this.config.save();
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
@@ -114,10 +105,11 @@ public class MVPortal {
         return true;
     }
 
-    private void setOwner(String owner) {
+    private boolean setOwner(String owner) {
         this.owner = owner;
         this.config.setProperty(this.portalConfigString + ".owner", this.owner);
         this.config.save();
+        return true;
     }
 
     public boolean setDestination(String destinationString) {
@@ -132,10 +124,12 @@ public class MVPortal {
 
     }
 
-    public void setName(String name) {
+    public boolean setName(String name) {
         this.config.setProperty("portals." + name, this.config.getProperty("portals." + this.name));
         this.config.save();
+        this.setPermission(name);
         this.name = name;
+        return true;
     }
 
     public String getName() {
@@ -152,6 +146,21 @@ public class MVPortal {
 
     public Destination getDestination() {
         return this.destination;
+    }
+
+    public boolean setProperty(String property, String value) {
+        if (property.equalsIgnoreCase("name")) {
+            return this.setName(value);
+        }
+
+        if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
+            return this.setDestination(value);
+        }
+
+        if (property.equalsIgnoreCase("owner")) {
+            return this.setOwner(value);
+        }
+        return false;
     }
 
 }

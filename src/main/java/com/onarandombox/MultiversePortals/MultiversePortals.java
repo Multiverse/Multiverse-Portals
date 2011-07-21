@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockListener;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
@@ -22,7 +23,6 @@ import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.DebugCommand;
 import com.onarandombox.MultiversePortals.commands.ListCommand;
 import com.onarandombox.MultiversePortals.commands.ModifyCommand;
-import com.onarandombox.MultiversePortals.commands.ModifySetCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
@@ -61,6 +61,7 @@ public class MultiversePortals extends JavaPlugin {
             return;
         }
         this.core.incrementPluginCount();
+        createDefaultPerms();
         this.portalManager = new PortalManager(this);
         // As soon as we know MVCore was found, we can use the debug log!
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
@@ -77,6 +78,23 @@ public class MultiversePortals extends JavaPlugin {
 
         registerCommands();
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
+        
+        
+    }
+
+    private void createDefaultPerms() {
+        if(this.getServer().getPluginManager().getPermission("multiverse.*") == null) {
+            Permission perm = new Permission("multiverse.*");
+            this.getServer().getPluginManager().addPermission(perm);
+        }
+        if(this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
+            Permission perm = new Permission("multiverse.portal.*");
+            this.getServer().getPluginManager().addPermission(perm);
+        }
+        if(this.getServer().getPluginManager().getPermission("multiverse.portal.access.*") == null) {
+            Permission perm = new Permission("multiverse.portal.access.*");
+            this.getServer().getPluginManager().addPermission(perm);
+        }
     }
 
     public PortalPlayerSession getPortalSession(Player p) {
@@ -113,7 +131,6 @@ public class MultiversePortals extends JavaPlugin {
         this.commandHandler.registerCommand(new CreateCommand(this));
         this.commandHandler.registerCommand(new DebugCommand(this));
         this.commandHandler.registerCommand(new RemoveCommand(this));
-        this.commandHandler.registerCommand(new ModifySetCommand(this));
         this.commandHandler.registerCommand(new ModifyCommand(this));
     }
 

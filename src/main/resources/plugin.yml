@@ -24,3 +24,6 @@ commands:
   mvpmodify:
     description: Generic Multiverse-Portals Command
     usage: /<command>
+  mvpms:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>

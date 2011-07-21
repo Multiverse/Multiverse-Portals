@@ -15,7 +15,11 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
-
+/**
+ * Manages all portals for all worlds.
+ * @author fernferret
+ *
+ */
 public class PortalManager {
     private MultiversePortals plugin;
     private Map<String, MVPortal> portals;

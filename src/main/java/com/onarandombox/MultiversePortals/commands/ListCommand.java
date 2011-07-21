@@ -8,7 +8,6 @@ import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.pneumaticraft.commandhandler.Command;
 
 public class ListCommand extends PortalCommand {
 

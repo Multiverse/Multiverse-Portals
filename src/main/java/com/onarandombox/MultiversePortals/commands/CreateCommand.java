@@ -12,10 +12,7 @@ import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.regions.Region;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 public class CreateCommand extends PortalCommand {
 
@@ -47,7 +44,7 @@ public class CreateCommand extends PortalCommand {
 
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
         
-        Region r = ps.getSelectedRegion();
+        MultiverseRegion r = MultiverseRegion.getMVRegion(ps.getSelectedRegion());
         if (r == null) {
             return;
         }
