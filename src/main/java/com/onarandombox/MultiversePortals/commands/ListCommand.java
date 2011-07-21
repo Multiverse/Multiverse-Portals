@@ -24,7 +24,7 @@ public class ListCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        for (MVPortal p : this.plugin.getPortalManager().getAllPortals()) {
+        for (MVPortal p : this.plugin.getPortalManager().getPortals(sender)) {
             sender.sendMessage(p.getName());
         }
     }

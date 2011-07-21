@@ -27,13 +27,12 @@ public class ModifyCommand extends PortalCommand {
     public ModifyCommand(MultiversePortals plugin) {
         super(plugin);
         this.setName("Modify a Portal (Set a value)");
-        this.setCommandUsage("/mvp modify" + ChatColor.GREEN + " set {PROPERTY}" + ChatColor.GOLD + " [VALUE] -p [PORTAL]");
+        this.setCommandUsage("/mvp modify" + ChatColor.GREEN + " {PROPERTY}" + ChatColor.GOLD + " [VALUE] -p [PORTAL]");
         this.setArgRange(1, 4);
-        this.addKey("mvp modify set");
-        this.addKey("mvpmodify set");
-        this.addKey("mvpm set");
-        this.addKey("mvpms");
-        this.setPermission("multiverse.portals.modify.set", "Allows you to modify all values that can be set.", PermissionDefault.OP);
+        this.addKey("mvp modify");
+        this.addKey("mvpmodify");
+        this.addKey("mvpm");
+        this.setPermission("multiverse.portals.modify", "Allows you to modify all values that can be set.", PermissionDefault.OP);
     }
 
     @Override
@@ -78,7 +77,7 @@ public class ModifyCommand extends PortalCommand {
 
         if (portalName != null) {
             // Simply chop off the rest, if they have loc, that's good enough!
-            if (SetProperties.valueOf(args.get(0).substring(0,3)) == SetProperties.loc) {
+            if (SetProperties.valueOf(args.get(0)) == SetProperties.loc || SetProperties.valueOf(args.get(0)) == SetProperties.location) {
                 this.setLocation(selectedPortal, player);
                 return;
             }

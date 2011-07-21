@@ -61,7 +61,7 @@ public class MultiversePortals extends JavaPlugin {
             return;
         }
         this.core.incrementPluginCount();
-        createDefaultPerms();
+        
         this.portalManager = new PortalManager(this);
         // As soon as we know MVCore was found, we can use the debug log!
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
@@ -74,6 +74,7 @@ public class MultiversePortals extends JavaPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
+        createDefaultPerms();
         this.loadPortals();
 
         registerCommands();

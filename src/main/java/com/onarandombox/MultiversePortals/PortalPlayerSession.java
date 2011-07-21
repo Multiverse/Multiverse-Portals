@@ -67,7 +67,6 @@ public class PortalPlayerSession {
     public void setStaleLocation(Location loc) {
         if (this.getLocation().getBlockX() == loc.getBlockX() && this.getLocation().getBlockY() == loc.getBlockY() && this.getLocation().getBlockZ() == loc.getBlockZ()) {
             this.setStaleLocation(true);
-            return;
         } else {
             this.setLocation(loc); // Update the Players Session to the new Location.
             this.setStaleLocation(false);

@@ -27,7 +27,7 @@ public class MVPortal {
         this.config = this.plugin.MVPconfig;
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.setPermission("multiverse.portal.access." + this.name);
+        this.setPermission(this.name);
     }
 
     private void setPermission(String portalName) {
@@ -141,7 +141,7 @@ public class MVPortal {
     }
 
     public boolean playerCanEnterPortal(Player player) {
-        return (this.plugin.getCore().getPermissions().hasPermission(player, "multiverse.portals.access." + this.name, false));
+        return (this.plugin.getCore().getPermissions().hasPermission(player, "multiverse.portal.access." + this.getName(), false));
     }
 
     public Destination getDestination() {

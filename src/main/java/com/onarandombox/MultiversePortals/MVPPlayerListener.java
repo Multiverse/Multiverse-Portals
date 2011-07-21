@@ -31,9 +31,10 @@ public class MVPPlayerListener extends PlayerListener {
         
         
         // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
-        if(ps != null && ps.isStaleLocation()) {
+        if(ps.isStaleLocation()) {
             return;
         }
+        
         
         // Otherwise, they actually moved. Check to see if their loc is inside a portal!
         MVPortal portal = this.plugin.getPortalManager().isPortal(event.getPlayer(), event.getTo());
