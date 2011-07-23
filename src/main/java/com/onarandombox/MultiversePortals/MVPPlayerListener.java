@@ -7,10 +7,8 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-import com.onarandombox.MultiverseCore.MVPlayerSession;
-import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.utils.Destination;
-import com.onarandombox.utils.DestinationType;
+import com.onarandombox.utils.InvalidDestination;
 
 public class MVPPlayerListener extends PlayerListener {
     private MultiversePortals plugin;
@@ -44,29 +42,17 @@ public class MVPPlayerListener extends PlayerListener {
         if(portal != null && !this.showDebugInfo(event.getPlayer(), portal)) {
             //TODO: Money
             Destination d = portal.getDestination();
-            Location l = null;
-            if(d.getType() == DestinationType.World) {
-                
-                if(this.plugin.getCore().isMVWorld(d.getName())) {
-                    MVWorld w = this.plugin.getCore().getMVWorld(d.getName());
-                    l = w.getCBWorld().getSpawnLocation();
-                } else if(this.plugin.getServer().getWorld(d.getName()) != null) {
-                    l = this.plugin.getServer().getWorld(d.getName()).getSpawnLocation();
-                }
-            } else if(d.getType() == DestinationType.Portal) {
-                
-            } else if(d.getType() == DestinationType.Exact) {
-                
-            }
             
-            if(l == null) {
-                return;
-            }
+            Location l = d.getLocation();
             Vector v = event.getPlayer().getVelocity();
             System.out.print("Vector: " + v.toString());
             System.out.print("Fall Distance: " + event.getPlayer().getFallDistance());
             System.out.print("Is inside vehicle: " + event.getPlayer().isInsideVehicle());
             event.getPlayer().setFallDistance(0);
+            
+            if(d instanceof InvalidDestination) {
+                return;
+            }
             event.getPlayer().teleport(l);
         }
     }

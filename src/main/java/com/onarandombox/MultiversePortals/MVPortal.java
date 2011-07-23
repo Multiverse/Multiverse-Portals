@@ -10,7 +10,7 @@ import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.utils.Destination;
-import com.onarandombox.utils.DestinationType;
+import com.onarandombox.utils.InvalidDestination;
 
 public class MVPortal {
     private String name;
@@ -113,9 +113,9 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
-        this.destination = Destination.parseDestination(destinationString, this.plugin.getCore());
-        if (this.destination.getType() == DestinationType.Invalid) {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid DESTINATION!");
+        this.destination = this.plugin.getCore().getDestinationFactory().getDestination(destinationString);
+        if (this.destination instanceof InvalidDestination) {
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name  + " has an invalid DESTINATION!");
             return false;
         }
         this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
