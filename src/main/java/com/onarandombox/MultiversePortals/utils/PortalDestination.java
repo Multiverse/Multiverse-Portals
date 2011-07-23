@@ -33,19 +33,12 @@ public class PortalDestination extends Destination {
     @Override
     public Location getLocation() {
         PortalLocation pl = this.portal.getLocation();
-        double portalWidth = Math.abs(pl.getMaximum().getBlockX() - pl.getMinimum().getBlockX());
-        double portalDepth = Math.abs(pl.getMaximum().getBlockZ() - pl.getMinimum().getBlockZ());
-        double portalHeight = Math.abs(pl.getMaximum().getBlockY() - pl.getMinimum().getBlockY());
+        double portalWidth = Math.abs((pl.getMaximum().getBlockX() + 1.0) - pl.getMinimum().getBlockX());
+        double portalDepth = Math.abs((pl.getMaximum().getBlockZ() + 1.0) - pl.getMinimum().getBlockZ());
         
         double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
         double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
-        if(portalWidth > portalDepth) {
-            // This is normal in my head.
-            finalZ += (portalDepth / 2.0) + 2;
-        } else {
-            finalX += (portalDepth / 2.0) + 2;
-        }
         
         return new Location(this.portal.getWorld(), finalX, finalY, finalZ);
     }
