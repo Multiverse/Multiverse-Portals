@@ -51,6 +51,7 @@ public class MVPPlayerListener extends PlayerListener {
             event.getPlayer().setFallDistance(0);
             
             if(d instanceof InvalidDestination) {
+                System.out.print("Invalid dest!");
                 return;
             }
             event.getPlayer().teleport(l);

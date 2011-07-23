@@ -3,6 +3,7 @@ package com.onarandombox.MultiversePortals;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -10,6 +11,7 @@ import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.ExactDestination;
 import com.onarandombox.utils.InvalidDestination;
 
 public class MVPortal {
@@ -27,23 +29,18 @@ public class MVPortal {
         this.config = this.plugin.MVPconfig;
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.setPermission(this.name);
+        this.setPermission();
+        
     }
 
-    private void setPermission(String portalName) {
+    private void setPermission() {
         Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
         Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
         Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
-        if (this.permission != null) {
-            this.plugin.getServer().getPluginManager().removePermission(this.permission.getName());
-            all.getChildren().remove(this.permission.getName());
-            allPortals.getChildren().remove(this.permission.getName());
-            allPortalAccess.getChildren().remove(this.permission.getName());
-        }
-        this.permission = new Permission("multiverse.portal.access." + portalName, PermissionDefault.TRUE);
-        all.getChildren().put("multiverse.portal.access." + portalName, true);
-        allPortals.getChildren().put("multiverse.portal.access." + portalName, true);
-        allPortalAccess.getChildren().put("multiverse.portal.access." + portalName, true);
+        this.permission = new Permission("multiverse.portal.access." + this.getName(), PermissionDefault.TRUE);
+        all.getChildren().put("multiverse.portal.access." + this.getName(), true);
+        allPortals.getChildren().put("multiverse.portal.access." + this.getName(), true);
+        allPortalAccess.getChildren().put("multiverse.portal.access." + this.getName(), true);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
@@ -115,20 +112,24 @@ public class MVPortal {
     public boolean setDestination(String destinationString) {
         this.destination = this.plugin.getCore().getDestinationFactory().getDestination(destinationString);
         if (this.destination instanceof InvalidDestination) {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name  + " has an invalid DESTINATION!");
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
         this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
         this.config.save();
         return true;
-
     }
 
-    public boolean setName(String name) {
-        this.config.setProperty("portals." + name, this.config.getProperty("portals." + this.name));
+    public boolean setExactDestination(Location location) {
+        this.destination = new ExactDestination();
+        ((ExactDestination) this.destination).setDestination(location);
+        if (!this.destination.isValid()) {
+            this.destination = new InvalidDestination();
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
+            return false;
+        }
+        this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
         this.config.save();
-        this.setPermission(name);
-        this.name = name;
         return true;
     }
 
@@ -141,7 +142,7 @@ public class MVPortal {
     }
 
     public boolean playerCanEnterPortal(Player player) {
-        return (this.plugin.getCore().getPermissions().hasPermission(player, "multiverse.portal.access." + this.getName(), false));
+        return (this.plugin.getCore().getPermissions().hasPermission(player, this.permission.getName(), false));
     }
 
     public Destination getDestination() {
@@ -149,10 +150,6 @@ public class MVPortal {
     }
 
     public boolean setProperty(String property, String value) {
-        if (property.equalsIgnoreCase("name")) {
-            return this.setName(value);
-        }
-
         if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
             return this.setDestination(value);
         }

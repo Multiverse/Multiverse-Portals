@@ -20,7 +20,7 @@ public class RemoveCommand extends PortalCommand {
         this.setName("Remove a Portal");
         this.setCommandUsage("/mvp remove" + ChatColor.GREEN + " {NAME}");
         // make it so no one can ever execute this.
-        this.setArgRange(1, 0);
+        this.setArgRange(1, 1);
         this.addKey("mvp remove");
         this.addKey("mvpremove");
         this.addKey("mvpr");

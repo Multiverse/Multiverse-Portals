@@ -84,10 +84,6 @@ public class MultiversePortals extends JavaPlugin {
     }
 
     private void createDefaultPerms() {
-        if(this.getServer().getPluginManager().getPermission("multiverse.*") == null) {
-            Permission perm = new Permission("multiverse.*");
-            this.getServer().getPluginManager().addPermission(perm);
-        }
         if(this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
             Permission perm = new Permission("multiverse.portal.*");
             this.getServer().getPluginManager().addPermission(perm);
@@ -96,6 +92,14 @@ public class MultiversePortals extends JavaPlugin {
             Permission perm = new Permission("multiverse.portal.access.*");
             this.getServer().getPluginManager().addPermission(perm);
         }
+        // Now add these to our parent one.
+        Permission allPortals = this.getServer().getPluginManager().getPermission("multiverse.portal.*");
+        allPortals.getChildren().put("multiverse.portal.access.*", true);
+        this.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
+        
+        Permission all = this.getServer().getPluginManager().getPermission("multiverse.*");
+        all.getChildren().put("multiverse.portal.*", true);
+        this.getServer().getPluginManager().recalculatePermissionDefaults(all);
     }
 
     public PortalPlayerSession getPortalSession(Player p) {

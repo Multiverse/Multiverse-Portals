@@ -43,7 +43,7 @@ public class CreateCommand extends PortalCommand {
         MVWorld world = this.plugin.getCore().getMVWorld(p.getWorld().getName());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
-        
+
         MultiverseRegion r = MultiverseRegion.getMVRegion(ps.getSelectedRegion());
         if (r == null) {
             return;
@@ -61,8 +61,14 @@ public class CreateCommand extends PortalCommand {
 
         }
         this.plugin.getPortalSession(p).selectPortal(portal);
-        if (args.size() > 1 && portal!=null) {
-            portal.setDestination(args.get(1));
+        if (args.size() > 1 && portal != null) {
+            String dest = args.get(1);
+            if(dest.equalsIgnoreCase("here")) {
+                portal.setExactDestination(p.getLocation());
+            } else {
+                portal.setDestination(args.get(1));
+            }
+            
         }
 
     }
