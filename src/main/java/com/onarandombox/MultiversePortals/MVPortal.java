@@ -4,6 +4,7 @@ import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -158,6 +159,10 @@ public class MVPortal {
             return this.setOwner(value);
         }
         return false;
+    }
+
+    public World getWorld() {
+        return this.location.getMVWorld().getCBWorld();
     }
 
 }

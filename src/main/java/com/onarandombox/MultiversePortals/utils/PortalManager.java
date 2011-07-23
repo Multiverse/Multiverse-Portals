@@ -141,7 +141,6 @@ public class PortalManager {
 
     public boolean isPortal(String portalName) {
         return this.portals.containsKey(portalName);
-
     }
 
 }

@@ -24,6 +24,7 @@ import com.onarandombox.MultiversePortals.commands.DebugCommand;
 import com.onarandombox.MultiversePortals.commands.ListCommand;
 import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
+import com.onarandombox.MultiversePortals.utils.PortalDestination;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
@@ -79,8 +80,7 @@ public class MultiversePortals extends JavaPlugin {
 
         registerCommands();
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
-        
-        
+        this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
     }
 
     private void createDefaultPerms() {
