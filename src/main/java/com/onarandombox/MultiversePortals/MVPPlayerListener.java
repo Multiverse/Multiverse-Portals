@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.utils.Destination;
@@ -15,7 +16,11 @@ public class MVPPlayerListener extends PlayerListener {
     public MVPPlayerListener(MultiversePortals plugin) {
         this.plugin = plugin;
     }
-    
+    @Override
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        this.plugin.getPortalSession(event.getPlayer()).playerDidTeleport();
+        super.onPlayerTeleport(event);
+    }
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
         Player p = event.getPlayer(); // Grab Player
@@ -52,7 +57,7 @@ public class MVPPlayerListener extends PlayerListener {
                 System.out.print("Invalid dest!");
                 return;
             }
-            ps.didTeleportPlayer();
+            ps.playerDidTeleport();
             event.getPlayer().teleport(l);
         }
     }

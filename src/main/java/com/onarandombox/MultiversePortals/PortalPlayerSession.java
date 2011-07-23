@@ -117,7 +117,7 @@ public class PortalPlayerSession {
         return this.standingIn;
     }
 
-    public void didTeleportPlayer() {
+    public void playerDidTeleport() {
         this.hasMovedOutOfPortal = false;
     }
 }
