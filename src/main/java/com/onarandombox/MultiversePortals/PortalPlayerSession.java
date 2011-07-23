@@ -3,7 +3,10 @@ package com.onarandombox.MultiversePortals;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
+import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.InvalidDestination;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
@@ -14,8 +17,10 @@ public class PortalPlayerSession {
     private Player player;
 
     private MVPortal portalSelection = null;
+    private MVPortal standingIn = null;
     private boolean debugMode;
     private boolean staleLocation;
+    private boolean hasMovedOutOfPortal = true;
     private Location loc;
 
     public PortalPlayerSession(MultiversePortals plugin, Player p) {
@@ -42,6 +47,7 @@ public class PortalPlayerSession {
             this.player.sendMessage("Portal debug mode " + ChatColor.RED + "DISABLED");
         }
     }
+
     public boolean isDebugModeOn() {
         return this.debugMode;
     }
@@ -49,15 +55,30 @@ public class PortalPlayerSession {
     public void setStaleLocation(boolean active) {
         this.staleLocation = active;
     }
-    
+
     public boolean isStaleLocation() {
         return this.staleLocation;
     }
 
-    public void setLocation(Location loc) {
-        // Perform rounding to always have integer values
+    private void setLocation(Location loc) {
+
         this.loc = loc;
-        
+        this.setStandinginLocation();
+    }
+
+    private void setStandinginLocation() {
+        if (this.standingIn == null) {
+            this.standingIn = this.plugin.getPortalManager().isPortal(this.player, this.loc);
+        } else if (this.plugin.getPortalManager().isPortal(this.player, this.loc) == null) {
+            this.hasMovedOutOfPortal = true;
+            this.standingIn = null;
+        } else {
+            this.hasMovedOutOfPortal = false;
+        }
+    }
+    
+    public boolean doTeleportPlayer() {
+        return this.hasMovedOutOfPortal == true && this.standingIn != null;
     }
 
     public Location getLocation() {
@@ -71,9 +92,9 @@ public class PortalPlayerSession {
             this.setLocation(loc); // Update the Players Session to the new Location.
             this.setStaleLocation(false);
         }
-        
+
     }
-    
+
     public Region getSelectedRegion() {
         WorldEditAPI api = this.plugin.getWEAPI();
         if (api == null) {
@@ -90,5 +111,13 @@ public class PortalPlayerSession {
             return null;
         }
         return r;
+    }
+
+    public MVPortal getStandingInPortal() {
+        return this.standingIn;
+    }
+
+    public void didTeleportPlayer() {
+        this.hasMovedOutOfPortal = false;
     }
 }

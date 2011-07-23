@@ -33,13 +33,11 @@ public class MVPPlayerListener extends PlayerListener {
             return;
         }
         
-        
-        // Otherwise, they actually moved. Check to see if their loc is inside a portal!
-        MVPortal portal = this.plugin.getPortalManager().isPortal(event.getPlayer(), event.getTo());
+        MVPortal portal = ps.getStandingInPortal();
         // If the portal is not null
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
-        if(portal != null && !this.showDebugInfo(event.getPlayer(), portal)) {
+        if(portal != null &&ps.doTeleportPlayer() && !this.showDebugInfo(event.getPlayer(), portal)) {
             //TODO: Money
             Destination d = portal.getDestination();
             
@@ -54,6 +52,7 @@ public class MVPPlayerListener extends PlayerListener {
                 System.out.print("Invalid dest!");
                 return;
             }
+            ps.didTeleportPlayer();
             event.getPlayer().teleport(l);
         }
     }
