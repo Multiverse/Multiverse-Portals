@@ -99,5 +99,10 @@ public class PortalDestination extends Destination {
         return "p:" + this.portal.getName();
 
     }
+    
+
+    public String getOrientationString() {
+        return this.orientationString;
+    }
 
 }
