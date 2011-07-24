@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.permissions.Permission;
@@ -129,6 +128,14 @@ public class MultiversePortals extends JavaPlugin {
                 this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
             }
         }
+        // Now Resolve destinations
+        for(MVPortal portal : this.portalManager.getAllPortals()) {
+            String dest = this.MVPconfig.getString("portals." + portal.getName() + ".destination", "");
+            if(dest != "") {
+                portal.setDestination(dest);
+            }
+        }
+        
 
     }
 

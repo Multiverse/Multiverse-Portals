@@ -3,10 +3,9 @@ package com.onarandombox.MultiversePortals;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.event.Event.Type;
 
-import com.onarandombox.utils.Destination;
-import com.onarandombox.utils.InvalidDestination;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
@@ -61,7 +60,6 @@ public class PortalPlayerSession {
     }
 
     private void setLocation(Location loc) {
-
         this.loc = loc;
         this.setStandinginLocation();
     }
@@ -76,8 +74,11 @@ public class PortalPlayerSession {
             this.hasMovedOutOfPortal = false;
         }
     }
-    
-    public boolean doTeleportPlayer() {
+
+    public boolean doTeleportPlayer(Type eventType) {
+        if (eventType == Type.PLAYER_MOVE && this.player.isInsideVehicle()) {
+            return false;
+        }
         return this.hasMovedOutOfPortal == true && this.standingIn != null;
     }
 
@@ -85,7 +86,10 @@ public class PortalPlayerSession {
         return this.loc;
     }
 
-    public void setStaleLocation(Location loc) {
+    public void setStaleLocation(Location loc, Type moveType) {
+        if (this.player.isInsideVehicle() && moveType != Type.VEHICLE_MOVE) {
+            return;
+        }
         if (this.getLocation().getBlockX() == loc.getBlockX() && this.getLocation().getBlockY() == loc.getBlockY() && this.getLocation().getBlockZ() == loc.getBlockZ()) {
             this.setStaleLocation(true);
         } else {
@@ -116,10 +120,37 @@ public class PortalPlayerSession {
     public MVPortal getStandingInPortal() {
         return this.standingIn;
     }
+
     /**
      * This method should be called every time a player telports to a portal.
+     * 
+     * @param location
      */
-    public void playerDidTeleport() {
-        this.hasMovedOutOfPortal = false;
+    public void playerDidTeleport(Location location) {
+        PortalManager pm = this.plugin.getPortalManager();
+        if (pm.isPortal(this.player, location) != null) {
+            this.hasMovedOutOfPortal = false;
+            return;
+        }
+        this.hasMovedOutOfPortal = true;
+    }
+
+    public boolean hasMovedOutOfPortal() {
+        return this.hasMovedOutOfPortal;
+    }
+
+    public boolean showDebugInfo() {
+        if (!this.isDebugModeOn()) {
+            return false;
+        }
+
+        if (this.standingIn == null) {
+            return false;
+        }
+
+        player.sendMessage("You are currently standing in " + ChatColor.DARK_AQUA + this.standingIn.getName());
+        player.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + this.standingIn.getDestination().getType());
+        player.sendMessage("The destination's name is: " + ChatColor.GREEN + this.standingIn.getDestination().getName());
+        return true;
     }
 }

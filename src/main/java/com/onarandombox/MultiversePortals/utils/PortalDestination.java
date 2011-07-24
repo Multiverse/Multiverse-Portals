@@ -122,6 +122,7 @@ public class PortalDestination extends Destination {
     @Override
     public String toString() {
         return "p:" + this.portal.getName();
+
     }
 
 }

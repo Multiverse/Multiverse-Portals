@@ -64,7 +64,9 @@ public class MVPortal {
 
     public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
         MVPortal portal = new MVPortal(instance, name);
-        portal.setDestination(portal.config.getString(portal.portalConfigString + ".destination", ""));
+        // Don't load portals from configs, as we have a linked list issue
+        // Have to load all portals first, then resolve their destinations.
+        //portal.setDestination(portal.config.getString(portal.portalConfigString + ".destination", ""));
 
         String portalLocString = portal.config.getString(portal.portalConfigString + ".location", "");
         String worldString = portal.config.getString(portal.portalConfigString + ".world", "");
@@ -79,14 +81,12 @@ public class MVPortal {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location, world);
-        System.out.print(this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.getName()));
     }
     
     public MVPortal(MultiversePortals instance, String name, String owner, PortalLocation location) {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location);
-        System.out.print(this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.getName()));
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
@@ -128,6 +128,7 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
+        this.plugin.getCore().log(Level.WARNING, destinationString);
         this.destination = this.plugin.getCore().getDestinationFactory().getDestination(destinationString);
         if (this.destination instanceof InvalidDestination) {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
