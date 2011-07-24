@@ -55,7 +55,8 @@ public class MVPVehicleListener extends VehicleListener {
                 // System.out.print("Invalid dest!");
                 return false;
             }
-            ps.playerDidTeleport(l);
+            ps.playerDidTeleport(to);
+            
             v.teleport(l);
             return true;
         }

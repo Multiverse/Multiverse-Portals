@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import com.onarandombox.MultiverseCore.MVTeleport;
 import com.onarandombox.utils.Destination;
 import com.onarandombox.utils.InvalidDestination;
 
@@ -59,8 +60,11 @@ public class MVPPlayerListener extends PlayerListener {
                 // System.out.print("Invalid dest!");
                 return;
             }
-            ps.playerDidTeleport(event.getTo());
-            event.getPlayer().teleport(l);
+            
+            MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
+            if(playerTeleporter.safelyTeleport(event.getPlayer(), l)) {
+                ps.playerDidTeleport(event.getTo());
+            }
         }
     }
 }
