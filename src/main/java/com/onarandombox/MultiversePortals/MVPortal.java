@@ -81,7 +81,7 @@ public class MVPortal {
         this.setPortalLocation(location, world);
         System.out.print(this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.getName()));
     }
-
+    
     public MVPortal(MultiversePortals instance, String name, String owner, PortalLocation location) {
         this(instance, name);
         this.setOwner(owner);

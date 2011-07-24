@@ -50,7 +50,6 @@ public class MVPPlayerListener extends PlayerListener {
             Vector v = event.getPlayer().getVelocity();
             System.out.print("Vector: " + v.toString());
             System.out.print("Fall Distance: " + event.getPlayer().getFallDistance());
-            System.out.print("Is inside vehicle: " + event.getPlayer().isInsideVehicle());
             event.getPlayer().setFallDistance(0);
             
             if(d instanceof InvalidDestination) {

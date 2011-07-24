@@ -13,7 +13,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockListener;
+import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
@@ -48,6 +50,7 @@ public class MultiversePortals extends JavaPlugin {
     private PortalManager portalManager;
     private Map<Player, PortalPlayerSession> portalSessions;
     private BlockListener blockListener;
+    private VehicleListener vehicleListener;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -70,12 +73,14 @@ public class MultiversePortals extends JavaPlugin {
         this.pluginListener = new MVPPluginListener(this);
         this.playerListener = new MVPPlayerListener(this);
         this.blockListener = new MVPBlockListener(this);
+        this.vehicleListener = new MVPVehicleListener(this);
         // Register the PLUGIN_ENABLE Event as we will need to keep an eye out for the Core Enabling if we don't find it initially.
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
         createDefaultPerms();
         
