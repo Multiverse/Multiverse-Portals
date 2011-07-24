@@ -15,6 +15,9 @@ public class MultiverseRegion extends CuboidRegion{
     }
 
     public static MultiverseRegion getMVRegion(Region selectedRegion) {
+        if(selectedRegion == null) {
+            return null;
+        }
         return new MultiverseRegion(selectedRegion.getMinimumPoint(), selectedRegion.getMaximumPoint());
     }
 

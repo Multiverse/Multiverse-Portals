@@ -32,7 +32,7 @@ public class ModifyCommand extends PortalCommand {
         this.addKey("mvp modify");
         this.addKey("mvpmodify");
         this.addKey("mvpm");
-        this.setPermission("multiverse.portals.modify", "Allows you to modify all values that can be set.", PermissionDefault.OP);
+        this.setPermission("multiverse.portal.modify", "Allows you to modify all values that can be set.", PermissionDefault.OP);
     }
 
     @Override
@@ -73,6 +73,8 @@ public class ModifyCommand extends PortalCommand {
             sender.sendMessage("You need to select a portal using " + ChatColor.AQUA + "/mvp select {NAME}");
             sender.sendMessage("or append " + ChatColor.DARK_AQUA + "-p {PORTAL}" + ChatColor.WHITE + " to this command.");
             return;
+        } else {
+            portalName = selectedPortal.getName();
         }
 
         if (portalName != null) {

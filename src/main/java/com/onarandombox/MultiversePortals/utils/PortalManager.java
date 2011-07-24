@@ -85,7 +85,11 @@ public class PortalManager {
         Configuration config = this.plugin.getMVPConfig();
         config.removeProperty("portals." + portalName);
         config.save();
-        return this.portals.remove(portalName);
+        
+        MVPortal removed =  this.portals.remove(portalName);
+        removed.removePermission();
+        this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
+        return removed;
     }
 
     public List<MVPortal> getAllPortals() {

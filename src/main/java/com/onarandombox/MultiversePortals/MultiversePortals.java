@@ -24,6 +24,7 @@ import com.onarandombox.MultiversePortals.commands.DebugCommand;
 import com.onarandombox.MultiversePortals.commands.ListCommand;
 import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
+import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.utils.PortalDestination;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
@@ -77,11 +78,13 @@ public class MultiversePortals extends JavaPlugin {
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
         createDefaultPerms();
-        this.loadPortals();
+        
 
         registerCommands();
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
         this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
+        
+        this.loadPortals();
     }
 
     private void createDefaultPerms() {
@@ -138,6 +141,7 @@ public class MultiversePortals extends JavaPlugin {
         this.commandHandler.registerCommand(new DebugCommand(this));
         this.commandHandler.registerCommand(new RemoveCommand(this));
         this.commandHandler.registerCommand(new ModifyCommand(this));
+        this.commandHandler.registerCommand(new SelectCommand(this));
     }
 
     @Override

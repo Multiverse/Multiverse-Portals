@@ -24,7 +24,7 @@ public class RemoveCommand extends PortalCommand {
         this.addKey("mvp remove");
         this.addKey("mvpremove");
         this.addKey("mvpr");
-        this.setPermission("multiverse.portals.remove", "Allows you to modify all existing portal.", PermissionDefault.OP);
+        this.setPermission("multiverse.portal.remove", "Allows you to modify all existing portal.", PermissionDefault.OP);
     }
 
     @Override

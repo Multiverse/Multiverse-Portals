@@ -116,7 +116,9 @@ public class PortalPlayerSession {
     public MVPortal getStandingInPortal() {
         return this.standingIn;
     }
-
+    /**
+     * This method should be called every time a player telports to a portal.
+     */
     public void playerDidTeleport() {
         this.hasMovedOutOfPortal = false;
     }

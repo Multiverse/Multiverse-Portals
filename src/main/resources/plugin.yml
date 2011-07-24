@@ -27,3 +27,15 @@ commands:
   mvpms:
     description: Generic Multiverse-Portals Command
     usage: /<command>
+  mvps:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpselect:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpr:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>
+  mvpremove:
+    description: Generic Multiverse-Portals Command
+    usage: /<command>

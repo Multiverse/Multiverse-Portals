@@ -30,18 +30,33 @@ public class MVPortal {
         this.config = this.plugin.MVPconfig;
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.setPermission();
+        this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the" + this.name + " portal", PermissionDefault.TRUE);
+        this.plugin.getServer().getPluginManager().addPermission(this.permission);
+        this.addToUpperLists(this.permission);
         
+
     }
 
-    private void setPermission() {
+    private void addToUpperLists(Permission permission) {
         Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
         Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
         Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
-        this.permission = new Permission("multiverse.portal.access." + this.getName(), PermissionDefault.TRUE);
-        all.getChildren().put("multiverse.portal.access." + this.getName(), true);
-        allPortals.getChildren().put("multiverse.portal.access." + this.getName(), true);
-        allPortalAccess.getChildren().put("multiverse.portal.access." + this.getName(), true);
+        if (all == null) {
+            all = new Permission("multiverse.*");
+            this.plugin.getServer().getPluginManager().addPermission(all);
+        }
+        if (allPortals == null) {
+            allPortals = new Permission("multiverse.portal.*");
+            this.plugin.getServer().getPluginManager().addPermission(allPortals);
+        }
+
+        if (allPortalAccess == null) {
+            allPortalAccess = new Permission("multiverse.portal.access.*");
+            this.plugin.getServer().getPluginManager().addPermission(allPortalAccess);
+        }
+        all.getChildren().put(this.permission.getName(), true);
+        allPortals.getChildren().put(this.permission.getName(), true);
+        allPortalAccess.getChildren().put(this.permission.getName(), true);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
@@ -64,12 +79,14 @@ public class MVPortal {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location, world);
+        System.out.print(this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.getName()));
     }
 
     public MVPortal(MultiversePortals instance, String name, String owner, PortalLocation location) {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location);
+        System.out.print(this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.getName()));
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
@@ -163,6 +180,35 @@ public class MVPortal {
 
     public World getWorld() {
         return this.location.getMVWorld().getCBWorld();
+    }
+
+    public Permission getPermission() {
+        return this.permission;
+    }
+
+    public void removePermission() {
+        this.removeFromUpperLists(this.permission);
+        this.plugin.getServer().getPluginManager().removePermission(permission);
+    }
+
+    private void removeFromUpperLists(Permission permission) {
+        Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
+        Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
+        Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
+        if (all != null) {
+            all.getChildren().remove(this.permission.getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
+        }
+        
+        if (allPortals != null) {
+            allPortals.getChildren().remove(this.permission.getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
+        }
+
+        if (allPortalAccess != null) {
+            allPortalAccess.getChildren().remove(this.permission.getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
+        }
     }
 
 }

@@ -19,7 +19,7 @@ public class ListCommand extends PortalCommand {
         this.addKey("mvp list");
         this.addKey("mvpl");
         this.addKey("mvplist");
-        this.setPermission("multiverse.portals.list", "Displays a listing of all portals that you can enter.", PermissionDefault.OP);
+        this.setPermission("multiverse.portal.list", "Displays a listing of all portals that you can enter.", PermissionDefault.OP);
     }
 
     @Override

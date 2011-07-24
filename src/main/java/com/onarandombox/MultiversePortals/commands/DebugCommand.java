@@ -20,7 +20,7 @@ public class DebugCommand extends PortalCommand {
         this.addKey("mvp debug");
         this.addKey("mvpd");
         this.addKey("mvpdebug");
-        this.setPermission("multiverse.portals.debug", "Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.", PermissionDefault.OP);
+        this.setPermission("multiverse.portal.debug", "Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.", PermissionDefault.OP);
     }
 
     @Override
