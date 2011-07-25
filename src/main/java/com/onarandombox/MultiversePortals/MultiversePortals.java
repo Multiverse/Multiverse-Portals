@@ -31,6 +31,7 @@ import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class MultiversePortals extends JavaPlugin {
 
@@ -65,7 +66,7 @@ public class MultiversePortals extends JavaPlugin {
             return;
         }
         this.core.incrementPluginCount();
-        
+
         this.portalManager = new PortalManager(this);
         // As soon as we know MVCore was found, we can use the debug log!
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
@@ -82,21 +83,28 @@ public class MultiversePortals extends JavaPlugin {
         this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
         log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
         createDefaultPerms();
-        
 
         registerCommands();
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
         this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
-        
+
         this.loadPortals();
+
+        this.checkForWorldEdit();
+    }
+
+    private void checkForWorldEdit() {
+        if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+            this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
+        }
     }
 
     private void createDefaultPerms() {
-        if(this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
+        if (this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
             Permission perm = new Permission("multiverse.portal.*");
             this.getServer().getPluginManager().addPermission(perm);
         }
-        if(this.getServer().getPluginManager().getPermission("multiverse.portal.access.*") == null) {
+        if (this.getServer().getPluginManager().getPermission("multiverse.portal.access.*") == null) {
             Permission perm = new Permission("multiverse.portal.access.*");
             this.getServer().getPluginManager().addPermission(perm);
         }
@@ -104,7 +112,7 @@ public class MultiversePortals extends JavaPlugin {
         Permission allPortals = this.getServer().getPluginManager().getPermission("multiverse.portal.*");
         allPortals.getChildren().put("multiverse.portal.access.*", true);
         this.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
-        
+
         Permission all = this.getServer().getPluginManager().getPermission("multiverse.*");
         all.getChildren().put("multiverse.portal.*", true);
         this.getServer().getPluginManager().recalculatePermissionDefaults(all);
@@ -129,13 +137,12 @@ public class MultiversePortals extends JavaPlugin {
             }
         }
         // Now Resolve destinations
-        for(MVPortal portal : this.portalManager.getAllPortals()) {
+        for (MVPortal portal : this.portalManager.getAllPortals()) {
             String dest = this.MVPconfig.getString("portals." + portal.getName() + ".destination", "");
-            if(dest != "") {
+            if (dest != "") {
                 portal.setDestination(dest);
             }
         }
-        
 
     }
 

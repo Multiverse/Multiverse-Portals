@@ -13,7 +13,6 @@ import com.onarandombox.utils.LocationManipulation;
 public class PortalDestination extends Destination {
     private MVPortal portal;
     private boolean isValid;
-    private BlockFace orientation = BlockFace.NORTH;
     private String orientationString;
 
     @Override
