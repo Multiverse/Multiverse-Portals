@@ -2,6 +2,7 @@ name: Multiverse-Portals
 main: com.onarandombox.MultiversePortals.MultiversePortals
 authors: ['Rigby', 'fernferret']
 version: maven-version-number
+depend: ['Multiverse-Core']
 commands:
   mvp:
     description: Generic Multiverse-Portals Command

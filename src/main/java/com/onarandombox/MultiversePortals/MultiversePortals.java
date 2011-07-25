@@ -65,26 +65,21 @@ public class MultiversePortals extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        // Turn on Logging and register ourselves with Core
+        log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
+        debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
         this.core.incrementPluginCount();
 
-        this.portalManager = new PortalManager(this);
-        // As soon as we know MVCore was found, we can use the debug log!
-        debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
-        this.pluginListener = new MVPPluginListener(this);
-        this.playerListener = new MVPPlayerListener(this);
-        this.blockListener = new MVPBlockListener(this);
-        this.vehicleListener = new MVPVehicleListener(this);
-        // Register the PLUGIN_ENABLE Event as we will need to keep an eye out for the Core Enabling if we don't find it initially.
-        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
-        log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
-        createDefaultPerms();
+        // Register our events
+        this.registerEvents();
 
-        registerCommands();
+        // Register our commands
+        this.registerCommands();
+
+        // Ensure permissions are created
+        this.createDefaultPerms();
+
+        this.portalManager = new PortalManager(this);
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
         this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
 
@@ -93,12 +88,33 @@ public class MultiversePortals extends JavaPlugin {
         this.checkForWorldEdit();
     }
 
+    private void registerEvents() {
+        // Initialize our listeners
+        this.pluginListener = new MVPPluginListener(this);
+        this.playerListener = new MVPPlayerListener(this);
+        this.blockListener = new MVPBlockListener(this);
+        this.vehicleListener = new MVPVehicleListener(this);
+
+        // Register our listeners with the Bukkit Server
+        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
+    }
+/**
+ * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure 
+ */
     private void checkForWorldEdit() {
         if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
             this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
         }
     }
 
+    /**
+     * Create the higher level permissions so we can add finer ones to them.
+     */
     private void createDefaultPerms() {
         if (this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
             Permission perm = new Permission("multiverse.portal.*");
