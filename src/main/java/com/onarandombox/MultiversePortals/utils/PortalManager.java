@@ -79,13 +79,15 @@ public class PortalManager {
         return false;
     }
 
-    public MVPortal removePortal(String portalName) {
+    public MVPortal removePortal(String portalName, boolean removeFromConfigs) {
         if (!isPortal(portalName)) {
             return null;
         }
-        Configuration config = this.plugin.getMVPConfig();
-        config.removeProperty("portals." + portalName);
-        config.save();
+        if (removeFromConfigs) {
+            Configuration config = this.plugin.getMVPConfig();
+            config.removeProperty("portals." + portalName);
+            config.save();
+        }
 
         MVPortal removed = this.portals.remove(portalName);
         removed.removePermission();
@@ -148,10 +150,10 @@ public class PortalManager {
         return this.portals.containsKey(portalName);
     }
 
-    public void removeAll() {
+    public void removeAll(boolean removeFromConfigs) {
         List<String> iterList = new ArrayList<String>(this.portals.keySet());
-        for(String s : iterList){
-            this.removePortal(s);
+        for (String s : iterList) {
+            this.removePortal(s, removeFromConfigs);
         }
     }
 

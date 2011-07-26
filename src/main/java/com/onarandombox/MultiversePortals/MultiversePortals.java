@@ -231,7 +231,7 @@ public class MultiversePortals extends JavaPlugin {
     }
 
     public void reloadConfigs() {
-        this.portalManager.removeAll();
+        this.portalManager.removeAll(false);
         this.loadPortals();
     }
 }

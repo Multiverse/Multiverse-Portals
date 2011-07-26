@@ -30,7 +30,7 @@ public class RemoveCommand extends PortalCommand {
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
         if (this.plugin.getPortalManager().isPortal(args.get(0))) {
-            MVPortal portal = this.plugin.getPortalManager().removePortal(args.get(0));
+            MVPortal portal = this.plugin.getPortalManager().removePortal(args.get(0), true);
             sender.sendMessage("Portal " + ChatColor.DARK_AQUA + portal.getName() + ChatColor.WHITE + " was removed successfully!");
             return;
         }
