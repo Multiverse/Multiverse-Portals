@@ -151,6 +151,7 @@ public class PortalPlayerSession {
         player.sendMessage("You are currently standing in " + ChatColor.DARK_AQUA + this.standingIn.getName());
         player.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + this.standingIn.getDestination().getType());
         player.sendMessage("The destination's name is: " + ChatColor.GREEN + this.standingIn.getDestination().getName());
+        player.sendMessage("More details for you: " + ChatColor.GREEN + this.standingIn.getDestination());
         return true;
     }
 }

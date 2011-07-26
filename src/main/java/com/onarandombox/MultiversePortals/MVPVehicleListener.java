@@ -8,6 +8,7 @@ import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
+import com.onarandombox.MultiverseCore.MVTeleport;
 import com.onarandombox.MultiversePortals.utils.PortalDestination;
 import com.onarandombox.utils.Destination;
 import com.onarandombox.utils.InvalidDestination;
@@ -65,8 +66,10 @@ public class MVPVehicleListener extends VehicleListener {
                 // System.out.print("Invalid dest!");
                 return false;
             }
-            ps.playerDidTeleport(to);
-            v.teleport(l);
+            MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
+            if(playerTeleporter.safelyTeleport(v, l)) {
+                ps.playerDidTeleport(to);
+            }
             return true;
         }
         return false;
