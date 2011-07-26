@@ -1,7 +1,6 @@
 package com.onarandombox.MultiversePortals.utils;
 
 import org.bukkit.Location;
-import org.bukkit.block.BlockFace;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.onarandombox.MultiversePortals.MVPortal;

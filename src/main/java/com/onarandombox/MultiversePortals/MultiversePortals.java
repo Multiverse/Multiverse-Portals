@@ -51,6 +51,7 @@ public class MultiversePortals extends JavaPlugin {
     private Map<Player, PortalPlayerSession> portalSessions;
     private BlockListener blockListener;
     private VehicleListener vehicleListener;
+    private MVPConfigReloadListener customListener;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -94,6 +95,7 @@ public class MultiversePortals extends JavaPlugin {
         this.playerListener = new MVPPlayerListener(this);
         this.blockListener = new MVPBlockListener(this);
         this.vehicleListener = new MVPVehicleListener(this);
+        this.customListener = new MVPConfigReloadListener(this);
 
         // Register our listeners with the Bukkit Server
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
@@ -102,6 +104,7 @@ public class MultiversePortals extends JavaPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, this.customListener, Priority.Normal, this);
     }
 /**
  * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure 
@@ -225,5 +228,10 @@ public class MultiversePortals extends JavaPlugin {
 
     public void setCore(MultiverseCore multiverseCore) {
         this.core = multiverseCore;
+    }
+
+    public void reloadConfigs() {
+        this.portalManager.removeAll();
+        this.loadPortals();
     }
 }

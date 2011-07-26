@@ -15,10 +15,11 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
+
 /**
  * Manages all portals for all worlds.
+ * 
  * @author fernferret
- *
  */
 public class PortalManager {
     private MultiversePortals plugin;
@@ -85,8 +86,8 @@ public class PortalManager {
         Configuration config = this.plugin.getMVPConfig();
         config.removeProperty("portals." + portalName);
         config.save();
-        
-        MVPortal removed =  this.portals.remove(portalName);
+
+        MVPortal removed = this.portals.remove(portalName);
         removed.removePermission();
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         return removed;
@@ -145,6 +146,13 @@ public class PortalManager {
 
     public boolean isPortal(String portalName) {
         return this.portals.containsKey(portalName);
+    }
+
+    public void removeAll() {
+        List<String> iterList = new ArrayList<String>(this.portals.keySet());
+        for(String s : iterList){
+            this.removePortal(s);
+        }
     }
 
 }
