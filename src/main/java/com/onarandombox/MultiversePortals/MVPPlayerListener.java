@@ -7,7 +7,9 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import com.fernferret.allpay.GenericBank;
 import com.onarandombox.MultiverseCore.MVTeleport;
+import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.utils.Destination;
 import com.onarandombox.utils.InvalidDestination;
 
@@ -45,7 +47,6 @@ public class MVPPlayerListener extends PlayerListener {
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
         if (portal != null && ps.doTeleportPlayer(Type.PLAYER_MOVE) && !ps.showDebugInfo()) {
-            // TODO: Money
             Destination d = portal.getDestination();
             if (d == null) {
                 return;
@@ -60,11 +61,28 @@ public class MVPPlayerListener extends PlayerListener {
                 // System.out.print("Invalid dest!");
                 return;
             }
-            
-            MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
-            if(playerTeleporter.safelyTeleport(event.getPlayer(), l)) {
-                ps.playerDidTeleport(event.getTo());
+
+            MVWorld world = this.plugin.getCore().getMVWorld(l.getWorld().getName());
+            if (world == null) {
+                return;
             }
+            // If the player does not have to pay, return now.
+            if (world.isExempt(event.getPlayer()) || portal.isExempt(event.getPlayer())) {
+                performTeleport(event, ps, l);
+                return;
+            }
+            GenericBank bank = plugin.getCore().getBank();
+            if (bank.hasEnough(event.getPlayer(), world.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
+                bank.pay(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                performTeleport(event, ps, l);
+            }
+        }
+    }
+
+    private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, Location l) {
+        MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
+        if (playerTeleporter.safelyTeleport(event.getPlayer(), l)) {
+            ps.playerDidTeleport(event.getTo());
         }
     }
 }

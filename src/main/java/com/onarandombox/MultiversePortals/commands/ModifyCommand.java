@@ -12,10 +12,10 @@ import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.sk89q.worldedit.regions.Region;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 enum SetProperties {
-    destination, dest, owner, loc, location
+    destination, dest, owner, loc, location, price, currency, curr
 }
 /**
  * Allows modification of portal location, destination and owner. NOT name at this time.
@@ -98,7 +98,7 @@ public class ModifyCommand extends PortalCommand {
 
     private void setLocation(MVPortal selectedPortal, Player player) {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
-        Region r = ps.getSelectedRegion();
+        MultiverseRegion r = ps.getSelectedRegion();
         if (r != null) {
             MVWorld world = this.plugin.getCore().getMVWorld(player.getWorld().getName());
             PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);

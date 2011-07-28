@@ -6,12 +6,11 @@ import java.util.List;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 public class PortalLocation {
 
-    private MVWorld world;
-    private Vector min;
-    private Vector max;
+    private MultiverseRegion region;
     private boolean validLocation = false;
 
     public PortalLocation(Vector pos1, Vector pos2, MVWorld world) {
@@ -72,14 +71,10 @@ public class PortalLocation {
     public boolean setLocation(Vector v1, Vector v2, MVWorld world) {
         if (v1 == null || v2 == null || world == null) {
             this.validLocation = false;
-            this.min = null;
-            this.max = null;
-            this.world = null;
+            this.region = null;
         } else {
             this.validLocation = true;
-            this.min = Vector.getMinimum(v1, v2);
-            this.max = Vector.getMaximum(v1, v2);
-            this.world = world;
+            this.region = new MultiverseRegion(v1, v2, world);
         }
         return this.validLocation;
     }
@@ -87,8 +82,7 @@ public class PortalLocation {
     public boolean setLocation(String v1, String v2, MVWorld world) {
         if (v1 == null || v2 == null) {
             this.validLocation = false;
-            this.min = null;
-            this.max = null;
+            this.region = null;
             return false;
         } else {
             return this.setLocation(parseVector(v1), parseVector(v2), world);
@@ -101,34 +95,38 @@ public class PortalLocation {
     }
 
     public List<Vector> getVectors() {
-        return Arrays.asList(this.min, this.max);
+        return Arrays.asList(this.region.getMinimumPoint(), this.region.getMaximumPoint());
     }
     
     public Vector getMinimum() {
-        return this.min;
+        return this.region.getMinimumPoint();
     }
     
     public Vector getMaximum() {
-        return this.max;
+        return this.region.getMaximumPoint();
     }
 
     @Override
     public String toString() {
-        if(this.min == null || this.max == null) {
+        if(this.region == null) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(this.min.getX() + ",");
-        sb.append(this.min.getY() + ",");
-        sb.append(this.min.getZ() + ":");
-        sb.append(this.max.getX() + ",");
-        sb.append(this.max.getY() + ",");
-        sb.append(this.max.getZ());
+        sb.append(this.region.getMinimumPoint().getX() + ",");
+        sb.append(this.region.getMinimumPoint().getY() + ",");
+        sb.append(this.region.getMinimumPoint().getZ() + ":");
+        sb.append(this.region.getMaximumPoint().getX() + ",");
+        sb.append(this.region.getMaximumPoint().getY() + ",");
+        sb.append(this.region.getMaximumPoint().getZ());
         return sb.toString();
     }
 
     public MVWorld getMVWorld() {
-        return this.world;
+        return this.region.getWorld();
+    }
+    
+    public MultiverseRegion getRegion() {
+        return this.region;
     }
 
 }

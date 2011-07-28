@@ -8,7 +8,7 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.permissions.Permission;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
@@ -41,24 +41,9 @@ public class PortalManager {
         }
         for (MVPortal portal : portalList) {
             PortalLocation portalLoc = portal.getLocation();
-            if (portalLoc.isValidLocation()) {
-                Vector min = portalLoc.getMinimum();
-                Vector max = portalLoc.getMaximum();
-                boolean playerIsInPortal = true;
-                if (!(l.getBlockX() >= min.getBlockX() && l.getBlockX() <= max.getBlockX())) {
-                    playerIsInPortal = false;
-                }
-                if (!(l.getBlockZ() >= min.getBlockZ() && l.getBlockZ() <= max.getBlockZ())) {
-                    playerIsInPortal = false;
-                }
-                if (!(l.getBlockY() >= min.getBlockY() && l.getBlockY() <= max.getBlockY())) {
-                    playerIsInPortal = false;
-                }
-                if (playerIsInPortal) {
-                    return portal;
-                }
+            if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
+                return portal;
             }
-
         }
         return null;
     }
@@ -91,7 +76,18 @@ public class PortalManager {
 
         MVPortal removed = this.portals.remove(portalName);
         removed.removePermission();
+        Permission portalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
+        Permission exemptAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
+        if (exemptAccess != null) {
+            exemptAccess.getChildren().remove(removed.getExempt().getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(exemptAccess);
+        }
+        if (portalAccess != null) {
+            portalAccess.getChildren().remove(removed.getPermission().getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(portalAccess);
+        }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
+        this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
         return removed;
     }
 

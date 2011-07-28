@@ -44,7 +44,6 @@ public class PortalDestination extends Destination {
         double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
         double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
-        System.out.print(LocationManipulation.getYaw(this.orientationString));
         Location l = new Location(this.portal.getWorld(), finalX, finalY, finalZ, LocationManipulation.getYaw(this.orientationString), 0);
 
         return l;

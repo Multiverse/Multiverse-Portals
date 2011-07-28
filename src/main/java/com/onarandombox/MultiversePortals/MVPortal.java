@@ -24,57 +24,95 @@ public class MVPortal {
     private String owner;
     private String portalConfigString;
     private Permission permission;
+    private Permission exempt;
+    private int currency;
+    private double price;
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
         this.config = this.plugin.MVPconfig;
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the" + this.name + " portal", PermissionDefault.TRUE);
+        this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.TRUE);
+        this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
-        this.addToUpperLists(this.permission);
-        
+        this.addToUpperLists();
 
     }
 
-    private void addToUpperLists(Permission permission) {
+    private void addToUpperLists() {
         Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
         Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
         Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
-        if (all == null) {
-            all = new Permission("multiverse.*");
-            this.plugin.getServer().getPluginManager().addPermission(all);
+        Permission allPortalExempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
+        if (allPortalAccess == null) {
+            allPortalAccess = new Permission("multiverse.portal.access.*");
+            this.plugin.getServer().getPluginManager().addPermission(allPortalAccess);
+        }
+        if (allPortalExempt == null) {
+            allPortalExempt = new Permission("multiverse.portal.exempt.*");
+            this.plugin.getServer().getPluginManager().addPermission(allPortalExempt);
         }
         if (allPortals == null) {
             allPortals = new Permission("multiverse.portal.*");
             this.plugin.getServer().getPluginManager().addPermission(allPortals);
         }
 
-        if (allPortalAccess == null) {
-            allPortalAccess = new Permission("multiverse.portal.access.*");
-            this.plugin.getServer().getPluginManager().addPermission(allPortalAccess);
+        if (all == null) {
+            all = new Permission("multiverse.*");
+            this.plugin.getServer().getPluginManager().addPermission(all);
+
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         }
-        all.getChildren().put(this.permission.getName(), true);
-        allPortals.getChildren().put(this.permission.getName(), true);
+        all.getChildren().put("multiverse.portal.*", true);
+        allPortals.getChildren().put("multiverse.portal.access.*", true);
+        allPortals.getChildren().put("multiverse.portal.exempt.*", true);
         allPortalAccess.getChildren().put(this.permission.getName(), true);
+        allPortalExempt.getChildren().put(this.exempt.getName(), true);
+
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
+        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalExempt);
     }
 
     public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
         MVPortal portal = new MVPortal(instance, name);
         // Don't load portals from configs, as we have a linked list issue
         // Have to load all portals first, then resolve their destinations.
-        //portal.setDestination(portal.config.getString(portal.portalConfigString + ".destination", ""));
+        // portal.setDestination(portal.config.getString(portal.portalConfigString + ".destination", ""));
 
         String portalLocString = portal.config.getString(portal.portalConfigString + ".location", "");
         String worldString = portal.config.getString(portal.portalConfigString + ".world", "");
         portal.setPortalLocation(portalLocString, worldString);
 
         portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
+        portal.setCurrency(portal.config.getInt(portal.portalConfigString + ".entryfee.currency", -1));
+        portal.setPrice(portal.config.getDouble(portal.portalConfigString + ".entryfee.amount", 0.0));
 
         return portal;
+    }
+
+    public int getCurrency() {
+        return this.currency;
+    }
+
+    public double getPrice() {
+        return this.price;
+    }
+
+    private boolean setCurrency(int currency) {
+        this.currency = currency;
+        config.getInt(this.portalConfigString + ".entryfee.currency", currency);
+        config.save();
+        return true;
+    }
+
+    private boolean setPrice(double price) {
+        this.price = price;
+        config.setProperty(this.portalConfigString + ".entryfee.amount", price);
+        config.save();
+        return true;
     }
 
     public MVPortal(MVWorld world, MultiversePortals instance, String name, String owner, String location) {
@@ -82,7 +120,7 @@ public class MVPortal {
         this.setOwner(owner);
         this.setPortalLocation(location, world);
     }
-    
+
     public MVPortal(MultiversePortals instance, String name, String owner, PortalLocation location) {
         this(instance, name);
         this.setOwner(owner);
@@ -173,6 +211,22 @@ public class MVPortal {
             return this.setDestination(value);
         }
 
+        if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
+            try {
+                return this.setCurrency(Integer.parseInt(value));
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        if (property.equalsIgnoreCase("price")) {
+            try {
+                return this.setPrice(Double.parseDouble(value));
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
         if (property.equalsIgnoreCase("owner")) {
             return this.setOwner(value);
         }
@@ -200,7 +254,7 @@ public class MVPortal {
             all.getChildren().remove(this.permission.getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
         }
-        
+
         if (allPortals != null) {
             allPortals.getChildren().remove(this.permission.getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
@@ -210,6 +264,14 @@ public class MVPortal {
             allPortalAccess.getChildren().remove(this.permission.getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
         }
+    }
+
+    public boolean isExempt(Player player) {
+        return false;
+    }
+
+    public Permission getExempt() {
+        return this.exempt;
     }
 
 }

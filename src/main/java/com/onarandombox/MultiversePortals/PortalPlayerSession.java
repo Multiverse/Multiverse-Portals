@@ -4,12 +4,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
+import org.bukkit.util.Vector;
 
+import com.fernferret.allpay.GenericBank;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.regions.Region;
+//import com.sk89q.worldedit.IncompleteRegionException;
+//import com.sk89q.worldedit.LocalSession;
+//import com.sk89q.worldedit.bukkit.WorldEditAPI;
+//import com.sk89q.worldedit.regions.Region;
 
 public class PortalPlayerSession {
     private MultiversePortals plugin;
@@ -21,6 +24,8 @@ public class PortalPlayerSession {
     private boolean staleLocation;
     private boolean hasMovedOutOfPortal = true;
     private Location loc;
+    private Vector rightClick;
+    private Vector leftClick;
 
     public PortalPlayerSession(MultiversePortals plugin, Player p) {
         this.plugin = plugin;
@@ -98,23 +103,44 @@ public class PortalPlayerSession {
         }
 
     }
+    
+    public void setLeftClickSelection(Vector v) {
+        this.leftClick = v;
+    }
+    
+    public void setRightClickSelection(Vector v) {
+        this.rightClick = v;
+    }
 
-    public Region getSelectedRegion() {
-        WorldEditAPI api = this.plugin.getWEAPI();
-        if (api == null) {
-            this.player.sendMessage("Did not find the WorldEdit API...");
-            this.player.sendMessage("It is currently required to use Multiverse-Portals.");
+    public MultiverseRegion getSelectedRegion() {
+        // Did not find WE
+        MultiverseRegion r = null;
+        if (this.plugin.getWEAPI() != null) {
+            //this.player.sendMessage("Did not find the WorldEdit API...");
+            //this.player.sendMessage("It is currently required to use Multiverse-Portals.");
+            // BEYAHH NOT ANYMORE
+            //return null;
+            try {
+                // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
+                r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.player).getSelection(this.plugin.getWEAPI().getSession(this.player).getSelectionWorld()).getMinimumPoint(),
+                        this.plugin.getWEAPI().getSession(this.player).getSelection(this.plugin.getWEAPI().getSession(this.player).getSelectionWorld()).getMaximumPoint().add(1, 1, 1), 
+                        this.plugin.getCore().getMVWorld(this.player.getWorld().getName()));
+            } catch (Exception e) {
+                this.player.sendMessage("You haven't finished your selection.");
+                return null;
+            }
+            return r;
+        }
+        // They're using our crappy selection:
+        if(this.leftClick == null) {
+            this.player.sendMessage("You need to LEFT click on a block with your wand(INSERT WAND NAME HERE)!");
             return null;
         }
-        LocalSession s = api.getSession(this.player);
-        Region r = null;
-        try {
-            r = s.getSelection(s.getSelectionWorld());
-        } catch (IncompleteRegionException e) {
-            this.player.sendMessage("You haven't finished your selection.");
+        if(this.rightClick == null) {
+            this.player.sendMessage("You need to RIGHT click on a block with your wand(INSERT WAND NAME HERE)!");
             return null;
         }
-        return r;
+        return new MultiverseRegion(this.leftClick, this.rightClick, this.plugin.getCore().getMVWorld(this.player.getWorld().getName()));
     }
 
     public MVPortal getStandingInPortal() {
@@ -149,9 +175,17 @@ public class PortalPlayerSession {
         }
 
         player.sendMessage("You are currently standing in " + ChatColor.DARK_AQUA + this.standingIn.getName());
+        player.sendMessage("It's coords are: " + ChatColor.GOLD + this.standingIn.getLocation().toString());
         player.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + this.standingIn.getDestination().getType());
         player.sendMessage("The destination's name is: " + ChatColor.GREEN + this.standingIn.getDestination().getName());
+        
         player.sendMessage("More details for you: " + ChatColor.GREEN + this.standingIn.getDestination());
+        if(this.standingIn.getPrice() > 0) {
+            GenericBank bank = this.plugin.getCore().getBank();
+            player.sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(this.standingIn.getPrice(), this.standingIn.getCurrency()));
+        } else {
+            player.sendMessage("Price: " + ChatColor.GREEN + "FREE!");
+        }
         return true;
     }
 }

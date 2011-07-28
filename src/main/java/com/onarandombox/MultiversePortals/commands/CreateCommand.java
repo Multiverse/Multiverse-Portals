@@ -44,7 +44,7 @@ public class CreateCommand extends PortalCommand {
 
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
 
-        MultiverseRegion r = MultiverseRegion.getMVRegion(ps.getSelectedRegion());
+        MultiverseRegion r = ps.getSelectedRegion();
         if (r == null) {
             return;
         }

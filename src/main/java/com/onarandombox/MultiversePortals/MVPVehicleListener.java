@@ -51,15 +51,12 @@ public class MVPVehicleListener extends VehicleListener {
             }
             Location l = d.getLocation();
             Vector vehicleVec = v.getVelocity();
-            System.out.print("Vector (Old): " + vehicleVec.toString());
             // 0 Yaw in dest = 0,X
             if (d instanceof PortalDestination) {
                 PortalDestination pd = (PortalDestination) d;
                 Vector newPos = LocationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
                 v.setVelocity(newPos);
             }
-            System.out.print("Vector (New): " + vehicleVec.toString());
-            // System.out.print("Fall Distance: " + p.getFallDistance());
             p.setFallDistance(0);
 
             if (d instanceof InvalidDestination) {
