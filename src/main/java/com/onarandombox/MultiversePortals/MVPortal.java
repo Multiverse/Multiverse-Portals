@@ -30,7 +30,7 @@ public class MVPortal {
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
-        this.config = this.plugin.MVPconfig;
+        this.config = this.plugin.getPortalsConfig();
         this.name = name;
         this.portalConfigString = "portals." + this.name;
         this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.TRUE);

@@ -26,6 +26,7 @@ import com.onarandombox.MultiversePortals.commands.ListCommand;
 import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
+import com.onarandombox.MultiversePortals.commands.WandCommand;
 import com.onarandombox.MultiversePortals.utils.PortalDestination;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
@@ -40,7 +41,7 @@ public class MultiversePortals extends JavaPlugin {
     protected static DebugLog debugLog;
     private MultiverseCore core;
 
-    protected Configuration MVPconfig;
+    private Configuration MVPPortalConfig;
 
     private CommandHandler commandHandler;
     protected WorldEditAPI worldEditAPI = null;
@@ -52,6 +53,8 @@ public class MultiversePortals extends JavaPlugin {
     private BlockListener blockListener;
     private VehicleListener vehicleListener;
     private MVPConfigReloadListener customListener;
+    private Configuration MVPconfig;
+    public static final int DEFAULT_WAND = 271;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -85,6 +88,7 @@ public class MultiversePortals extends JavaPlugin {
         this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
 
         this.loadPortals();
+        this.loadConfig();
 
         this.checkForWorldEdit();
     }
@@ -105,6 +109,8 @@ public class MultiversePortals extends JavaPlugin {
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, this.customListener, Priority.Normal, this);
+        // These will only get used if WE is not found. so they're monitor.
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, this.playerListener, Priority.Low, this);
     }
 /**
  * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure 
@@ -147,9 +153,9 @@ public class MultiversePortals extends JavaPlugin {
     }
 
     private void loadPortals() {
-        this.MVPconfig = new Configuration(new File(getDataFolder(), "portals.yml"));
-        this.MVPconfig.load();
-        List<String> keys = this.MVPconfig.getKeys("portals");
+        this.MVPPortalConfig = new Configuration(new File(getDataFolder(), "portals.yml"));
+        this.MVPPortalConfig.load();
+        List<String> keys = this.MVPPortalConfig.getKeys("portals");
         if (keys != null) {
             for (String pname : keys) {
                 this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
@@ -157,12 +163,19 @@ public class MultiversePortals extends JavaPlugin {
         }
         // Now Resolve destinations
         for (MVPortal portal : this.portalManager.getAllPortals()) {
-            String dest = this.MVPconfig.getString("portals." + portal.getName() + ".destination", "");
+            String dest = this.MVPPortalConfig.getString("portals." + portal.getName() + ".destination", "");
             if (dest != "") {
                 portal.setDestination(dest);
             }
         }
 
+    }
+    
+    private void loadConfig() {
+        this.MVPconfig = new Configuration(new File(getDataFolder(), "config.yml"));
+        this.MVPconfig.load();
+        this.MVPconfig.setProperty("wand", this.MVPconfig.getInt("wand", DEFAULT_WAND));
+        this.MVPconfig.save();
     }
 
     public void onDisable() {
@@ -180,6 +193,7 @@ public class MultiversePortals extends JavaPlugin {
         this.commandHandler.registerCommand(new RemoveCommand(this));
         this.commandHandler.registerCommand(new ModifyCommand(this));
         this.commandHandler.registerCommand(new SelectCommand(this));
+        this.commandHandler.registerCommand(new WandCommand(this));
     }
 
     @Override
@@ -222,16 +236,21 @@ public class MultiversePortals extends JavaPlugin {
         return this.portalManager;
     }
 
-    public Configuration getMVPConfig() {
-        return this.MVPconfig;
+    public Configuration getPortalsConfig() {
+        return this.MVPPortalConfig;
     }
 
     public void setCore(MultiverseCore multiverseCore) {
         this.core = multiverseCore;
     }
+    
+    public Configuration getMainConfig() {
+        return this.MVPconfig;
+    }
 
     public void reloadConfigs() {
         this.portalManager.removeAll(false);
         this.loadPortals();
+        this.loadConfig();
     }
 }

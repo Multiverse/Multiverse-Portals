@@ -69,7 +69,7 @@ public class PortalManager {
             return null;
         }
         if (removeFromConfigs) {
-            Configuration config = this.plugin.getMVPConfig();
+            Configuration config = this.plugin.getPortalsConfig();
             config.removeProperty("portals." + portalName);
             config.save();
         }

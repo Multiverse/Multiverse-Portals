@@ -15,6 +15,7 @@ public class MVPConfigReloadListener extends CustomEventListener {
         if(event instanceof MVConfigReloadEvent) {
             plugin.reloadConfigs();
             ((MVConfigReloadEvent)event).addConfig("Multiverse-Portals - portals.yml");
+            ((MVConfigReloadEvent)event).addConfig("Multiverse-Portals - config.yml");
         }
     }
 }

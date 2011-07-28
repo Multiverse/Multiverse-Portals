@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MVPortal;
@@ -16,7 +17,7 @@ public class SelectCommand extends PortalCommand {
         super(plugin);
         this.setName("Select a portal");
         this.setCommandUsage("/mvp select " + ChatColor.GREEN + "{PORTAL}");
-        this.setArgRange(1, 1);
+        this.setArgRange(0, 1);
         this.addKey("mvp select");
         this.addKey("mvps");
         this.addKey("mvpselect");
@@ -30,6 +31,22 @@ public class SelectCommand extends PortalCommand {
             return;
         }
         Player p = (Player) sender;
+        if (!this.plugin.getCore().getPermissions().hasPermission(p, "multiverse.portal.create", true)) {
+            p.sendMessage("You need create permissions to do this!(multiverse.portal.create)");
+            return;
+        }
+        if (args.size() == 0) {
+            MVPortal selected = this.plugin.getPortalSession(p).getSelectedPortal();
+            if (this.plugin.getPortalSession(p).getSelectedPortal() == null) {
+                p.sendMessage("You have not selected a portal yet!");
+                ItemStack wand = new ItemStack(this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND));
+                p.sendMessage("Use a " + ChatColor.GREEN + wand.getType() + ChatColor.WHITE + " to do so!");
+                return;
+            }
+            p.sendMessage("You have selected: " + ChatColor.DARK_AQUA + selected.getName());
+            return;
+        }
+
         MVPortal selected = this.plugin.getPortalManager().getPortal(args.get(0));
         this.plugin.getPortalSession(p).selectPortal(selected);
         if (selected != null) {

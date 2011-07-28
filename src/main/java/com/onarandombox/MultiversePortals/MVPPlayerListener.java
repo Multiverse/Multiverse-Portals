@@ -3,6 +3,8 @@ package com.onarandombox.MultiversePortals;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -14,6 +16,8 @@ import com.onarandombox.utils.Destination;
 import com.onarandombox.utils.InvalidDestination;
 
 public class MVPPlayerListener extends PlayerListener {
+    // This is a wooden axe
+
     private MultiversePortals plugin;
 
     public MVPPlayerListener(MultiversePortals plugin) {
@@ -22,13 +26,37 @@ public class MVPPlayerListener extends PlayerListener {
 
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         ps.playerDidTeleport(event.getTo());
         super.onPlayerTeleport(event);
     }
 
     @Override
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (this.plugin.getWEAPI() != null || !this.plugin.getCore().getPermissions().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+            return;
+        }
+        int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
+            MVWorld world = this.plugin.getCore().getMVWorld(event.getPlayer().getWorld().getName());
+            this.plugin.getPortalSession(event.getPlayer()).setLeftClickSelection(event.getClickedBlock().getLocation().toVector(), world);
+            event.setCancelled(true);
+        }
+        else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
+            MVWorld world = this.plugin.getCore().getMVWorld(event.getPlayer().getWorld().getName());
+            this.plugin.getPortalSession(event.getPlayer()).setRightClickSelection(event.getClickedBlock().getLocation().toVector(), world);
+            event.setCancelled(true);
+        }
+    }
+
+    @Override
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
         Player p = event.getPlayer(); // Grab Player
         Location loc = p.getLocation(); // Grab Location
         /**
