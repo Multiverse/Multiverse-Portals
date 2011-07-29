@@ -25,14 +25,16 @@ public class MVPortal {
     private String portalConfigString;
     private Permission permission;
     private Permission exempt;
-    private int currency;
-    private double price;
+    private int currency = -1;
+    private double price = 0.0;
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
         this.config = this.plugin.getPortalsConfig();
         this.name = name;
         this.portalConfigString = "portals." + this.name;
+        this.setCurrency(this.config.getInt(this.portalConfigString + ".entryfee.currency", -1));
+        this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.TRUE);
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
@@ -102,7 +104,7 @@ public class MVPortal {
 
     private boolean setCurrency(int currency) {
         this.currency = currency;
-        config.getInt(this.portalConfigString + ".entryfee.currency", currency);
+        config.setProperty(this.portalConfigString + ".entryfee.currency", currency);
         config.save();
         return true;
     }
