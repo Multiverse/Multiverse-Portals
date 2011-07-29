@@ -143,7 +143,7 @@ public class MVPortal {
     public boolean setPortalLocation(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid LOCATION!");
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + ChatColor.WHITE + " has an invalid LOCATION!");
             return false;
         }
         this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
@@ -152,7 +152,7 @@ public class MVPortal {
 
             this.config.setProperty(this.portalConfigString + ".world", world.getName());
         } else {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + ChatColor.RED + this.name + ChatColor.WHITE + " has an invalid WORLD");
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + ChatColor.WHITE + " has an invalid WORLD");
             return false;
         }
         this.config.save();
@@ -167,7 +167,6 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
-        this.plugin.getCore().log(Level.WARNING, destinationString);
         this.destination = this.plugin.getCore().getDestinationFactory().getDestination(destinationString);
         if (this.destination instanceof InvalidDestination) {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");

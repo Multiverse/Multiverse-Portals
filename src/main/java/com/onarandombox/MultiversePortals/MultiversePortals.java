@@ -162,7 +162,9 @@ public class MultiversePortals extends JavaPlugin {
             for (String pname : keys) {
                 this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
             }
+            this.log(Level.INFO, keys.size() + " - Portals(s) loaded");
         }
+        
         // Now Resolve destinations
         for (MVPortal portal : this.portalManager.getAllPortals()) {
             String dest = this.MVPPortalConfig.getString("portals." + portal.getName() + ".destination", "");

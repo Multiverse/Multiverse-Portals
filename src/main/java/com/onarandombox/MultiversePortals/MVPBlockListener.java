@@ -10,8 +10,17 @@ public class MVPBlockListener extends BlockListener {
     }
     @Override
     public void onBlockFromTo(BlockFromToEvent event) {
-        // TODO Auto-generated method stub
-        plugin.getPortalManager();
-        super.onBlockFromTo(event);
+        // If lava/something else is trying to flow in...
+        MVPortal portal = plugin.getPortalManager().isPortal(null, event.getToBlock().getLocation());
+        if(portal != null) {
+            event.setCancelled(true);
+            return;
+        }
+        // If something is trying to flow out, stop that too.
+        portal = plugin.getPortalManager().isPortal(null, event.getBlock().getLocation());
+        if(portal != null) {
+            event.setCancelled(true);
+            return;
+        }
     }
 }
