@@ -116,13 +116,10 @@ public class ModifyCommand extends PortalCommand {
         // This means that they did not specify the -p or forgot the [PORTAL]
 
         if (property == SetProperties.loc && args.size() % 2 == 0) {
-            System.out.print("Invalid params!" + args);
             return false;
         } else if (property != SetProperties.loc && args.size() % 2 != 0) {
-            System.out.print("Invalid params!" + args);
             return false;
         }
-        System.out.print("VALID params!" + args);
         return true;
     }
 

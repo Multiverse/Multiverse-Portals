@@ -2,6 +2,7 @@ package com.onarandombox.MultiversePortals;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
 import org.bukkit.util.Vector;
@@ -46,6 +47,7 @@ public class PortalPlayerSession {
     }
 
     public void setDebugMode(boolean debugMode) {
+        System.out.print("DEBUG");
         this.debugMode = debugMode;
         if (this.debugMode) {
             this.player.sendMessage("Portal debug mode " + ChatColor.GREEN + "ENABLED");
@@ -111,9 +113,9 @@ public class PortalPlayerSession {
         this.leftClick = v;
         this.leftClickWorld = world;
         String message = ChatColor.AQUA + "First position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
-        if(this.leftClickWorld == this.rightClickWorld && this.rightClick != null) {
+        if (this.leftClickWorld == this.rightClickWorld && this.rightClick != null) {
             MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
-            message += ChatColor.GOLD + " (" +tempReg.getArea()+  " blocks)";
+            message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
         }
         this.player.sendMessage(message);
     }
@@ -122,12 +124,12 @@ public class PortalPlayerSession {
         this.rightClick = v;
         this.rightClickWorld = world;
         String message = ChatColor.AQUA + "Second position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
-        if(this.leftClickWorld == this.rightClickWorld && this.leftClick != null) {
+        if (this.leftClickWorld == this.rightClickWorld && this.leftClick != null) {
             MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
-            message += ChatColor.GOLD + " (" +tempReg.getArea()+  " blocks)";
+            message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
         }
         this.player.sendMessage(message);
-        
+
     }
 
     public MultiverseRegion getSelectedRegion() {
@@ -137,7 +139,7 @@ public class PortalPlayerSession {
             try {
                 // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
                 r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.player).getSelection(this.plugin.getWEAPI().getSession(this.player).getSelectionWorld()).getMinimumPoint(),
-                        this.plugin.getWEAPI().getSession(this.player).getSelection(this.plugin.getWEAPI().getSession(this.player).getSelectionWorld()).getMaximumPoint().add(1, 1, 1),
+                        this.plugin.getWEAPI().getSession(this.player).getSelection(this.plugin.getWEAPI().getSession(this.player).getSelectionWorld()).getMaximumPoint(),
                         this.plugin.getCore().getMVWorld(this.player.getWorld().getName()));
             } catch (Exception e) {
                 this.player.sendMessage("You haven't finished your selection.");
@@ -194,18 +196,32 @@ public class PortalPlayerSession {
             return false;
         }
 
-        player.sendMessage("You are currently standing in " + ChatColor.DARK_AQUA + this.standingIn.getName());
-        player.sendMessage("It's coords are: " + ChatColor.GOLD + this.standingIn.getLocation().toString());
-        player.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + this.standingIn.getDestination().getType());
-        player.sendMessage("The destination's name is: " + ChatColor.GREEN + this.standingIn.getDestination().getName());
+        showStaticInfo(this.player, this.standingIn, "You are currently standing in ");
+        showPortalPriceInfo(this.standingIn);
+        return true;
+    }
 
-        player.sendMessage("More details for you: " + ChatColor.GREEN + this.standingIn.getDestination());
-        if (this.standingIn.getPrice() > 0) {
+    public boolean showDebugInfo(MVPortal portal) {
+
+        showStaticInfo(this.player, portal, "Portal Info ");
+        showPortalPriceInfo(portal);
+        return true;
+    }
+
+    private void showPortalPriceInfo(MVPortal portal) {
+        player.sendMessage("More details for you: " + ChatColor.GREEN + portal.getDestination());
+        if (portal.getPrice() > 0) {
             GenericBank bank = this.plugin.getCore().getBank();
-            player.sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(this.standingIn.getPrice(), this.standingIn.getCurrency()));
+            player.sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(portal.getPrice(), portal.getCurrency()));
         } else {
             player.sendMessage("Price: " + ChatColor.GREEN + "FREE!");
         }
-        return true;
+    }
+
+    public static void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
+        sender.sendMessage(message + ChatColor.DARK_AQUA + portal.getName());
+        sender.sendMessage("It's coords are: " + ChatColor.GOLD + portal.getLocation().toString());
+        sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
+        sender.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
     }
 }

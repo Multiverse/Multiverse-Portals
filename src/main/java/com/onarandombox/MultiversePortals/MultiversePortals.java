@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
@@ -22,6 +23,7 @@ import org.bukkit.util.config.Configuration;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.DebugCommand;
+import com.onarandombox.MultiversePortals.commands.InfoCommand;
 import com.onarandombox.MultiversePortals.commands.ListCommand;
 import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
@@ -36,8 +38,8 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class MultiversePortals extends JavaPlugin {
 
-    public static final Logger log = Logger.getLogger("Minecraft");
-    public static final String logPrefix = "[MultiVerse-Portals] ";
+    private static final Logger log = Logger.getLogger("Minecraft");
+    private static final String logPrefix = "[MultiVerse-Portals] ";
     protected static DebugLog debugLog;
     private MultiverseCore core;
 
@@ -187,6 +189,7 @@ public class MultiversePortals extends JavaPlugin {
      */
     private void registerCommands() {
         this.commandHandler = this.core.getCommandHandler();
+        this.commandHandler.registerCommand(new InfoCommand(this));
         this.commandHandler.registerCommand(new ListCommand(this));
         this.commandHandler.registerCommand(new CreateCommand(this));
         this.commandHandler.registerCommand(new DebugCommand(this));
@@ -252,5 +255,15 @@ public class MultiversePortals extends JavaPlugin {
         this.portalManager.removeAll(false);
         this.loadPortals();
         this.loadConfig();
+    }
+    /**
+     * Print messages to the server Log as well as to our DebugLog. 'debugLog' is used to seperate Heroes information from the Servers Log Output.
+     * 
+     * @param level
+     * @param msg
+     */
+    public void log(Level level, String msg) {
+        log.log(level, logPrefix + " " + msg);
+        debugLog.log(level, logPrefix + " " + msg);
     }
 }

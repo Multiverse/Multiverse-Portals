@@ -100,7 +100,7 @@ public class MVPPlayerListener extends PlayerListener {
                 return;
             }
             GenericBank bank = plugin.getCore().getBank();
-            if (bank.hasEnough(event.getPlayer(), world.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
+            if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
                 bank.pay(event.getPlayer(), portal.getPrice(), portal.getCurrency());
                 performTeleport(event, ps, l);
             }

@@ -80,7 +80,6 @@ public class MVPortal {
         MVPortal portal = new MVPortal(instance, name);
         // Don't load portals from configs, as we have a linked list issue
         // Have to load all portals first, then resolve their destinations.
-        // portal.setDestination(portal.config.getString(portal.portalConfigString + ".destination", ""));
 
         String portalLocString = portal.config.getString(portal.portalConfigString + ".location", "");
         String worldString = portal.config.getString(portal.portalConfigString + ".world", "");

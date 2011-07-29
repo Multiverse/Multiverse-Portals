@@ -1,5 +1,7 @@
 package com.onarandombox.MultiversePortals;
 
+import java.util.logging.Level;
+
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.server.ServerListener;
@@ -23,7 +25,7 @@ public class MVPPluginListener extends ServerListener {
             this.plugin.getServer().getPluginManager().enablePlugin(this.plugin);
         } else if(event.getPlugin().getDescription().getName().equals("WorldEdit")) {
             this.plugin.worldEditAPI = new WorldEditAPI((WorldEditPlugin)this.plugin.getServer().getPluginManager().getPlugin("WorldEdit"));
-            MultiversePortals.log.info("Found WorldEdit. Using it for selections.");
+            this.plugin.log(Level.INFO, "Found WorldEdit. Using it for selections.");
         }
     }
 
