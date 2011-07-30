@@ -2,6 +2,7 @@ package com.onarandombox.MultiversePortals;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.util.Vector;
 
@@ -14,7 +15,8 @@ public class PortalLocation {
     private boolean validLocation = false;
 
     public PortalLocation(Vector pos1, Vector pos2, MVWorld world) {
-        this.validLocation = this.setLocation(pos1, pos2, world);;
+        this.validLocation = this.setLocation(pos1, pos2, world);
+        ;
     }
 
     public PortalLocation() {
@@ -30,23 +32,25 @@ public class PortalLocation {
         this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
     }
 
-    public static PortalLocation parseLocation(String locationString, MVWorld world) {
+    public static PortalLocation parseLocation(String locationString, MVWorld world, String portalName) {
         String[] split = locationString.split(":");
-        if (split.length != 2 || world == null) {
-            System.out.print("MVP - Failed Parsing Portal (World or Length Error: " + locationString);
+        if (split.length != 2) {
+            MultiversePortals.log(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
             return getInvalidPortalLocation();
         }
-        
-        
+        if (world == null) {
+            MultiversePortals.log(Level.WARNING, "Failed Parsing World for: " + portalName + " (World Error, World did not exist or was not imported into Multiverse-Core!)");
+            return getInvalidPortalLocation();
+        }
+
         Vector pos1 = parseVector(split[0]);
         Vector pos2 = parseVector(split[1]);
 
         if (pos1 == null || pos2 == null) {
-            System.out.print("MVP - Failed Parsing Portal location (Vector Error): " + locationString);
+            MultiversePortals.log(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Vector Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
             return getInvalidPortalLocation();
         }
         return new PortalLocation(pos1, pos2, world);
-       
 
     }
 
@@ -97,18 +101,18 @@ public class PortalLocation {
     public List<Vector> getVectors() {
         return Arrays.asList(this.region.getMinimumPoint(), this.region.getMaximumPoint());
     }
-    
+
     public Vector getMinimum() {
         return this.region.getMinimumPoint();
     }
-    
+
     public Vector getMaximum() {
         return this.region.getMaximumPoint();
     }
 
     @Override
     public String toString() {
-        if(this.region == null) {
+        if (this.region == null) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
@@ -124,7 +128,7 @@ public class PortalLocation {
     public MVWorld getMVWorld() {
         return this.region.getWorld();
     }
-    
+
     public MultiverseRegion getRegion() {
         return this.region;
     }

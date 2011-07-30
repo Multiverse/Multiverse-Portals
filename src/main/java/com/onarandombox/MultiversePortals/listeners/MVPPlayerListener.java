@@ -1,4 +1,4 @@
-package com.onarandombox.MultiversePortals;
+package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,6 +12,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import com.fernferret.allpay.GenericBank;
 import com.onarandombox.MultiverseCore.MVTeleport;
 import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.utils.Destination;
 import com.onarandombox.utils.InvalidDestination;
 

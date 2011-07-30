@@ -1,4 +1,4 @@
-package com.onarandombox.MultiversePortals;
+package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -9,6 +9,9 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.MVTeleport;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.PortalDestination;
 import com.onarandombox.utils.Destination;
 import com.onarandombox.utils.InvalidDestination;

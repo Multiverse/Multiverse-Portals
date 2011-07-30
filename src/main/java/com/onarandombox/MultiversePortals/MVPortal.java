@@ -2,7 +2,6 @@ package com.onarandombox.MultiversePortals;
 
 import java.util.logging.Level;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -137,13 +136,13 @@ public class MVPortal {
     }
 
     public boolean setPortalLocation(String locationString, MVWorld world) {
-        return this.setPortalLocation(PortalLocation.parseLocation(locationString, world));
+        return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
 
     public boolean setPortalLocation(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + ChatColor.WHITE + " has an invalid LOCATION!");
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid LOCATION!");
             return false;
         }
         this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
@@ -152,7 +151,7 @@ public class MVPortal {
 
             this.config.setProperty(this.portalConfigString + ".world", world.getName());
         } else {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + ChatColor.WHITE + " has an invalid WORLD");
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
             return false;
         }
         this.config.save();

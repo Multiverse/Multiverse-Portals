@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.configuration.DefaultConfiguration;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.DebugCommand;
 import com.onarandombox.MultiversePortals.commands.InfoCommand;
@@ -29,6 +30,12 @@ import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.commands.WandCommand;
+import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
+import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
+import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
+import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalDestination;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.DebugLog;
@@ -56,6 +63,7 @@ public class MultiversePortals extends JavaPlugin {
     private VehicleListener vehicleListener;
     private MVPConfigReloadListener customListener;
     private Configuration MVPconfig;
+    protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
 
     public void onLoad() {
@@ -155,6 +163,7 @@ public class MultiversePortals extends JavaPlugin {
     }
 
     private void loadPortals() {
+        new DefaultConfiguration(getDataFolder(), "portals.yml", this.migrator);
         this.MVPPortalConfig = new Configuration(new File(getDataFolder(), "portals.yml"));
         this.MVPPortalConfig.load();
         List<String> keys = this.MVPPortalConfig.getKeys("portals");
@@ -162,7 +171,7 @@ public class MultiversePortals extends JavaPlugin {
             for (String pname : keys) {
                 this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
             }
-            this.log(Level.INFO, keys.size() + " - Portals(s) loaded");
+            log(Level.INFO, keys.size() + " - Portals(s) loaded");
         }
         
         // Now Resolve destinations
@@ -176,10 +185,9 @@ public class MultiversePortals extends JavaPlugin {
     }
     
     private void loadConfig() {
+        new DefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPconfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPconfig.load();
-        this.MVPconfig.setProperty("wand", this.MVPconfig.getInt("wand", DEFAULT_WAND));
-        this.MVPconfig.save();
     }
 
     public void onDisable() {
@@ -264,8 +272,12 @@ public class MultiversePortals extends JavaPlugin {
      * @param level
      * @param msg
      */
-    public void log(Level level, String msg) {
+    public static void log(Level level, String msg) {
         log.log(level, logPrefix + " " + msg);
         debugLog.log(level, logPrefix + " " + msg);
+    }
+
+    public void setWorldEditAPI(WorldEditAPI api) {
+        this.worldEditAPI = api;
     }
 }

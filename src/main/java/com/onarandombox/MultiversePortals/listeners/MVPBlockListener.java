@@ -1,7 +1,10 @@
-package com.onarandombox.MultiversePortals;
+package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockListener;
+
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
 
 public class MVPBlockListener extends BlockListener {
     private MultiversePortals plugin;

@@ -1,9 +1,10 @@
-package com.onarandombox.MultiversePortals;
+package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 
 import com.onarandombox.MultiverseCore.event.MVConfigReloadEvent;       
+import com.onarandombox.MultiversePortals.MultiversePortals;
 
 public class MVPConfigReloadListener extends CustomEventListener {
     private MultiversePortals plugin;
