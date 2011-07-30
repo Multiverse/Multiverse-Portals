@@ -11,9 +11,9 @@ import com.onarandombox.MultiverseCore.configuration.MVConfigMigrator;
  *
  * @author Nijikokun & Coelho
  */
-public class DefaultConfiguration {
+public class MVPDefaultConfiguration {
 
-    public DefaultConfiguration(File folder, String name, MVConfigMigrator migrator) {
+    public MVPDefaultConfiguration(File folder, String name, MVConfigMigrator migrator) {
         File actual = new File(folder, name);
         if(actual.exists() && migrator.createdDefaults.contains(name)) {
             actual.delete();

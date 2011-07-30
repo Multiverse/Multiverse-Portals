@@ -30,7 +30,7 @@ import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.commands.WandCommand;
-import com.onarandombox.MultiversePortals.configuration.DefaultConfiguration;
+import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
 import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
@@ -164,7 +164,7 @@ public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
     }
 
     private void loadPortals() {
-        new DefaultConfiguration(getDataFolder(), "portals.yml", this.migrator);
+        new MVPDefaultConfiguration(getDataFolder(), "portals.yml", this.migrator);
         this.MVPPortalConfig = new Configuration(new File(getDataFolder(), "portals.yml"));
         this.MVPPortalConfig.load();
         List<String> keys = this.MVPPortalConfig.getKeys("portals");
@@ -186,7 +186,7 @@ public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
     }
     
     private void loadConfig() {
-        new DefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
+        new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPconfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPconfig.load();
     }
