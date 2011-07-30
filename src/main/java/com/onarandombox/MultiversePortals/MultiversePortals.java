@@ -20,8 +20,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
+import com.onarandombox.MultiverseCore.LoggablePlugin;
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.configuration.DefaultConfiguration;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.DebugCommand;
 import com.onarandombox.MultiversePortals.commands.InfoCommand;
@@ -30,6 +30,7 @@ import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.commands.WandCommand;
+import com.onarandombox.MultiversePortals.configuration.DefaultConfiguration;
 import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
@@ -43,7 +44,7 @@ import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-public class MultiversePortals extends JavaPlugin {
+public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
 
     private static final Logger log = Logger.getLogger("Minecraft");
     private static final String logPrefix = "[MultiVerse-Portals] ";
@@ -171,7 +172,7 @@ public class MultiversePortals extends JavaPlugin {
             for (String pname : keys) {
                 this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
             }
-            log(Level.INFO, keys.size() + " - Portals(s) loaded");
+            staticLog(Level.INFO, keys.size() + " - Portals(s) loaded");
         }
         
         // Now Resolve destinations
@@ -272,12 +273,17 @@ public class MultiversePortals extends JavaPlugin {
      * @param level
      * @param msg
      */
-    public static void log(Level level, String msg) {
+    public static void staticLog(Level level, String msg) {
         log.log(level, logPrefix + " " + msg);
         debugLog.log(level, logPrefix + " " + msg);
     }
 
     public void setWorldEditAPI(WorldEditAPI api) {
         this.worldEditAPI = api;
+    }
+
+    @Override
+    public void log(Level level, String msg) {
+        staticLog(level, msg);
     }
 }

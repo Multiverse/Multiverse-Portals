@@ -26,11 +26,11 @@ public class MVPPluginListener extends ServerListener {
             this.plugin.getServer().getPluginManager().enablePlugin(this.plugin);
         } else if (event.getPlugin().getDescription().getName().equals("WorldEdit")) {
             this.plugin.setWorldEditAPI(new WorldEditAPI((WorldEditPlugin) this.plugin.getServer().getPluginManager().getPlugin("WorldEdit")));
-            MultiversePortals.log(Level.INFO, "Found WorldEdit. Using it for selections.");
+            MultiversePortals.staticLog(Level.INFO, "Found WorldEdit. Using it for selections.");
         } else if (event.getPlugin().getDescription().getName().equals("MultiVerse")) {
             if (event.getPlugin().isEnabled()) {
                 this.plugin.getServer().getPluginManager().disablePlugin(event.getPlugin());
-                MultiversePortals.log(Level.WARNING, "I just disabled the old version of Multiverse for you. You should remove the JAR now, your configs have been migrated.");
+                MultiversePortals.staticLog(Level.WARNING, "I just disabled the old version of Multiverse for you. You should remove the JAR now, your configs have been migrated.");
             }
         }
     }

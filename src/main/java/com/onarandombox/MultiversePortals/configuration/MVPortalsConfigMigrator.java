@@ -17,7 +17,7 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
     }
 
     public boolean migrate(String name, File folder) {
-        File oldFolder = detectMultiverseFolders(folder, this.plugin.getCore());
+        File oldFolder = detectMultiverseFolders(folder, this.plugin);
         if (oldFolder == null) {
             return false;
         }
@@ -32,15 +32,15 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
 
     private boolean migratePortals(String name, File oldFolder, File newFolder) {
         Configuration newConfig = new Configuration(new File(newFolder, "portals.yml"));
-        MultiversePortals.log(Level.INFO, "Trying to migrate Portals.yml...");
+        MultiversePortals.staticLog(Level.INFO, "Trying to migrate Portals.yml...");
         Configuration oldConfig = new Configuration(new File(oldFolder, "Portals.yml"));
         oldConfig.load();
         List<String> keys = oldConfig.getKeys("portals");
         if (keys == null) {
-            MultiversePortals.log(Level.SEVERE, "Migration FAILURE!");
-            MultiversePortals.log(Level.SEVERE, "Old Folder Location: " + oldFolder);
-            MultiversePortals.log(Level.SEVERE, "New Folder Location: " + newFolder);
-            MultiversePortals.log(Level.SEVERE, "Old Config Dump: " + oldConfig.getAll());
+            MultiversePortals.staticLog(Level.SEVERE, "Migration FAILURE!");
+            MultiversePortals.staticLog(Level.SEVERE, "Old Folder Location: " + oldFolder);
+            MultiversePortals.staticLog(Level.SEVERE, "New Folder Location: " + newFolder);
+            MultiversePortals.staticLog(Level.SEVERE, "Old Config Dump: " + oldConfig.getAll());
             return false;
         }
         for (String key : keys) {
@@ -52,18 +52,18 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
             newConfig.setProperty("portals." + key + ".owner", oldConfig.getProperty("portals." + key + ".owner"));
         }
         newConfig.save();
-        MultiversePortals.log(Level.INFO, "Migration SUCCESS!");
+        MultiversePortals.staticLog(Level.INFO, "Migration SUCCESS!");
         return true;
     }
     
     private boolean migrateConfig(String name, File oldFolder, File newFolder) {
         Configuration newConfig = new Configuration(new File(newFolder, "config.yml"));
-        MultiversePortals.log(Level.INFO, "Trying to migrate MultiVerse.yml...");
+        MultiversePortals.staticLog(Level.INFO, "Trying to migrate MultiVerse.yml...");
         Configuration oldConfig = new Configuration(new File(oldFolder, "MultiVerse.yml"));
         oldConfig.load();
         newConfig.setProperty("wand", oldConfig.getInt("setwand", MultiversePortals.DEFAULT_WAND));
         newConfig.save();
-        MultiversePortals.log(Level.INFO, "Migration SUCCESS!");
+        MultiversePortals.staticLog(Level.INFO, "Migration SUCCESS!");
         return true;
     }
 }
