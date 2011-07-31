@@ -14,7 +14,7 @@ public class ListCommand extends PortalCommand {
     public ListCommand(MultiversePortals plugin) {
         super(plugin);
         this.setName("Portal Listing");
-        this.setCommandUsage("/mvplist " + ChatColor.GOLD + "[WORLD]");
+        this.setCommandUsage("/mvp list " + ChatColor.GOLD + "[WORLD]");
         this.setArgRange(0, 1);
         this.addKey("mvp list");
         this.addKey("mvpl");

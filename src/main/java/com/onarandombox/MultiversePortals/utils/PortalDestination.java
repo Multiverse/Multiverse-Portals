@@ -38,8 +38,8 @@ public class PortalDestination extends Destination {
     @Override
     public Location getLocation() {
         PortalLocation pl = this.portal.getLocation();
-        double portalWidth = Math.abs((pl.getMaximum().getBlockX() + 1.0) - pl.getMinimum().getBlockX());
-        double portalDepth = Math.abs((pl.getMaximum().getBlockZ() + 1.0) - pl.getMinimum().getBlockZ());
+        double portalWidth = Math.abs((pl.getMaximum().getBlockX()) - pl.getMinimum().getBlockX()) + 1;
+        double portalDepth = Math.abs((pl.getMaximum().getBlockZ()) - pl.getMinimum().getBlockZ()) + 1;
 
         double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
         double finalY = pl.getMinimum().getBlockY();
@@ -96,7 +96,6 @@ public class PortalDestination extends Destination {
         return "p:" + this.portal.getName();
 
     }
-    
 
     public String getOrientationString() {
         return this.orientationString;

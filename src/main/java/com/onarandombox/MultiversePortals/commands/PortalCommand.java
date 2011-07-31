@@ -11,7 +11,7 @@ import com.pneumaticraft.commandhandler.Command;
  * @author fernferret
  *
  */
-public class PortalCommand extends Command {
+public abstract class PortalCommand extends Command {
 
     protected MultiversePortals plugin;
     public PortalCommand(MultiversePortals plugin) {
@@ -20,8 +20,6 @@ public class PortalCommand extends Command {
     }
     
     @Override
-    public void runCommand(CommandSender sender, List<String> args) {
-        
-    }
+    public abstract void runCommand(CommandSender sender, List<String> args);
 
 }

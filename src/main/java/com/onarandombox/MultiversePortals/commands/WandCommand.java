@@ -15,9 +15,11 @@ public class WandCommand extends PortalCommand {
     public WandCommand(MultiversePortals plugin) {
         super(plugin);
         this.setName("Gives a Portal Creation Wand");
-        this.setCommandUsage("/mvp wand ");
+        this.setCommandUsage("/mvp wand");
         this.setArgRange(0, 0);
         this.addKey("mvp wand");
+        this.addKey("mvpwand");
+        this.addKey("mvpw");
         this.setPermission("multiverse.portal.givewand", "Gives you the wand that MV uses. This will only work if you are NOT using WorldEdit.", PermissionDefault.OP);
     }
 

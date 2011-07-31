@@ -19,7 +19,7 @@ public class CreateCommand extends PortalCommand {
     public CreateCommand(MultiversePortals plugin) {
         super(plugin);
         this.setName("Create a Portal");
-        this.setCommandUsage("/mvp create {NAME}" + ChatColor.GOLD + " [DESTINATION]");
+        this.setCommandUsage("/mvp create" + ChatColor.GREEN + " {NAME}" + ChatColor.GOLD + " [DESTINATION]");
         this.setArgRange(1, 2);
         this.addKey("mvp create");
         this.addKey("mvpc");
