@@ -40,7 +40,6 @@ public class MVPVehicleListener extends VehicleListener {
     }
 
     private boolean teleportVehicle(Player p, Vehicle v, Location to) {
-
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
         MVPortal portal = ps.getStandingInPortal();
         // If the portal is not null
@@ -49,11 +48,13 @@ public class MVPVehicleListener extends VehicleListener {
         if (portal != null && ps.doTeleportPlayer(Type.VEHICLE_MOVE) && !ps.showDebugInfo()) {
             // TODO: Money
             Destination d = portal.getDestination();
-            if (d == null) {
+            if (d == null || d instanceof InvalidDestination) {
                 return false;
             }
+
             Location l = d.getLocation();
             Vector vehicleVec = v.getVelocity();
+
             // 0 Yaw in dest = 0,X
             if (d instanceof PortalDestination) {
                 PortalDestination pd = (PortalDestination) d;
@@ -62,16 +63,44 @@ public class MVPVehicleListener extends VehicleListener {
             }
             p.setFallDistance(0);
 
-            if (d instanceof InvalidDestination) {
-                // System.out.print("Invalid dest!");
-                return false;
-            }
             MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
-            if(playerTeleporter.safelyTeleport(v, l)) {
+
+            // The worlds are different! Ahhh!
+            if (!l.getWorld().equals(p.getWorld())) {
+                return teleportVehicleSeperately(p, v, l, ps, playerTeleporter);
+            }
+
+            if (playerTeleporter.safelyTeleport(v, l)) {
                 ps.playerDidTeleport(to);
             }
             return true;
         }
         return false;
+    }
+
+    private boolean teleportVehicleSeperately(Player p, Vehicle v, Location to, PortalPlayerSession ps, MVTeleport tp) {
+        // Remove the player from the old one.
+        v.eject();
+        // Add an offset to ensure the player is 1 higher than where the cart was.
+        to.add(0, 1.5, 0);
+        // If they didn't teleport, return false and place them back into their vehicle.
+        if (!tp.safelyTeleport(p, to)) {
+            v.setPassenger(p);
+            return false;
+        }
+
+        // Now create a new vehicle:
+        Vehicle newVehicle = to.getWorld().spawn(to, v.getClass());
+
+        // Set the vehicle's velocity to ours.
+        newVehicle.setVelocity(v.getVelocity());
+
+        // Set the new player
+        newVehicle.setPassenger(p);
+
+        // They did teleport. Let's delete the old vehicle.
+        v.remove();
+
+        return true;
     }
 }
