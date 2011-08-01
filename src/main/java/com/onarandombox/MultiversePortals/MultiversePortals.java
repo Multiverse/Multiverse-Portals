@@ -209,11 +209,11 @@ public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
         this.commandHandler.registerCommand(new ModifyCommand(this));
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
-//        for(com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
-//            if(c instanceof HelpCommand) {
-//                c.addKey("mvp");
-//            }
-//        }
+        for(com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
+            if(c instanceof HelpCommand) {
+                c.addKey("mvp");
+            }
+        }
     }
 
     @Override
