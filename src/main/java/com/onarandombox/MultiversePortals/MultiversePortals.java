@@ -118,6 +118,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, this.playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, this.playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, this.customListener, Priority.Normal, this);
@@ -303,5 +305,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.log(Level.INFO, "Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
         this.log(Level.INFO, "wand: " + this.getMainConfig().getString("wand", "NOT SET"));
         this.log(Level.INFO, "Special Code: FRN001");
+    }
+
+    public void removePortalPlayerSession(String name) {
+        this.portalSessions.remove(name);
     }
 }
