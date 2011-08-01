@@ -34,7 +34,6 @@ public class MVPPlayerListener extends PlayerListener {
         }
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         ps.playerDidTeleport(event.getTo());
-        super.onPlayerTeleport(event);
     }
 
     @Override
