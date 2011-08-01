@@ -20,7 +20,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.LoggablePlugin;
+import com.onarandombox.MultiverseCore.MVPlugin;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.commands.HelpCommand;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
@@ -45,7 +45,7 @@ import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
+public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private static final Logger log = Logger.getLogger("Minecraft");
     private static final String logPrefix = "[MultiVerse-Portals] ";
@@ -210,7 +210,7 @@ public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
         for(com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
-            if(c instanceof HelpCommand) {
+            if(c instanceof HelpCommand) {  
                 c.addKey("mvp");
             }
         }
@@ -291,5 +291,17 @@ public class MultiversePortals extends JavaPlugin implements LoggablePlugin {
     @Override
     public void log(Level level, String msg) {
         staticLog(level, msg);
+    }
+
+    @Override
+    public void dumpVersionInfo() {
+        this.log(Level.INFO, "Multiverse-Portals Version: " + this.getDescription().getVersion());
+        this.log(Level.INFO, "Bukkit Version: " + this.getServer().getVersion());
+        this.log(Level.INFO, "Loaded Portals: " + this.getPortalManager().getAllPortals().size());
+        this.log(Level.INFO, "Dumping Portal Values: (version " + this.getPortalsConfig().getString("version", "NOT SET") + ")");
+        this.log(Level.INFO, this.getPortalsConfig().getAll() + "");
+        this.log(Level.INFO, "Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
+        this.log(Level.INFO, "wand: " + this.getMainConfig().getString("wand", "NOT SET"));
+        this.log(Level.INFO, "Special Code: FRN001");
     }
 }
