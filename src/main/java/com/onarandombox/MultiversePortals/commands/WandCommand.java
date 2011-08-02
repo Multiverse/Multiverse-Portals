@@ -27,6 +27,11 @@ public class WandCommand extends PortalCommand {
     public void runCommand(CommandSender sender, List<String> args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
+            if (this.plugin.getWEAPI() != null) {
+                p.sendMessage(ChatColor.GREEN + "Cool!" + ChatColor.WHITE + " You're using" + ChatColor.AQUA + " WorldEdit! ");
+                p.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit wand " + ChatColor.WHITE + "to perform portal selections!");
+                return;
+            }
             int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
             ItemStack wand = new ItemStack(itemType, 1);
 

@@ -17,10 +17,11 @@ import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 enum SetProperties {
     destination, dest, owner, loc, location, price, currency, curr
 }
+
 /**
  * Allows modification of portal location, destination and owner. NOT name at this time.
+ * 
  * @author fernferret
- *
  */
 public class ModifyCommand extends PortalCommand {
 
@@ -81,7 +82,7 @@ public class ModifyCommand extends PortalCommand {
             // Simply chop off the rest, if they have loc, that's good enough!
             if (SetProperties.valueOf(args.get(0)) == SetProperties.loc || SetProperties.valueOf(args.get(0)) == SetProperties.location) {
                 this.setLocation(selectedPortal, player);
-                return;
+                return; 
             }
 
             if (this.setProperty(selectedPortal, args.get(0), args.get(1))) {
@@ -103,7 +104,7 @@ public class ModifyCommand extends PortalCommand {
             MVWorld world = this.plugin.getCore().getMVWorld(player.getWorld().getName());
             PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
             selectedPortal.setPortalLocation(location);
-            player.sendMessage("Portal location is not set to your selection!");
+            player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");
         }
     }
 
