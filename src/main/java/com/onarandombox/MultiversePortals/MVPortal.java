@@ -10,14 +10,14 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.ExactDestination;
 import com.onarandombox.utils.InvalidDestination;
 
 public class MVPortal {
     private String name;
     private PortalLocation location;
-    private Destination destination;
+    private MVDestination destination;
     private Configuration config;
     private MultiversePortals plugin;
     private String owner;
@@ -201,7 +201,7 @@ public class MVPortal {
         return (this.plugin.getCore().getPermissions().hasPermission(player, this.permission.getName(), false));
     }
 
-    public Destination getDestination() {
+    public MVDestination getDestination() {
         return this.destination;
     }
 

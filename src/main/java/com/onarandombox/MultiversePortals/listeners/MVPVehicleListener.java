@@ -13,7 +13,7 @@ import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.PortalDestination;
-import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.InvalidDestination;
 import com.onarandombox.utils.LocationManipulation;
 
@@ -47,7 +47,7 @@ public class MVPVehicleListener extends VehicleListener {
         // The debug is meant to toggle.
         if (portal != null && ps.doTeleportPlayer(Type.VEHICLE_MOVE) && !ps.showDebugInfo()) {
             // TODO: Money
-            Destination d = portal.getDestination();
+            MVDestination d = portal.getDestination();
             if (d == null || d instanceof InvalidDestination) {
                 return false;
             }

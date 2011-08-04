@@ -1,5 +1,7 @@
 package com.onarandombox.MultiversePortals;
 
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -11,10 +13,6 @@ import com.fernferret.allpay.GenericBank;
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
-//import com.sk89q.worldedit.IncompleteRegionException;
-//import com.sk89q.worldedit.LocalSession;
-//import com.sk89q.worldedit.bukkit.WorldEditAPI;
-//import com.sk89q.worldedit.regions.Region;
 
 public class PortalPlayerSession {
     private MultiversePortals plugin;
@@ -22,7 +20,7 @@ public class PortalPlayerSession {
 
     private MVPortal portalSelection = null;
     private MVPortal standingIn = null;
-    private boolean debugMode = false   ;
+    private boolean debugMode = false;
     private boolean staleLocation;
     private boolean hasMovedOutOfPortal = true;
     private Location loc;
@@ -45,7 +43,7 @@ public class PortalPlayerSession {
     public MVPortal getSelectedPortal() {
         return this.portalSelection;
     }
-    
+
     private Player getPlayerFromName() {
         return this.plugin.getServer().getPlayer(playerName);
     }
@@ -205,9 +203,12 @@ public class PortalPlayerSession {
     }
 
     public boolean showDebugInfo(MVPortal portal) {
-
-        showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
-        showPortalPriceInfo(portal);
+        if (this.plugin.getCore().getPermissions().hasPermission(this.getPlayerFromName(), "multiverse.portal.access." + portal.getName(), true)) {
+            showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
+            showPortalPriceInfo(portal);
+        } else {
+            this.plugin.log(Level.INFO, "Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
+        }
         return true;
     }
 
@@ -224,7 +225,11 @@ public class PortalPlayerSession {
     public static void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
         sender.sendMessage(message + ChatColor.DARK_AQUA + portal.getName());
         sender.sendMessage("It's coords are: " + ChatColor.GOLD + portal.getLocation().toString());
-        sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
-        sender.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
+        if (portal.getDestination() == null) {
+            sender.sendMessage("This portal has " + ChatColor.RED + "NO DESTINATION SET.");
+        } else {
+            sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
+            sender.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
+        }
     }
 }

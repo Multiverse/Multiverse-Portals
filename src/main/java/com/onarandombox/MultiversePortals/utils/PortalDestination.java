@@ -6,10 +6,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
-import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.LocationManipulation;
 
-public class PortalDestination extends Destination {
+public class PortalDestination implements MVDestination {
     private MVPortal portal;
     private boolean isValid;
     private String orientationString;
@@ -99,6 +99,11 @@ public class PortalDestination extends Destination {
 
     public String getOrientationString() {
         return this.orientationString;
+    }
+
+    public String getRequiredPermission() {
+        System.out.print("Requested permission for " + portal.getName());
+        return "multiverse.portal.access." + this.portal.getName();
     }
 
 }

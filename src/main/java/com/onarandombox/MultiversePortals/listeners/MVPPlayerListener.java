@@ -17,7 +17,7 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.utils.Destination;
+import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.InvalidDestination;
 
 public class MVPPlayerListener extends PlayerListener {
@@ -79,7 +79,7 @@ public class MVPPlayerListener extends PlayerListener {
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
         if (portal != null && ps.doTeleportPlayer(Type.PLAYER_MOVE) && !ps.showDebugInfo()) {
-            Destination d = portal.getDestination();
+            MVDestination d = portal.getDestination();
             if (d == null) {
                 return;
             }
