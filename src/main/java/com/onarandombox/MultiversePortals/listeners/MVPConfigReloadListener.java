@@ -19,7 +19,7 @@ public class MVPConfigReloadListener extends CustomEventListener {
             ((MVConfigReloadEvent)event).addConfig("Multiverse-Portals - portals.yml");
             ((MVConfigReloadEvent)event).addConfig("Multiverse-Portals - config.yml");
         } else if(event instanceof MVVersionRequestEvent) {
-            this.plugin.dumpVersionInfo();
+            ((MVVersionRequestEvent)event).setPasteBinBuffer(this.plugin.dumpVersionInfo(((MVVersionRequestEvent)event).getPasteBinBuffer()));
         }
     }
 }

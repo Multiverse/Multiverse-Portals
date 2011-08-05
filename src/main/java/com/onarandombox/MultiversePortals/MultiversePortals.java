@@ -296,15 +296,21 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     @Override
-    public void dumpVersionInfo() {
-        this.log(Level.INFO, "Multiverse-Portals Version: " + this.getDescription().getVersion());
-        this.log(Level.INFO, "Bukkit Version: " + this.getServer().getVersion());
-        this.log(Level.INFO, "Loaded Portals: " + this.getPortalManager().getAllPortals().size());
-        this.log(Level.INFO, "Dumping Portal Values: (version " + this.getPortalsConfig().getString("version", "NOT SET") + ")");
-        this.log(Level.INFO, this.getPortalsConfig().getAll() + "");
-        this.log(Level.INFO, "Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
-        this.log(Level.INFO, "wand: " + this.getMainConfig().getString("wand", "NOT SET"));
-        this.log(Level.INFO, "Special Code: FRN001");
+    public String dumpVersionInfo(String buffer) {
+        buffer += logAndAddToPasteBinBuffer("Multiverse-Portals Version: " + this.getDescription().getVersion());
+        buffer += logAndAddToPasteBinBuffer("Bukkit Version: " + this.getServer().getVersion());
+        buffer += logAndAddToPasteBinBuffer("Loaded Portals: " + this.getPortalManager().getAllPortals().size());
+        buffer += logAndAddToPasteBinBuffer("Dumping Portal Values: (version " + this.getPortalsConfig().getString("version", "NOT SET") + ")");
+        buffer += logAndAddToPasteBinBuffer(this.getPortalsConfig().getAll() + "");
+        buffer += logAndAddToPasteBinBuffer("Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
+        buffer += logAndAddToPasteBinBuffer("wand: " + this.getMainConfig().getString("wand", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
+        return buffer;
+    }
+    
+    private String logAndAddToPasteBinBuffer(String string) {
+        this.log(Level.INFO, string);
+        return "[Multiverse-Portals] " + string + "\n";
     }
 
     public void removePortalPlayerSession(String name) {
