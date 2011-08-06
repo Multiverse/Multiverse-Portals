@@ -102,7 +102,6 @@ public class PortalDestination implements MVDestination {
     }
 
     public String getRequiredPermission() {
-        System.out.print("Requested permission for " + portal.getName());
         return "multiverse.portal.access." + this.portal.getName();
     }
 

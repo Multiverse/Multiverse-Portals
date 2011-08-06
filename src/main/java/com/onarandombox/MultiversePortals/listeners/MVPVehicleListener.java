@@ -82,7 +82,7 @@ public class MVPVehicleListener extends VehicleListener {
         // Remove the player from the old one.
         v.eject();
         // Add an offset to ensure the player is 1 higher than where the cart was.
-        to.add(0, 1.5, 0);
+        to.add(0, .5, 0);
         // If they didn't teleport, return false and place them back into their vehicle.
         if (!tp.safelyTeleport(p, to)) {
             v.setPassenger(p);
