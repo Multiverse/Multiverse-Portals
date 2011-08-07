@@ -173,7 +173,7 @@ public class MVPortal {
         }
         this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
         this.config.save();
-        return true;
+        return !(this.destination instanceof InvalidDestination);
     }
 
     public boolean setExactDestination(Location location) {

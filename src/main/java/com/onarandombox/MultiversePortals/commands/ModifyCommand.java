@@ -3,6 +3,7 @@ package com.onarandombox.MultiversePortals.commands;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
@@ -82,13 +83,20 @@ public class ModifyCommand extends PortalCommand {
             // Simply chop off the rest, if they have loc, that's good enough!
             if (SetProperties.valueOf(args.get(0)) == SetProperties.loc || SetProperties.valueOf(args.get(0)) == SetProperties.location) {
                 this.setLocation(selectedPortal, player);
-                return; 
+                return;
+            }
+
+            if (SetProperties.valueOf(args.get(0)) == SetProperties.dest || SetProperties.valueOf(args.get(0)) == SetProperties.destination) {
+                if (args.get(1).equalsIgnoreCase("here")) {
+                    Location l = player.getLocation();
+                    args.set(1, "e:" + l.getWorld() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw());
+                }
             }
 
             if (this.setProperty(selectedPortal, args.get(0), args.get(1))) {
-                sender.sendMessage("Property " + args.get(0) + " of Portal " + selectedPortal.getName() + " was set to " + args.get(1));
+                sender.sendMessage("Property " + args.get(0) + " of Portal " + ChatColor.YELLOW + selectedPortal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + args.get(1));
             } else {
-                sender.sendMessage("Property " + args.get(0) + " of Portal " + selectedPortal.getName() + " was set to " + args.get(1));
+                sender.sendMessage("Property " + args.get(0) + " of Portal " + ChatColor.YELLOW + selectedPortal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + args.get(1));
             }
         }
     }
