@@ -52,7 +52,7 @@ public class MVPVehicleListener extends VehicleListener {
                 return false;
             }
 
-            Location l = d.getLocation();
+            Location l = d.getLocation(p);
             Vector vehicleVec = v.getVelocity();
 
             // 0 Yaw in dest = 0,X

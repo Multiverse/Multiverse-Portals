@@ -81,7 +81,7 @@ public class MVPPlayerListener extends PlayerListener {
             if (d == null) {
                 return;
             }
-            Location l = d.getLocation();
+            Location l = d.getLocation(event.getPlayer());
             // Vector v = event.getPlayer().getVelocity();
             // System.out.print("Vector: " + v.toString());
             // System.out.print("Fall Distance: " + event.getPlayer().getFallDistance());

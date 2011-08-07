@@ -1,13 +1,14 @@
 package com.onarandombox.MultiversePortals.utils;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
-import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.LocationManipulation;
+import com.onarandombox.utils.MVDestination;
 
 public class PortalDestination implements MVDestination {
     private MVPortal portal;
@@ -36,7 +37,7 @@ public class PortalDestination implements MVDestination {
     }
 
     @Override
-    public Location getLocation() {
+    public Location getLocation(Entity e) {
         PortalLocation pl = this.portal.getLocation();
         double portalWidth = Math.abs((pl.getMaximum().getBlockX()) - pl.getMinimum().getBlockX()) + 1;
         double portalDepth = Math.abs((pl.getMaximum().getBlockZ()) - pl.getMinimum().getBlockZ()) + 1;

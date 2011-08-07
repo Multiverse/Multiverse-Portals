@@ -98,6 +98,10 @@ public class PortalPlayerSession {
     }
 
     public void setStaleLocation(Location loc, Type moveType) {
+        if(this.getPlayerFromName() == null) {
+            // This should never happen, but seems to when someone gets kicked.
+            return;
+        }
         if (this.getPlayerFromName().isInsideVehicle() && moveType != Type.VEHICLE_MOVE) {
             return;
         }
