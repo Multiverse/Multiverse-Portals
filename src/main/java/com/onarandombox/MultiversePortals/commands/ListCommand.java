@@ -60,14 +60,23 @@ public class ListCommand extends PortalCommand {
         if (filter == null) {
             filter = "";
         }
+        boolean altColor = false;
         for (MVPortal p : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
             if (p.getName().matches("(i?).*" + filter + ".*")) {
-                portals += p.getName() + ", ";
+                if (altColor) {
+                    portals += ChatColor.YELLOW;
+                    altColor = false;
+                } else {
+                    portals += ChatColor.WHITE;
+                    altColor = true;
+                }
+                
+                portals += p.getName() + " ";
             }
 
         }
         if (portals.length() > 2) {
-            portals = portals.substring(0, portals.length() - 2);
+            portals = portals.substring(0, portals.length() - 1);
         }
         return portals;
     }
