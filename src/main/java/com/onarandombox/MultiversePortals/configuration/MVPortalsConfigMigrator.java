@@ -46,7 +46,7 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
         for (String key : keys) {
             newConfig.setProperty("portals." + key + ".entryfee.amount", oldConfig.getDouble("portals." + key + ".price", 0.0));
             newConfig.setProperty("portals." + key + ".entryfee.amount", -1);
-            newConfig.setProperty("portals." + key + ".destination", oldConfig.getProperty("portals." + key + ".destlocation"));
+            newConfig.setProperty("portals." + key + ".destination", transformDestination(oldConfig.getString("portals." + key + ".destlocation")));
             newConfig.setProperty("portals." + key + ".world", oldConfig.getProperty("portals." + key + ".world"));
             newConfig.setProperty("portals." + key + ".location", oldConfig.getProperty("portals." + key + ".location"));
             newConfig.setProperty("portals." + key + ".owner", oldConfig.getProperty("portals." + key + ".owner"));
@@ -55,7 +55,21 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
         MultiversePortals.staticLog(Level.INFO, "Migration SUCCESS!");
         return true;
     }
-    
+
+    // Old Ref:
+    // w:world:1271:68:-1:270.3718:13.200012
+    // New Ref:
+    // e:world:1271,68,-1:13.200012:270.3718
+    private String transformDestination(String property) {
+        String[] oldSplit = property.split(":");
+        if (oldSplit.length >= 7) {
+            return "e:" + oldSplit[1] + ":" + oldSplit[2] + "," + oldSplit[3] + "," + oldSplit[4] + ":" + oldSplit[6] + ":" + oldSplit[5];
+        } else if(oldSplit.length >= 5) {
+            return "e:" + oldSplit[1] + ":" + oldSplit[2] + "," + oldSplit[3] + "," + oldSplit[4];
+        }
+        return property;
+    }
+
     private boolean migrateConfig(String name, File oldFolder, File newFolder) {
         Configuration newConfig = new Configuration(new File(newFolder, "config.yml"));
         MultiversePortals.staticLog(Level.INFO, "Trying to migrate MultiVerse.yml...");
