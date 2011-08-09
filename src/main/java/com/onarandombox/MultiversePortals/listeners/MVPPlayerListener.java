@@ -15,8 +15,8 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.InvalidDestination;
+import com.onarandombox.utils.MVDestination;
 
 public class MVPPlayerListener extends PlayerListener {
     // This is a wooden axe
@@ -81,7 +81,6 @@ public class MVPPlayerListener extends PlayerListener {
             if (d == null) {
                 return;
             }
-            Location l = d.getLocation(event.getPlayer());
             // Vector v = event.getPlayer().getVelocity();
             // System.out.print("Vector: " + v.toString());
             // System.out.print("Fall Distance: " + event.getPlayer().getFallDistance());
@@ -92,27 +91,28 @@ public class MVPPlayerListener extends PlayerListener {
                 return;
             }
 
-            MVWorld world = this.plugin.getCore().getMVWorld(l.getWorld().getName());
+            MVWorld world = this.plugin.getCore().getMVWorld(d.getLocation(p).getWorld().getName());
             if (world == null) {
                 return;
             }
             // If the player does not have to pay, return now.
             if (world.isExempt(event.getPlayer()) || portal.isExempt(event.getPlayer())) {
-                performTeleport(event, ps, l);
+                performTeleport(event, ps, d);
                 return;
             }
             GenericBank bank = plugin.getCore().getBank();
             if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
                 bank.pay(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                performTeleport(event, ps, l);
+                performTeleport(event, ps, d);
             }
         }
     }
 
-    private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, Location l) {
+    private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
         MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
-        if (playerTeleporter.safelyTeleport(event.getPlayer(), l)) {
+        if (playerTeleporter.safelyTeleport(event.getPlayer(), d.getLocation(event.getPlayer()))) {
             ps.playerDidTeleport(event.getTo());
+            event.getPlayer().setVelocity(d.getVelocity());
         }
     }
 }

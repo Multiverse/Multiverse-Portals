@@ -13,6 +13,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import com.onarandombox.utils.LocationManipulation;
 
 public class CreateCommand extends PortalCommand {
 
@@ -66,7 +67,23 @@ public class CreateCommand extends PortalCommand {
         if (args.size() > 1 && portal != null) {
             String dest = args.get(1);
             if (dest.equalsIgnoreCase("here")) {
-                portal.setExactDestination(p.getLocation());
+                MVPortal standingIn = ps.getUncachedStandingInPortal();
+                if (standingIn != null) {
+                    // If they're standing in a portal. treat it differently, niftily you might say...
+                    String cardinal = LocationManipulation.getDirection(p.getLocation());
+                    portal.setDestination("p:" + standingIn.getName() + ":" + cardinal);
+                } else {
+                    portal.setExactDestination(p.getLocation());
+                }
+            } else if (dest.matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
+                // We found a Cannon Destination!
+                try {
+                    Double speed = Double.parseDouble(dest.split("-")[1]);
+                    portal.setCannonDestination(p.getLocation(), speed);
+                } catch (NumberFormatException e) {
+                    portal.setDestination(args.get(1));
+                }
+
             } else {
                 portal.setDestination(args.get(1));
             }

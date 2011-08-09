@@ -98,7 +98,7 @@ public class PortalPlayerSession {
     }
 
     public void setStaleLocation(Location loc, Type moveType) {
-        if(this.getPlayerFromName() == null) {
+        if (this.getPlayerFromName() == null) {
             // This should never happen, but seems to when someone gets kicked.
             return;
         }
@@ -170,8 +170,22 @@ public class PortalPlayerSession {
         return new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
     }
 
+    /**
+     * If a player teleports from A - B, this method will report A even if the player is in B. This is done for hysteresis.
+     * 
+     * @return
+     */
     public MVPortal getStandingInPortal() {
         return this.standingIn;
+    }
+
+    /**
+     * This will ALWAYS return the portal a player is actually in. See {@method getStandingInPortal}
+     * 
+     * @return
+     */
+    public MVPortal getUncachedStandingInPortal() {
+        return this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
     }
 
     /**

@@ -14,6 +14,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import com.onarandombox.utils.LocationManipulation;
 
 enum SetProperties {
     destination, dest, owner, loc, location, price, currency, curr
@@ -88,8 +89,24 @@ public class ModifyCommand extends PortalCommand {
 
             if (SetProperties.valueOf(args.get(0)) == SetProperties.dest || SetProperties.valueOf(args.get(0)) == SetProperties.destination) {
                 if (args.get(1).equalsIgnoreCase("here")) {
+                    PortalPlayerSession ps = this.plugin.getPortalSession(player);
+                    MVPortal standingIn = ps.getUncachedStandingInPortal();
                     Location l = player.getLocation();
-                    args.set(1, "e:" + l.getWorld() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw());
+                    if (standingIn != null) {
+                        String cardinal = LocationManipulation.getDirection(l);
+                        args.set(1, "p:" + standingIn.getName() + ":" + cardinal);
+                    } else {
+                        args.set(1, "e:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw());
+                    }
+                }else if (args.get(1).matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
+                    // We found a Cannon Destination!
+                    Location l = player.getLocation();
+                    try {
+                        Double speed = Double.parseDouble(args.get(1).split("-")[1]);
+                        args.set(1, "ca:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw() + ":" + speed);
+                    } catch (NumberFormatException e) {
+                    }
+
                 }
             }
 

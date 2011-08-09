@@ -10,6 +10,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.utils.CannonDestination;
 import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.ExactDestination;
 import com.onarandombox.utils.InvalidDestination;
@@ -271,6 +272,19 @@ public class MVPortal {
 
     public Permission getExempt() {
         return this.exempt;
+    }
+
+    public boolean setCannonDestination(Location location, Double speed) {
+        this.destination = new CannonDestination();
+        ((CannonDestination) this.destination).setDestination(location, speed);
+        if (!this.destination.isValid()) {
+            this.destination = new InvalidDestination();
+            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
+            return false;
+        }
+        this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
+        this.config.save();
+        return true;
     }
 
 }

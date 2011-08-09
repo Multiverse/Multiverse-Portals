@@ -3,6 +3,7 @@ package com.onarandombox.MultiversePortals.utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -104,6 +105,9 @@ public class PortalDestination implements MVDestination {
 
     public String getRequiredPermission() {
         return "multiverse.portal.access." + this.portal.getName();
+    }
+    public Vector getVelocity() {
+        return new Vector(0,0,0);
     }
 
 }

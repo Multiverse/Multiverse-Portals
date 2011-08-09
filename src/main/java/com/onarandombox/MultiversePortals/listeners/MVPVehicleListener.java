@@ -67,33 +67,36 @@ public class MVPVehicleListener extends VehicleListener {
 
             // The worlds are different! Ahhh!
             if (!l.getWorld().equals(p.getWorld())) {
-                return teleportVehicleSeperately(p, v, l, ps, playerTeleporter);
+                return teleportVehicleSeperately(p, v, d, ps, playerTeleporter);
             }
 
             if (playerTeleporter.safelyTeleport(v, l)) {
                 ps.playerDidTeleport(to);
+                setVehicleVelocity(v.getVelocity(), d, v);
             }
             return true;
         }
         return false;
     }
 
-    private boolean teleportVehicleSeperately(Player p, Vehicle v, Location to, PortalPlayerSession ps, MVTeleport tp) {
+    private boolean teleportVehicleSeperately(Player p, Vehicle v, MVDestination to, PortalPlayerSession ps, MVTeleport tp) {
         // Remove the player from the old one.
         v.eject();
+        Location toLocation = to.getLocation(v);
         // Add an offset to ensure the player is 1 higher than where the cart was.
-        to.add(0, .5, 0);
+        toLocation.add(0, .5, 0);
         // If they didn't teleport, return false and place them back into their vehicle.
-        if (!tp.safelyTeleport(p, to)) {
+        if (!tp.safelyTeleport(p, toLocation)) {
             v.setPassenger(p);
             return false;
         }
 
         // Now create a new vehicle:
-        Vehicle newVehicle = to.getWorld().spawn(to, v.getClass());
+        Vehicle newVehicle = toLocation.getWorld().spawn(toLocation, v.getClass());
 
         // Set the vehicle's velocity to ours.
-        newVehicle.setVelocity(v.getVelocity());
+
+        setVehicleVelocity(v.getVelocity(), to, newVehicle);
 
         // Set the new player
         newVehicle.setPassenger(p);
@@ -102,5 +105,13 @@ public class MVPVehicleListener extends VehicleListener {
         v.remove();
 
         return true;
+    }
+
+    private void setVehicleVelocity(Vector calculated, MVDestination to, Vehicle newVehicle) {
+        if (!to.getVelocity().equals(new Vector(0, 0, 0))) {
+            newVehicle.setVelocity(to.getVelocity());
+        } else {
+            newVehicle.setVelocity(calculated);
+        }
     }
 }
