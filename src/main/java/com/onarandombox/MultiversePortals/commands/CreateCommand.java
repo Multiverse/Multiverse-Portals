@@ -3,6 +3,7 @@ package com.onarandombox.MultiversePortals.commands;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
@@ -77,11 +78,12 @@ public class CreateCommand extends PortalCommand {
                 }
             } else if (dest.matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
                 // We found a Cannon Destination!
+                Location l = p.getLocation();
                 try {
-                    Double speed = Double.parseDouble(dest.split("-")[1]);
-                    portal.setCannonDestination(p.getLocation(), speed);
+                    Double speed = Double.parseDouble(args.get(1).split("-")[1]);
+                    portal.setDestination("ca:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw() + ":" + speed);
                 } catch (NumberFormatException e) {
-                    portal.setDestination(args.get(1));
+                    portal.setDestination("i:invalid");
                 }
 
             } else {

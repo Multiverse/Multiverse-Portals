@@ -274,17 +274,4 @@ public class MVPortal {
         return this.exempt;
     }
 
-    public boolean setCannonDestination(Location location, Double speed) {
-        this.destination = new CannonDestination();
-        ((CannonDestination) this.destination).setDestination(location, speed);
-        if (!this.destination.isValid()) {
-            this.destination = new InvalidDestination();
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
-            return false;
-        }
-        this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
-        this.config.save();
-        return true;
-    }
-
 }
