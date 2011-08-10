@@ -113,7 +113,8 @@ public class PortalManager {
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         for (MVPortal p : all) {
-            if (p.getLocation().getMVWorld().equals(world)) {
+            MVWorld portalworld = p.getLocation().getMVWorld();
+            if (portalworld != null && portalworld.equals(world)) {
                 validItems.add(p);
             }
         }
@@ -141,9 +142,9 @@ public class PortalManager {
         }
         return null;
     }
-    
+
     public MVPortal getPortal(String portalName, CommandSender sender) {
-        if(!this.plugin.getCore().getPermissions().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
+        if (!this.plugin.getCore().getPermissions().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
             return null;
         }
         return this.getPortal(portalName);

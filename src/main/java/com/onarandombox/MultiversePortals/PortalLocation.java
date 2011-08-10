@@ -126,6 +126,9 @@ public class PortalLocation {
     }
 
     public MVWorld getMVWorld() {
+        if(this.region == null) {
+            return null;
+        }
         return this.region.getWorld();
     }
 
