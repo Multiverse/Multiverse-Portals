@@ -46,7 +46,7 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
         for (String key : keys) {
             newConfig.setProperty("portals." + key + ".entryfee.amount", oldConfig.getDouble("portals." + key + ".price", 0.0));
             newConfig.setProperty("portals." + key + ".entryfee.amount", -1);
-            newConfig.setProperty("portals." + key + ".destination", transformDestination(oldConfig.getString("portals." + key + ".destlocation")));
+            newConfig.setProperty("portals." + key + ".destination", transformDestination(oldConfig.getString("portals." + key + ".destlocation", "i:Invalid")));
             newConfig.setProperty("portals." + key + ".world", oldConfig.getProperty("portals." + key + ".world"));
             newConfig.setProperty("portals." + key + ".location", oldConfig.getProperty("portals." + key + ".location"));
             newConfig.setProperty("portals." + key + ".owner", oldConfig.getProperty("portals." + key + ".owner"));

@@ -10,7 +10,6 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.utils.CannonDestination;
 import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.ExactDestination;
 import com.onarandombox.utils.InvalidDestination;
