@@ -234,7 +234,7 @@ public class PortalPlayerSession {
         getPlayerFromName().sendMessage("More details for you: " + ChatColor.GREEN + portal.getDestination());
         if (portal.getPrice() > 0) {
             GenericBank bank = this.plugin.getCore().getBank();
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(portal.getPrice(), portal.getCurrency()));
+            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(getPlayerFromName(), portal.getPrice(), portal.getCurrency()));
         } else {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + "FREE!");
         }
