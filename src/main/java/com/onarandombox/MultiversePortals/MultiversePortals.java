@@ -86,9 +86,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
         this.core.incrementPluginCount();
 
-        // Register our events
-        this.registerEvents();
-
         // Register our commands
         this.registerCommands();
 
@@ -101,6 +98,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         this.loadPortals();
         this.loadConfig();
+        
+        // Register our events AFTER the config.
+        this.registerEvents();
 
         this.checkForWorldEdit();
     }
@@ -123,6 +123,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, this.customListener, Priority.Normal, this);
+        // High priority so we override NetherPortals
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.High, this);
         // These will only get used if WE is not found. so they're monitor.
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, this.playerListener, Priority.Low, this);
     }

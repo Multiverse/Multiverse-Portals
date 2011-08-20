@@ -12,6 +12,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.fernferret.allpay.GenericBank;
@@ -53,7 +54,8 @@ public class MVPPlayerListener extends PlayerListener {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
             this.plugin.log(Level.FINER, "Player is ligting block: " + LocationManipulation.strCoordsRaw(event.getClickedBlock().getLocation()));
-            this.checkLocationInsidePortal(event.getPlayer(), this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace()));
+            event.setCancelled(this.checkLocationInsidePortal(event.getPlayer(), this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace())));
+            return;
         }
 
         // Portal Wand stuff
@@ -82,12 +84,13 @@ public class MVPPlayerListener extends PlayerListener {
         return newLoc;
     }
 
-    private void checkLocationInsidePortal(Player p, Location l) {
+    private boolean checkLocationInsidePortal(Player p, Location l) {
 
         MVPortal portal = portalManager.isPortal(p, l);
         if (portal != null) {
-            this.filler.fillRegion(portal.getLocation().getRegion());
+            return this.filler.fillRegion(portal.getLocation().getRegion(), l);
         }
+        return false;
     }
 
     @Override
@@ -150,5 +153,20 @@ public class MVPPlayerListener extends PlayerListener {
             ps.playerDidTeleport(event.getTo());
             event.getPlayer().setVelocity(d.getVelocity());
         }
+    }
+
+    @Override
+    public void onPlayerPortal(PlayerPortalEvent event) {
+        PortalManager pm = this.plugin.getPortalManager();
+        // Determine if we're in a portal
+        MVPortal portal = pm.isPortal(event.getPlayer(), event.getPlayer().getLocation());
+        if (portal != null) {
+            MVDestination portalDest = portal.getDestination();
+            if (!(portalDest instanceof InvalidDestination)) {
+                event.setTo(portal.getDestination().getLocation(event.getPlayer()));
+                this.plugin.log(Level.FINE, "Sending player to a location!");    
+            }
+        }
+
     }
 }

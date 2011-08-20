@@ -14,6 +14,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.utils.LocationManipulation;
 
 public class CreateCommand extends PortalCommand {
@@ -91,6 +92,8 @@ public class CreateCommand extends PortalCommand {
             }
 
         }
+        PortalFiller filler = new PortalFiller(this.plugin.getCore());
+        filler.fillRegion(portal.getLocation().getRegion(), portal.getWorld().getSpawnLocation());
 
     }
 }
