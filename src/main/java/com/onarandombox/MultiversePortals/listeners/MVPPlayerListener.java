@@ -1,6 +1,11 @@
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.Action;
@@ -15,16 +20,22 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.utils.PortalFiller;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.InvalidDestination;
+import com.onarandombox.utils.LocationManipulation;
 import com.onarandombox.utils.MVDestination;
 
 public class MVPPlayerListener extends PlayerListener {
     // This is a wooden axe
 
     private MultiversePortals plugin;
+    private PortalFiller filler;
+    private PortalManager portalManager;
 
     public MVPPlayerListener(MultiversePortals plugin) {
         this.plugin = plugin;
+        this.filler = new PortalFiller(plugin.getCore());
     }
 
     @Override
@@ -38,6 +49,14 @@ public class MVPPlayerListener extends PlayerListener {
 
     @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
+        // Portal lighting stuff
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType() == Material.FLINT_AND_STEEL) {
+            // They're lighting somethin'
+            this.plugin.log(Level.FINER, "Player is ligting block: " + LocationManipulation.strCoordsRaw(event.getClickedBlock().getLocation()));
+            this.checkLocationInsidePortal(event.getPlayer(), this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace()));
+        }
+
+        // Portal Wand stuff
         if (this.plugin.getWEAPI() != null || !this.plugin.getCore().getPermissions().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;
         }
@@ -51,6 +70,23 @@ public class MVPPlayerListener extends PlayerListener {
             MVWorld world = this.plugin.getCore().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setRightClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
+        }
+    }
+
+    private Location getTranslatedLocation(Block clickedBlock, BlockFace face) {
+        Location clickedLoc = clickedBlock.getLocation();
+        Location newLoc = new Location(clickedBlock.getWorld(), face.getModX() + clickedLoc.getBlockX(), face.getModY() + clickedLoc.getBlockY(), face.getModZ() + clickedLoc.getBlockZ());
+        this.portalManager = this.plugin.getPortalManager();
+        this.plugin.log(Level.FINEST, "Clicked Block: " + clickedBlock.getLocation());
+        this.plugin.log(Level.FINEST, "Translated Block: " + newLoc);
+        return newLoc;
+    }
+
+    private void checkLocationInsidePortal(Player p, Location l) {
+
+        MVPortal portal = portalManager.isPortal(p, l);
+        if (portal != null) {
+            this.filler.fillRegion(portal.getLocation().getRegion());
         }
     }
 

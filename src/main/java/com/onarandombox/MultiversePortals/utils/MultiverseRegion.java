@@ -42,20 +42,29 @@ public class MultiverseRegion {
     public Vector getMaximumPoint() {
         return this.max;
     }
-    
+
     public MVWorld getWorld() {
         return this.world;
     }
 
-    public int getArea() {
-        int width = Math.abs((this.max.getBlockX() + 1) - this.min.getBlockX());
-        int height = Math.abs((this.max.getBlockY() + 1) - this.min.getBlockY());
-        int depth = Math.abs((this.max.getBlockZ() + 1) - this.min.getBlockZ());
-        return width * height * depth;
+    public int getWidth() {
+        return Math.abs((this.max.getBlockX() + 1) - this.min.getBlockX());
     }
-    
+
+    public int getHeight() {
+        return Math.abs((this.max.getBlockY() + 1) - this.min.getBlockY());
+    }
+
+    public int getDepth() {
+        return Math.abs((this.max.getBlockZ() + 1) - this.min.getBlockZ());
+    }
+
+    public int getArea() {
+        return this.getWidth() * this.getHeight() * this.getDepth();
+    }
+
     public boolean containsVector(Location l) {
-        if(!this.world.getCBWorld().equals(l.getWorld())) {
+        if (!this.world.getCBWorld().equals(l.getWorld())) {
             return false;
         }
         if (!(l.getBlockX() >= min.getBlockX() && l.getBlockX() <= max.getBlockX())) {

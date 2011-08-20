@@ -285,6 +285,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         log.log(level, logPrefix + " " + msg);
         debugLog.log(level, logPrefix + " " + msg);
     }
+    
+    public static void staticDebugLog(Level level, String msg) {
+        log.log(level, "[MVPortals-Debug] " + msg);
+        debugLog.log(level, "[MVPortals-Debug] " + msg);
+    }
 
     public void setWorldEditAPI(WorldEditAPI api) {
         this.worldEditAPI = api;
@@ -292,7 +297,19 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     @Override
     public void log(Level level, String msg) {
-        staticLog(level, msg);
+        if (level == Level.FINE && MultiverseCore.GlobalDebug >= 1) {
+            staticDebugLog(Level.INFO, msg);
+            return;
+        } else if (level == Level.FINER && MultiverseCore.GlobalDebug >= 2) {
+            staticDebugLog(Level.INFO, msg);
+            return;
+        } else if (level == Level.FINEST && MultiverseCore.GlobalDebug >= 3) {
+            staticDebugLog(Level.INFO, msg);
+            return;
+        } else if (level != Level.FINE && level != Level.FINER && level != Level.FINEST) {
+            staticLog(level, msg);
+        }
+        
     }
 
     @Override
