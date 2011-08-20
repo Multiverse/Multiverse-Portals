@@ -1,9 +1,7 @@
 package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockListener;
 
 import com.onarandombox.MultiversePortals.MVPortal;
@@ -29,13 +27,6 @@ public class MVPBlockListener extends BlockListener {
         if (portal != null) {
             event.setCancelled(true);
             return;
-        }
-    }
-
-    @Override
-    public void onBlockIgnite(BlockIgniteEvent event) {
-        if (event.getCause() == IgniteCause.FLINT_AND_STEEL) {
-            
         }
     }
     

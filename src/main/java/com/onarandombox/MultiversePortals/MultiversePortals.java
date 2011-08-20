@@ -116,7 +116,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Register our listeners with the Bukkit Server
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
+        // Only register this one if they want it
+        if(this.MVPconfig.getBoolean("useonmove", true)) {
+            this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
+        }
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, this.playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, this.playerListener, Priority.Monitor, this);
@@ -194,6 +197,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPconfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPconfig.load();
+        this.MVPconfig.getBoolean("use_onmove", true);
+        this.MVPconfig.getBoolean("mvportals_default_to_nether", false);
+        this.MVPconfig.save();
+        
     }
 
     public void onDisable() {
@@ -278,7 +285,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadConfig();
     }
     /**
-     * Print messages to the server Log as well as to our DebugLog. 'debugLog' is used to seperate Heroes information from the Servers Log Output.
+     * Print messages to the server Log as well as to our DebugLog.
      * 
      * @param level
      * @param msg

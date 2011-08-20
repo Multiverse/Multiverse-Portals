@@ -2,8 +2,10 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -21,6 +23,7 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.InvalidDestination;
@@ -54,7 +57,18 @@ public class MVPPlayerListener extends PlayerListener {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
             this.plugin.log(Level.FINER, "Player is ligting block: " + LocationManipulation.strCoordsRaw(event.getClickedBlock().getLocation()));
-            event.setCancelled(this.checkLocationInsidePortal(event.getPlayer(), this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace())));
+            PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
+            Location translatedLocation = this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace());
+            MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+            // Cancel the event if there was a portal.
+            if (portal != null) {
+                if (ps.isDebugModeOn()) {
+                    ps.showDebugInfo(portal);
+                    event.setCancelled(true);
+                } else {
+                    event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation));
+                }
+            }
             return;
         }
 
@@ -82,15 +96,6 @@ public class MVPPlayerListener extends PlayerListener {
         this.plugin.log(Level.FINEST, "Clicked Block: " + clickedBlock.getLocation());
         this.plugin.log(Level.FINEST, "Translated Block: " + newLoc);
         return newLoc;
-    }
-
-    private boolean checkLocationInsidePortal(Player p, Location l) {
-
-        MVPortal portal = portalManager.isPortal(p, l);
-        if (portal != null) {
-            return this.filler.fillRegion(portal.getLocation().getRegion(), l);
-        }
-        return false;
     }
 
     @Override
@@ -162,9 +167,15 @@ public class MVPPlayerListener extends PlayerListener {
         MVPortal portal = pm.isPortal(event.getPlayer(), event.getPlayer().getLocation());
         if (portal != null) {
             MVDestination portalDest = portal.getDestination();
-            if (!(portalDest instanceof InvalidDestination)) {
-                event.setTo(portal.getDestination().getLocation(event.getPlayer()));
-                this.plugin.log(Level.FINE, "Sending player to a location!");    
+            if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
+                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest.getLocation(event.getPlayer()), event.getPlayer());
+                event.setPortalTravelAgent(agent);
+                event.useTravelAgent(true);
+                this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
+            } else if (!this.plugin.getMainConfig().getBoolean("mvportals_default_to_nether", false)) {
+                // If portals should not default to the nether, cancel the event
+                event.getPlayer().sendMessage("This portal " + ChatColor.RED + "doesn't go anywhere." + ChatColor.RED + " You should exit it now.");
+                event.setCancelled(true);
             }
         }
 

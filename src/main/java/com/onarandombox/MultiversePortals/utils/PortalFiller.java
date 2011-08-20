@@ -4,7 +4,6 @@ import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
