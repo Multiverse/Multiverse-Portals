@@ -1,6 +1,7 @@
 package com.onarandombox.MultiversePortals.utils;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -8,6 +9,7 @@ import org.bukkit.util.Vector;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.utils.BlockSafety;
 import com.onarandombox.utils.LocationManipulation;
 import com.onarandombox.utils.MVDestination;
 
@@ -44,11 +46,32 @@ public class PortalDestination implements MVDestination {
         double portalDepth = Math.abs((pl.getMaximum().getBlockZ()) - pl.getMinimum().getBlockZ()) + 1;
 
         double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
-        double finalY = pl.getMinimum().getBlockY();
+        // double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
+        double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), this.portal.getWorld());
         Location l = new Location(this.portal.getWorld(), finalX, finalY, finalZ, LocationManipulation.getYaw(this.orientationString), 0);
 
         return l;
+    }
+
+    /**
+     * Allows us to check the column first but only when doing portals
+     * 
+     * @param finalX
+     * @param finalZ
+     * @param y
+     * @param yMax
+     * @param w
+     * @return
+     */
+    private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
+        BlockSafety bs = new BlockSafety();
+        for (int i = y; i < yMax; i++) {
+            if (bs.playerCanSpawnHereSafely(w, finalX, i, finalZ)) {
+                return i;
+            }
+        }
+        return y;
     }
 
     @Override
@@ -106,8 +129,9 @@ public class PortalDestination implements MVDestination {
     public String getRequiredPermission() {
         return "multiverse.portal.access." + this.portal.getName();
     }
+
     public Vector getVelocity() {
-        return new Vector(0,0,0);
+        return new Vector(0, 0, 0);
     }
 
 }

@@ -110,7 +110,7 @@ public class MVPPlayerListener extends PlayerListener {
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
         MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
-        if (playerTeleporter.safelyTeleport(event.getPlayer(), d.getLocation(event.getPlayer()))) {
+        if (playerTeleporter.safelyTeleport(event.getPlayer(), d)) {
             ps.playerDidTeleport(event.getTo());
             event.getPlayer().setVelocity(d.getVelocity());
         }

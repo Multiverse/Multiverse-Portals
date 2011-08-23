@@ -70,9 +70,8 @@ public class MVPVehicleListener extends VehicleListener {
                 return teleportVehicleSeperately(p, v, d, ps, playerTeleporter);
             }
 
-            if (playerTeleporter.safelyTeleport(v, l)) {
+            if (playerTeleporter.safelyTeleport(v, d)) {
                 ps.playerDidTeleport(to);
-                setVehicleVelocity(v.getVelocity(), d, v);
             }
             return true;
         }
@@ -84,9 +83,9 @@ public class MVPVehicleListener extends VehicleListener {
         v.eject();
         Location toLocation = to.getLocation(v);
         // Add an offset to ensure the player is 1 higher than where the cart was.
-        toLocation.add(0, .5, 0);
+        to.getLocation(p).add(0,.5,0);
         // If they didn't teleport, return false and place them back into their vehicle.
-        if (!tp.safelyTeleport(p, toLocation)) {
+        if (!tp.safelyTeleport(p, to)) {
             v.setPassenger(p);
             return false;
         }
