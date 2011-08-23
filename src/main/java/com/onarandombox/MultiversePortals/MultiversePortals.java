@@ -117,7 +117,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         // Only register this one if they want it
-        if(this.MVPconfig.getBoolean("useonmove", true)) {
+        if(this.MVPconfig.getBoolean("use_onmove", true)) {
             this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         }
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);

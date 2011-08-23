@@ -23,12 +23,12 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.onarandombox.utils.InvalidDestination;
 import com.onarandombox.utils.LocationManipulation;
 import com.onarandombox.utils.MVDestination;
+import com.onarandombox.utils.MVTravelAgent;
 
 public class MVPPlayerListener extends PlayerListener {
     // This is a wooden axe
@@ -154,9 +154,8 @@ public class MVPPlayerListener extends PlayerListener {
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
         MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
-        if (playerTeleporter.safelyTeleport(event.getPlayer(), d.getLocation(event.getPlayer()))) {
+        if (playerTeleporter.safelyTeleport(event.getPlayer(), d)) {
             ps.playerDidTeleport(event.getTo());
-            event.getPlayer().setVelocity(d.getVelocity());
         }
     }
 
@@ -168,7 +167,7 @@ public class MVPPlayerListener extends PlayerListener {
         if (portal != null) {
             MVDestination portalDest = portal.getDestination();
             if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
-                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest.getLocation(event.getPlayer()), event.getPlayer());
+                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
                 event.setPortalTravelAgent(agent);
                 event.useTravelAgent(true);
                 this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
