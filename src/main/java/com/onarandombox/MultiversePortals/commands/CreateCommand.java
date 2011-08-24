@@ -93,7 +93,7 @@ public class CreateCommand extends PortalCommand {
 
         }
         PortalFiller filler = new PortalFiller(this.plugin.getCore());
-        filler.fillRegion(portal.getLocation().getRegion(), portal.getWorld().getSpawnLocation());
+        //filler.fillRegion(portal.getLocation().getRegion(), portal.getWorld().getSpawnLocation());
 
     }
 }
