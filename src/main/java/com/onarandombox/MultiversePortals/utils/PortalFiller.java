@@ -33,19 +33,21 @@ public class PortalFiller {
         Block oldLoc = l.getWorld().getBlockAt(l);
         doFill(oldLoc, useX, useZ, r);
     }
+
     /**
      * Recursively fills out from a single point!
+     * 
      * @param newLoc
      * @param useX
      * @param useZ
      */
     private void doFill(Block newLoc, int useX, int useZ, MultiverseRegion r) {
-        if(isAirOrWater(newLoc.getLocation())) {
+        if (isAirOrWater(newLoc.getLocation())) {
             newLoc.setTypeId(Material.PORTAL.getId(), false);
         }
         if (isAirOrWater(newLoc.getRelative(useX * 1, 0, useZ * 1).getLocation())) {
             Block tmpLoc = newLoc.getRelative(useX * 1, 0, useZ * 1);
-            if(!r.containsVector(tmpLoc.getLocation())) {
+            if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
             this.plugin.log(Level.FINER, "Moving Right/Left: " + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
@@ -53,7 +55,7 @@ public class PortalFiller {
         }
         if (isAirOrWater(newLoc.getRelative(useX * 0, 1, useZ * 0).getLocation())) {
             Block tmpLoc = newLoc.getRelative(useX * 0, 1, useZ * 0);
-            if(!r.containsVector(tmpLoc.getLocation())) {
+            if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
             this.plugin.log(Level.FINER, "Moving Up" + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
@@ -61,7 +63,7 @@ public class PortalFiller {
         }
         if (isAirOrWater(newLoc.getRelative(useX * -1, 0, useZ * -1).getLocation())) {
             Block tmpLoc = newLoc.getRelative(useX * -1, 0, useZ * -1);
-            if(!r.containsVector(tmpLoc.getLocation())) {
+            if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
             this.plugin.log(Level.FINER, "Moving Left/Right" + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
@@ -69,7 +71,7 @@ public class PortalFiller {
         }
         if (isAirOrWater(newLoc.getRelative(useX * 0, -1, useZ * 0).getLocation())) {
             Block tmpLoc = newLoc.getRelative(useX * 0, -1, useZ * 0);
-            if(!r.containsVector(tmpLoc.getLocation())) {
+            if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
             this.plugin.log(Level.FINER, "Moving Down" + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
