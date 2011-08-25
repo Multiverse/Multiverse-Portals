@@ -14,7 +14,6 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
-import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.utils.LocationManipulation;
 
 public class CreateCommand extends PortalCommand {
@@ -39,11 +38,11 @@ public class CreateCommand extends PortalCommand {
         }
         p = (Player) sender;
 
-        if (!this.plugin.getCore().isMVWorld(p.getWorld().getName())) {
+        if (!this.plugin.getCore().getWorldManager().isMVWorld(p.getWorld().getName())) {
             this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
             return;
         }
-        MVWorld world = this.plugin.getCore().getMVWorld(p.getWorld().getName());
+        MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(p.getWorld().getName());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
 
@@ -92,8 +91,5 @@ public class CreateCommand extends PortalCommand {
             }
 
         }
-        PortalFiller filler = new PortalFiller(this.plugin.getCore());
-        //filler.fillRegion(portal.getLocation().getRegion(), portal.getWorld().getSpawnLocation());
-
     }
 }

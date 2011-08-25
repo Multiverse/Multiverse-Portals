@@ -126,7 +126,7 @@ public class ModifyCommand extends PortalCommand {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
         MultiverseRegion r = ps.getSelectedRegion();
         if (r != null) {
-            MVWorld world = this.plugin.getCore().getMVWorld(player.getWorld().getName());
+            MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(player.getWorld().getName());
             PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
             selectedPortal.setPortalLocation(location);
             player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");

@@ -13,6 +13,7 @@ import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.ExactDestination;
 import com.onarandombox.utils.InvalidDestination;
+import com.onarandombox.utils.WorldManager;
 
 public class MVPortal {
     private String name;
@@ -26,6 +27,7 @@ public class MVPortal {
     private Permission exempt;
     private int currency = -1;
     private double price = 0.0;
+    private WorldManager worldManager;
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
@@ -38,7 +40,7 @@ public class MVPortal {
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
         this.addToUpperLists();
-
+        this.worldManager = this.plugin.getCore().getWorldManager();
     }
 
     private void addToUpperLists() {
@@ -129,8 +131,8 @@ public class MVPortal {
 
     public boolean setPortalLocation(String locationString, String worldString) {
         MVWorld world = null;
-        if (((MultiversePortals) this.plugin).getCore().isMVWorld(worldString)) {
-            world = ((MultiversePortals) this.plugin).getCore().getMVWorld(worldString);
+        if (this.worldManager.isMVWorld(worldString)) {
+            world = this.worldManager.getMVWorld(worldString);
         }
         return this.setPortalLocation(locationString, world);
     }

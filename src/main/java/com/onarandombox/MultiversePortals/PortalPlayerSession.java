@@ -145,7 +145,7 @@ public class PortalPlayerSession {
                 // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
                 r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMinimumPoint(),
                         this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMaximumPoint(),
-                        this.plugin.getCore().getMVWorld(this.getPlayerFromName().getWorld().getName()));
+                        this.plugin.getCore().getWorldManager().getMVWorld(this.getPlayerFromName().getWorld().getName()));
             } catch (Exception e) {
                 this.getPlayerFromName().sendMessage("You haven't finished your selection.");
                 return null;

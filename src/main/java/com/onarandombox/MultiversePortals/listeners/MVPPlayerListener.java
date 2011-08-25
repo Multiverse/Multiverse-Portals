@@ -78,12 +78,12 @@ public class MVPPlayerListener extends PlayerListener {
         }
         int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
         if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
-            MVWorld world = this.plugin.getCore().getMVWorld(event.getPlayer().getWorld().getName());
+            MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setLeftClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
         }
         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
-            MVWorld world = this.plugin.getCore().getMVWorld(event.getPlayer().getWorld().getName());
+            MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setRightClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
         }
@@ -125,17 +125,14 @@ public class MVPPlayerListener extends PlayerListener {
             if (d == null) {
                 return;
             }
-            // Vector v = event.getPlayer().getVelocity();
-            // System.out.print("Vector: " + v.toString());
-            // System.out.print("Fall Distance: " + event.getPlayer().getFallDistance());
             event.getPlayer().setFallDistance(0);
 
             if (d instanceof InvalidDestination) {
-                // System.out.print("Invalid dest!");
+                this.plugin.log(Level.FINE, "Invalid Destination!");
                 return;
             }
 
-            MVWorld world = this.plugin.getCore().getMVWorld(d.getLocation(p).getWorld().getName());
+            MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(d.getLocation(p).getWorld().getName());
             if (world == null) {
                 return;
             }

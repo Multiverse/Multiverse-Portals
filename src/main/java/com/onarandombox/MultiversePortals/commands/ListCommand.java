@@ -28,7 +28,7 @@ public class ListCommand extends PortalCommand {
         MVWorld world = null;
         String filter = null;
         if (args.size() > 0) {
-            world = this.plugin.getCore().getMVWorld(args.get(args.size() - 1));
+            world = this.plugin.getCore().getWorldManager().getMVWorld(args.get(args.size() - 1));
             filter = args.get(0);
         }
         if (args.size() == 2) {
