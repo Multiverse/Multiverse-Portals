@@ -130,6 +130,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.High, this);
         // These will only get used if WE is not found. so they're monitor.
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, this.playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, this.playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, this.playerListener, Priority.Low, this);
     }
 /**
  * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure 

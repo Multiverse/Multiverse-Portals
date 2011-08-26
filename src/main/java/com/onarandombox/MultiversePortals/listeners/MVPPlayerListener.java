@@ -11,6 +11,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -52,21 +54,79 @@ public class MVPPlayerListener extends PlayerListener {
     }
 
     @Override
+    public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
+        this.plugin.log(Level.FINER, "Fill: ");
+        this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
+        this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
+
+        PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
+        MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+        if (portal != null) {
+            if (ps.isDebugModeOn()) {
+                ps.showDebugInfo(portal);
+                event.setCancelled(true);
+            } else {
+                Material fillMaterial = Material.AIR;
+                this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
+                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial);
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
+        this.plugin.log(Level.FINER, "Fill: ");
+        this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
+        this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
+
+        PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
+        MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+        if (portal != null) {
+            if (ps.isDebugModeOn()) {
+                ps.showDebugInfo(portal);
+                event.setCancelled(true);
+            } else {
+                Material fillMaterial = Material.WATER;
+                if (event.getItemStack().getType() == Material.LAVA_BUCKET) {
+                    fillMaterial = Material.LAVA;
+                }
+
+                this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
+                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial);
+            }
+        }
+    }
+
+    @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
         // Portal lighting stuff
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType() == Material.FLINT_AND_STEEL) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
             this.plugin.log(Level.FINER, "Player is ligting block: " + LocationManipulation.strCoordsRaw(event.getClickedBlock().getLocation()));
             PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
             Location translatedLocation = this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace());
             MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+            if (event.getItem() == null) {
+                return;
+            }
+            Material inHand = event.getItem().getType();
+
             // Cancel the event if there was a portal.
+
             if (portal != null) {
+                this.plugin.log(Level.FINER, "Right Clicked: ");
+                this.plugin.log(Level.FINER, "Block Clicked: " + event.getClickedBlock() + ":" + event.getClickedBlock().getType());
+                this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
+                this.plugin.log(Level.FINER, "In Hand: " + inHand);
                 if (ps.isDebugModeOn()) {
                     ps.showDebugInfo(portal);
                     event.setCancelled(true);
                 } else {
-                    event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation));
+                    Material fillMaterial = Material.PORTAL;
+                    this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
+                    event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial));
                 }
             }
             return;

@@ -1,11 +1,12 @@
 package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockListener;
+import org.bukkit.event.block.BlockPhysicsEvent;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MVPBlockListener extends BlockListener {
     private MultiversePortals plugin;
@@ -30,10 +31,17 @@ public class MVPBlockListener extends BlockListener {
         }
     }
     
+    
     @Override
     public void onBlockPhysics(BlockPhysicsEvent event) {
-        // TODO Auto-generated method stub
-        super.onBlockPhysics(event);
+        if(event.isCancelled()) {
+            return;
+        }
+        PortalManager pm = this.plugin.getPortalManager();
+        
+        MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
+        if(portal != null) {
+            event.setCancelled(true);
+        }
     }
-
 }
