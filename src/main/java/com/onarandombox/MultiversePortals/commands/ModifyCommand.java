@@ -17,7 +17,7 @@ import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.utils.LocationManipulation;
 
 enum SetProperties {
-    destination, dest, owner, loc, location, price, currency, curr
+    destination, dest, owner, loc, location, price, currency, curr, safe
 }
 
 /**

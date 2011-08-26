@@ -10,9 +10,10 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
 import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.ExactDestination;
 import com.onarandombox.utils.InvalidDestination;
+import com.onarandombox.utils.MVDestination;
+import com.onarandombox.utils.WorldManager;
 
 public class MVPortal {
     private String name;
@@ -26,6 +27,7 @@ public class MVPortal {
     private Permission exempt;
     private int currency = -1;
     private double price = 0.0;
+    private boolean safeTeleporter;
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
@@ -34,11 +36,22 @@ public class MVPortal {
         this.portalConfigString = "portals." + this.name;
         this.setCurrency(this.config.getInt(this.portalConfigString + ".entryfee.currency", -1));
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
+        this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
         this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
         this.addToUpperLists();
 
+    }
+
+    private void setUseSafeTeleporter(boolean teleport) {
+        this.safeTeleporter = teleport;
+        this.config.setProperty(this.portalConfigString + ".safeteleport", teleport);
+        this.config.save();
+    }
+    
+    public boolean useSafeTeleporter() {
+        return this.safeTeleporter;
     }
 
     private void addToUpperLists() {
@@ -129,8 +142,9 @@ public class MVPortal {
 
     public boolean setPortalLocation(String locationString, String worldString) {
         MVWorld world = null;
-        if (((MultiversePortals) this.plugin).getCore().isMVWorld(worldString)) {
-            world = ((MultiversePortals) this.plugin).getCore().getMVWorld(worldString);
+        WorldManager worldManager = ((MultiversePortals) this.plugin).getCore().getWorldManager();
+        if (worldManager.isMVWorld(worldString)) {
+            world = worldManager.getMVWorld(worldString);
         }
         return this.setPortalLocation(locationString, world);
     }
@@ -209,6 +223,7 @@ public class MVPortal {
         if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
             return this.setDestination(value);
         }
+        
 
         if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
             try {
@@ -228,6 +243,14 @@ public class MVPortal {
 
         if (property.equalsIgnoreCase("owner")) {
             return this.setOwner(value);
+        }
+        if (property.equalsIgnoreCase("owner")) {
+            try {
+                this.setUseSafeTeleporter(Boolean.parseBoolean(value));
+                return true;
+            } catch (Exception e) {
+                
+            }
         }
         return false;
     }
