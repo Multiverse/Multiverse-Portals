@@ -134,4 +134,9 @@ public class PortalDestination implements MVDestination {
         return new Vector(0, 0, 0);
     }
 
+    @Override
+    public boolean useSafeTeleporter() {
+        return this.portal.useSafeTeleporter();
+    }
+
 }
