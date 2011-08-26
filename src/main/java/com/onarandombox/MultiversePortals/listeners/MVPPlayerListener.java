@@ -88,8 +88,9 @@ public class MVPPlayerListener extends PlayerListener {
                 ps.showDebugInfo(portal);
                 event.setCancelled(true);
             } else {
+                
                 Material fillMaterial = Material.WATER;
-                if (event.getItemStack().getType() == Material.LAVA_BUCKET) {
+                if (event.getBucket().equals(Material.LAVA_BUCKET)) {
                     fillMaterial = Material.LAVA;
                 }
 
