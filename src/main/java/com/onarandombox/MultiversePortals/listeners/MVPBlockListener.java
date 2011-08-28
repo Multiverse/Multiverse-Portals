@@ -1,11 +1,18 @@
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.util.logging.Level;
+
+import org.bukkit.Material;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 
+import com.onarandombox.MultiverseCore.MVPermissions;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MVPBlockListener extends BlockListener {
@@ -38,9 +45,11 @@ public class MVPBlockListener extends BlockListener {
             return;
         }
         PortalManager pm = this.plugin.getPortalManager();
-        
+        this.plugin.log(Level.FINER, "Found some physics:");
+        this.plugin.log(Level.FINER, event.getChangedType() + "");
+        this.plugin.log(Level.FINER, "-------------------");
         MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
-        if(portal != null) {
+        if(portal != null && (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL)){
             event.setCancelled(true);
         }
     }

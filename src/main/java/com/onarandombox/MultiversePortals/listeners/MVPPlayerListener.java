@@ -112,6 +112,9 @@ public class MVPPlayerListener extends PlayerListener {
             if (event.getItem() == null) {
                 return;
             }
+            if(!this.plugin.getCore().getPermissions().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+                return;
+            }
             Material inHand = event.getItem().getType();
 
             // Cancel the event if there was a portal.
@@ -126,6 +129,9 @@ public class MVPPlayerListener extends PlayerListener {
                     event.setCancelled(true);
                 } else {
                     Material fillMaterial = Material.PORTAL;
+                    if(translatedLocation.getWorld().getBlockAt(translatedLocation).getType() == Material.PORTAL) {
+                        fillMaterial = Material.AIR;
+                    }
                     this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
                     event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial));
                 }
@@ -226,6 +232,11 @@ public class MVPPlayerListener extends PlayerListener {
             MVDestination portalDest = portal.getDestination();
             if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
                 TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
+                event.setTo(portalDest.getLocation(event.getPlayer()));
+                if(portalDest.useSafeTeleporter()) {
+                    MVTeleport teleporter = this.plugin.getCore().getTeleporter();
+                    event.setTo(teleporter.getSafeLocation(event.getPlayer(), portalDest));
+                }
                 event.setPortalTravelAgent(agent);
                 event.useTravelAgent(true);
                 this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
