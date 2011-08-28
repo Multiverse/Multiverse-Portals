@@ -24,6 +24,9 @@ public class MVPBlockListener extends BlockListener {
 
     @Override
     public void onBlockFromTo(BlockFromToEvent event) {
+        if (event.getBlock() == null)
+            return;
+        
         // If lava/something else is trying to flow in...
         MVPortal portal = plugin.getPortalManager().isPortal(null, event.getToBlock().getLocation());
         if (portal != null) {
