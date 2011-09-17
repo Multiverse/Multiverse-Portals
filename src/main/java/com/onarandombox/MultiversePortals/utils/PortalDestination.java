@@ -26,7 +26,7 @@ public class PortalDestination implements MVDestination {
     private String orientationString;
 
     @Override
-    public String getIdentifer() {
+    public String getIdentifier() {
         return "p";
     }
 
