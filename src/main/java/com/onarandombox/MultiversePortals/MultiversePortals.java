@@ -55,7 +55,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private static final Logger log = Logger.getLogger("Minecraft");
-    private static final String logPrefix = "[MultiVerse-Portals] ";
+    private static final String logPrefix = "[Multiverse-Portals] ";
     protected static DebugLog debugLog;
     private MultiverseCore core;
 
@@ -71,7 +71,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private BlockListener blockListener;
     private VehicleListener vehicleListener;
     private MVPConfigReloadListener customListener;
-    private Configuration MVPconfig;
+    private Configuration MVPConfig;
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
 
@@ -124,7 +124,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         // Only register this one if they want it
-        if(this.MVPconfig.getBoolean("use_onmove", true)) {
+        if(this.MVPConfig.getBoolean("use_onmove", true)) {
             this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         }
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
@@ -205,11 +205,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private void loadConfig() {
         new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
-        this.MVPconfig = new Configuration(new File(getDataFolder(), "config.yml"));
-        this.MVPconfig.load();
-        this.MVPconfig.getBoolean("use_onmove", true);
-        this.MVPconfig.getBoolean("mvportals_default_to_nether", false);
-        this.MVPconfig.save();
+        this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
+        this.MVPConfig.load();
+        this.MVPConfig.getBoolean("use_onmove", true);
+        this.MVPConfig.getInt("portal_cooldown", 1000);
+        this.MVPConfig.getBoolean("mvportals_default_to_nether", false);
+        this.MVPConfig.save();
 
     }
 
@@ -286,7 +287,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public Configuration getMainConfig() {
-        return this.MVPconfig;
+        return this.MVPConfig;
     }
 
     public void reloadConfigs() {
