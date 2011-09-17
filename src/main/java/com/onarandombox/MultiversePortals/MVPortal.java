@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals;
 
 import java.util.logging.Level;
@@ -50,7 +57,7 @@ public class MVPortal {
         this.config.setProperty(this.portalConfigString + ".safeteleport", teleport);
         this.config.save();
     }
-    
+
     public boolean useSafeTeleporter() {
         return this.safeTeleporter;
     }
@@ -223,7 +230,7 @@ public class MVPortal {
         if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
             return this.setDestination(value);
         }
-        
+
 
         if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
             try {
@@ -249,7 +256,7 @@ public class MVPortal {
                 this.setUseSafeTeleporter(Boolean.parseBoolean(value));
                 return true;
             } catch (Exception e) {
-                
+
             }
         }
         return false;

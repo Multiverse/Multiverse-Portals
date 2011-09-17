@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals.utils;
 
 import java.util.logging.Level;
@@ -22,7 +29,7 @@ public class PortalFiller {
             return false;
         }
         this.plugin.log(Level.FINER, "Neat, Starting Portal fill w:[" + r.getWidth() + "] h:[" + r.getHeight() + "] d:[" + r.getDepth() + "]");
-        
+
 
         int useX = (r.getWidth() == 1) ? 0 : 1;
         int useZ = (r.getDepth() == 1) ? 0 : 1;
@@ -34,7 +41,7 @@ public class PortalFiller {
 
     /**
      * Recursively fills out from a single point!
-     * 
+     *
      * @param newLoc
      * @param useX
      * @param useZ
@@ -77,7 +84,7 @@ public class PortalFiller {
         }
     }
     /**
-     * 
+     *
      * @param l
      * @param portalType
      * @return

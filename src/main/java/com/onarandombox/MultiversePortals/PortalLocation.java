@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals;
 
 import java.util.Arrays;
@@ -24,7 +31,7 @@ public class PortalLocation {
 
     /**
      * This constructor takes the Vectors from WorldEdit and converts them to Bukkit vectors.
-     * 
+     *
      * @param minPt
      * @param maxPt
      */

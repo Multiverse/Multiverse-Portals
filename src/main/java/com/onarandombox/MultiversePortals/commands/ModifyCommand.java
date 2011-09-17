@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
@@ -22,7 +29,7 @@ enum SetProperties {
 
 /**
  * Allows modification of portal location, destination and owner. NOT name at this time.
- * 
+ *
  * @author fernferret
  */
 public class ModifyCommand extends PortalCommand {

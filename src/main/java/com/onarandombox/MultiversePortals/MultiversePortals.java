@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals;
 
 import java.io.File;
@@ -98,7 +105,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         this.loadPortals();
         this.loadConfig();
-        
+
         // Register our events AFTER the config.
         this.registerEvents();
 
@@ -135,7 +142,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, this.playerListener, Priority.Low, this);
     }
 /**
- * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure 
+ * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure
  */
     private void checkForWorldEdit() {
         if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
@@ -185,7 +192,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             }
             staticLog(Level.INFO, keys.size() + " - Portals(s) loaded");
         }
-        
+
         // Now Resolve destinations
         for (MVPortal portal : this.portalManager.getAllPortals()) {
             String dest = this.MVPPortalConfig.getString("portals." + portal.getName() + ".destination", "");
@@ -195,7 +202,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         }
 
     }
-    
+
     private void loadConfig() {
         new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPconfig = new Configuration(new File(getDataFolder(), "config.yml"));
@@ -203,7 +210,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPconfig.getBoolean("use_onmove", true);
         this.MVPconfig.getBoolean("mvportals_default_to_nether", false);
         this.MVPconfig.save();
-        
+
     }
 
     public void onDisable() {
@@ -224,7 +231,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
         for(com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
-            if(c instanceof HelpCommand) {  
+            if(c instanceof HelpCommand) {
                 c.addKey("mvp");
             }
         }
@@ -243,7 +250,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     /**
      * Parse the Authors Array into a readable String with ',' and 'and'.
-     * 
+     *
      * @return String containing all the authors formatted correctly with ',' and 'and'.
      */
     private String getAuthors() {
@@ -277,7 +284,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public void setCore(MultiverseCore multiverseCore) {
         this.core = multiverseCore;
     }
-    
+
     public Configuration getMainConfig() {
         return this.MVPconfig;
     }
@@ -289,7 +296,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
     /**
      * Print messages to the server Log as well as to our DebugLog.
-     * 
+     *
      * @param level
      * @param msg
      */
@@ -297,7 +304,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         log.log(level, logPrefix + " " + msg);
         debugLog.log(level, logPrefix + " " + msg);
     }
-    
+
     public static void staticDebugLog(Level level, String msg) {
         log.log(level, "[MVPortals-Debug] " + msg);
         debugLog.log(level, "[MVPortals-Debug] " + msg);
@@ -321,7 +328,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         } else if (level != Level.FINE && level != Level.FINER && level != Level.FINEST) {
             staticLog(level, msg);
         }
-        
+
     }
 
     @Override
@@ -336,7 +343,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }
-    
+
     private String logAndAddToPasteBinBuffer(String string) {
         this.log(Level.INFO, string);
         return "[Multiverse-Portals] " + string + "\n";

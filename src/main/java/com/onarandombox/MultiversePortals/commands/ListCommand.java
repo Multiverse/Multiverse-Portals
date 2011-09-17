@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
@@ -70,7 +77,7 @@ public class ListCommand extends PortalCommand {
                     portals += ChatColor.WHITE;
                     altColor = true;
                 }
-                
+
                 portals += p.getName() + " ";
             }
 

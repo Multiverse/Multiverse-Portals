@@ -1,3 +1,10 @@
+/*
+ * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 is licensed under the BSD License.
+ * For more information please check the README.md file included
+ * with this project
+ */
+
 package com.onarandombox.MultiversePortals;
 
 import java.util.logging.Level;
@@ -172,7 +179,7 @@ public class PortalPlayerSession {
 
     /**
      * If a player teleports from A - B, this method will report A even if the player is in B. This is done for hysteresis.
-     * 
+     *
      * @return
      */
     public MVPortal getStandingInPortal() {
@@ -181,7 +188,7 @@ public class PortalPlayerSession {
 
     /**
      * This will ALWAYS return the portal a player is actually in. See {@method getStandingInPortal}
-     * 
+     *
      * @return
      */
     public MVPortal getUncachedStandingInPortal() {
@@ -190,7 +197,7 @@ public class PortalPlayerSession {
 
     /**
      * This method should be called every time a player telports to a portal.
-     * 
+     *
      * @param location
      */
     public void playerDidTeleport(Location location) {
