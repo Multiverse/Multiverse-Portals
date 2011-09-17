@@ -19,7 +19,7 @@ public class PortalDestination implements MVDestination {
     private String orientationString;
 
     @Override
-    public String getIdentifer() {
+    public String getIdentifier() {
         return "p";
     }
 
@@ -56,7 +56,7 @@ public class PortalDestination implements MVDestination {
 
     /**
      * Allows us to check the column first but only when doing portals
-     * 
+     *
      * @param finalX
      * @param finalZ
      * @param y
