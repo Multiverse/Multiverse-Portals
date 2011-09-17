@@ -7,6 +7,7 @@
 
 package com.onarandombox.MultiversePortals;
 
+import java.util.Date;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -35,6 +36,7 @@ public class PortalPlayerSession {
     private Vector leftClick;
     private MVWorld rightClickWorld;
     private MVWorld leftClickWorld;
+    private Date lastTeleportTime;
 
     public PortalPlayerSession(MultiversePortals plugin, Player p) {
         this.plugin = plugin;
@@ -97,7 +99,7 @@ public class PortalPlayerSession {
         if (eventType == Type.PLAYER_MOVE && this.getPlayerFromName().isInsideVehicle()) {
             return false;
         }
-        return this.hasMovedOutOfPortal == true && this.standingIn != null;
+        return this.hasMovedOutOfPortal && this.standingIn != null;
     }
 
     public Location getLocation() {
@@ -178,25 +180,26 @@ public class PortalPlayerSession {
     }
 
     /**
-     * If a player teleports from A - B, this method will report A even if the player is in B. This is done for hysteresis.
+     * If a player teleports from A - B, this method will report A even if the player is in B.
+     * This is done for hysteresis. For the exact detection please use {@link #getUncachedStandingInPortal()}
      *
-     * @return
+     * @return The {@link MVPortal} the player is standing in.
      */
     public MVPortal getStandingInPortal() {
         return this.standingIn;
     }
 
     /**
-     * This will ALWAYS return the portal a player is actually in. See {@method getStandingInPortal}
+     * This will ALWAYS return the portal a player is actually in. For hysteresis see {@link #getStandingInPortal()}.
      *
-     * @return
+     * @return The {@link MVPortal} the player is standing in.
      */
     public MVPortal getUncachedStandingInPortal() {
         return this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
     }
 
     /**
-     * This method should be called every time a player telports to a portal.
+     * This method should be called every time a player teleports to a portal.
      *
      * @param location
      */
@@ -256,5 +259,12 @@ public class PortalPlayerSession {
             sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
             sender.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
         }
+    }
+
+    public void setTeleportTime(Date date) {
+        this.lastTeleportTime = date;
+    }
+    public boolean allowTeleportViaCooldown(Date date) {
+        return (date.after(new Date((new Date()).getTime() + this.plugin.getCooldownTime())));
     }
 }

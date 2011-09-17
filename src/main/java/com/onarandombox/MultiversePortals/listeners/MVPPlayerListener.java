@@ -7,8 +7,10 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.util.Date;
 import java.util.logging.Level;
 
+import com.sun.xml.internal.ws.client.SenderException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -210,6 +212,11 @@ public class MVPPlayerListener extends PlayerListener {
             if (world == null) {
                 return;
             }
+            if(!ps.allowTeleportViaCooldown(new Date())) {
+                // TODO: Tell them how much time is remaining.
+                p.sendMessage("There is a portal cooldown in effect. Please try again later.");
+                return;
+            }
             // If the player does not have to pay, return now.
             if (world.isExempt(event.getPlayer()) || portal.isExempt(event.getPlayer())) {
                 performTeleport(event, ps, d);
@@ -227,6 +234,7 @@ public class MVPPlayerListener extends PlayerListener {
         MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
         if (playerTeleporter.safelyTeleport(event.getPlayer(), d)) {
             ps.playerDidTeleport(event.getTo());
+            ps.setTeleportTime(new Date());
         }
     }
 

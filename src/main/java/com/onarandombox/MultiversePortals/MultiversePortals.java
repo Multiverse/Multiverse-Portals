@@ -74,6 +74,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private Configuration MVPConfig;
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
+    private long portalCooldown = 0;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -208,7 +209,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPConfig.load();
         this.MVPConfig.getBoolean("use_onmove", true);
-        this.MVPConfig.getInt("portal_cooldown", 1000);
+        this.portalCooldown = this.MVPConfig.getInt("portal_cooldown", 1000);
         this.MVPConfig.getBoolean("mvportals_default_to_nether", false);
         this.MVPConfig.save();
 
@@ -352,5 +353,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public void removePortalPlayerSession(String name) {
         this.portalSessions.remove(name);
+    }
+
+    public long getCooldownTime() {
+        return this.portalCooldown;
     }
 }
