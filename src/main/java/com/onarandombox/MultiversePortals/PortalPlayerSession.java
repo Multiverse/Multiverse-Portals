@@ -265,6 +265,16 @@ public class PortalPlayerSession {
         this.lastTeleportTime = date;
     }
     public boolean allowTeleportViaCooldown(Date date) {
-        return (date.after(new Date((new Date()).getTime() + this.plugin.getCooldownTime())));
+        this.plugin.log(Level.FINE, "Checking portal cooldown: Last TP Time: " + this.lastTeleportTime);
+        this.plugin.log(Level.FINER, "Checking portal cooldown: Cooldown: " + this.plugin.getCooldownTime());
+        //this.plugin.log(Level.FINEST, "Checking portal cooldown: Total   : " + (this.lastTeleportTime.getTime() + this.plugin.getCooldownTime()));
+        this.plugin.log(Level.FINE, "Checking portal cooldown: Current date: " + new Date());
+        if(lastTeleportTime == null) {
+            lastTeleportTime = new Date();
+            return true;
+        } else {
+            this.plugin.log(Level.FINE, "Checking portal cooldown: Total   : " + (this.lastTeleportTime.getTime() + this.plugin.getCooldownTime()));
+        }
+        return (date.after(new Date((lastTeleportTime).getTime() + this.plugin.getCooldownTime())));
     }
 }

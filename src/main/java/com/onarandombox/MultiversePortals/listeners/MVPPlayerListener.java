@@ -241,12 +241,21 @@ public class MVPPlayerListener extends PlayerListener {
 
     @Override
     public void onPlayerPortal(PlayerPortalEvent event) {
+        this.plugin.log(Level.FINER, "onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
         // Determine if we're in a portal
         MVPortal portal = pm.isPortal(event.getPlayer(), event.getPlayer().getLocation());
+
         if (portal != null) {
             MVDestination portalDest = portal.getDestination();
             if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
+                PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
+                if(!ps.allowTeleportViaCooldown(new Date())) {
+                        // TODO: Tell them how much time is remaining.
+                        event.getPlayer().sendMessage("There is a portal cooldown in effect. Please try again later.");
+                        event.setCancelled(true);
+                        return;
+                }
                 TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
                 event.setTo(portalDest.getLocation(event.getPlayer()));
                 if(portalDest.useSafeTeleporter()) {
