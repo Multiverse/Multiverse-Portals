@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.logging.Level;
 
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
-import com.sun.xml.internal.ws.client.SenderException;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
