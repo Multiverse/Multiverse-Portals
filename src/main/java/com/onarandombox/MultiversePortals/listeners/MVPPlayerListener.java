@@ -10,6 +10,7 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import com.sun.xml.internal.ws.client.SenderException;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -254,6 +255,13 @@ public class MVPPlayerListener extends PlayerListener {
                 }
                 event.setPortalTravelAgent(agent);
                 event.useTravelAgent(true);
+                MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent);
+                this.plugin.getServer().getPluginManager().callEvent(portalEvent);
+                if(portalEvent.isCancelled()) {
+                    event.setCancelled(true);
+                    this.plugin.log(Level.FINE, "Someone cancelled the MVPlayerPortal Event!");
+                    return;
+                }
                 this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
             } else if (!this.plugin.getMainConfig().getBoolean("mvportals_default_to_nether", false)) {
                 // If portals should not default to the nether, cancel the event
