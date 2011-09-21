@@ -7,6 +7,8 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.util.Date;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -41,6 +43,10 @@ public class MVPVehicleListener extends VehicleListener {
             if (ps.isStaleLocation()) {
                 return;
             }
+	    if(!ps.allowTeleportViaCooldown(new Date())) {
+		p.sendMessage("There is a portal cooldown in effect. Please try again in "+Integer.toString((int)ps.getRemainingCooldown()/1000)+"s.");
+		return;
+	    }
             // Teleport the Player
             teleportVehicle(p, v, event.getTo());
         }

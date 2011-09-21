@@ -42,6 +42,7 @@ public class PortalPlayerSession {
         this.plugin = plugin;
         this.playerName = p.getName();
         this.setLocation(p.getLocation());
+	this.lastTeleportTime = new Date();
     }
 
     public boolean selectPortal(MVPortal portal) {
@@ -265,6 +266,11 @@ public class PortalPlayerSession {
         this.lastTeleportTime = date;
     }
     public boolean allowTeleportViaCooldown(Date date) {
-        return (date.after(new Date((new Date()).getTime() + this.plugin.getCooldownTime())));
+        return (date.after(new Date(this.lastTeleportTime.getTime() + this.plugin.getCooldownTime())));
+    }
+
+    public long getRemainingCooldown() {
+    	//Calculate the remaining cooldown period
+	return (this.plugin.getCooldownTime() - ((new Date()).getTime() - this.lastTeleportTime.getTime()));
     }
 }
