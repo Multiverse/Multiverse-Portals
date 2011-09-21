@@ -85,6 +85,7 @@ public class MVPVehicleListener extends VehicleListener {
 
             if (playerTeleporter.safelyTeleport(v, d)) {
                 ps.playerDidTeleport(to);
+		ps.setTeleportTime(new Date());
             }
             return true;
         }
