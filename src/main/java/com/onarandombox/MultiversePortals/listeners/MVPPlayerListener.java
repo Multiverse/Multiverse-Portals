@@ -213,7 +213,7 @@ public class MVPPlayerListener extends PlayerListener {
             }
             if(!ps.allowTeleportViaCooldown(new Date())) {
                 // TODO: Tell them how much time is remaining.
-                p.sendMessage("There is a portal cooldown in effect. Please try again later.");
+                p.sendMessage("There is a portal cooldown in effect. Please try again in "+Integer.toString((int)ps.getRemainingCooldown()/1000)+"s.");
                 return;
             }
             // If the player does not have to pay, return now.
