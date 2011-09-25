@@ -9,6 +9,7 @@ package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
 
+import com.onarandombox.MultiversePortals.enums.SetProperties;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -22,10 +23,6 @@ import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.utils.LocationManipulation;
-
-enum SetProperties {
-    destination, dest, owner, loc, location, price, currency, curr, safe
-}
 
 /**
  * Allows modification of portal location, destination and owner. NOT name at this time.

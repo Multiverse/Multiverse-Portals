@@ -7,15 +7,19 @@
 
 package com.onarandombox.MultiversePortals;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVPlugin;
+import com.onarandombox.MultiverseCore.commands.HelpCommand;
+import com.onarandombox.MultiversePortals.commands.*;
+import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
+import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
+import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.MultiversePortals.listeners.*;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
+import com.onarandombox.utils.DebugLog;
+import com.pneumaticraft.commandhandler.CommandHandler;
+import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,30 +31,10 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.MVPlugin;
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.commands.HelpCommand;
-import com.onarandombox.MultiversePortals.commands.CreateCommand;
-import com.onarandombox.MultiversePortals.commands.DebugCommand;
-import com.onarandombox.MultiversePortals.commands.InfoCommand;
-import com.onarandombox.MultiversePortals.commands.ListCommand;
-import com.onarandombox.MultiversePortals.commands.ModifyCommand;
-import com.onarandombox.MultiversePortals.commands.RemoveCommand;
-import com.onarandombox.MultiversePortals.commands.SelectCommand;
-import com.onarandombox.MultiversePortals.commands.WandCommand;
-import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
-import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
-import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
-import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
-import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
-import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
-import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
-import com.onarandombox.MultiversePortals.utils.PortalDestination;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.onarandombox.utils.DebugLog;
-import com.pneumaticraft.commandhandler.CommandHandler;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import java.io.File;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
@@ -125,7 +109,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
         // Only register this one if they want it
-        if(this.MVPConfig.getBoolean("use_onmove", true)) {
+        if (this.MVPConfig.getBoolean("use_onmove", true)) {
             this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
         }
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
@@ -142,18 +126,18 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, this.playerListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, this.playerListener, Priority.Low, this);
     }
-/**
- * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure
- */
+
+    /**
+     * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make
+     * sure
+     */
     private void checkForWorldEdit() {
         if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
             this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
         }
     }
 
-    /**
-     * Create the higher level permissions so we can add finer ones to them.
-     */
+    /** Create the higher level permissions so we can add finer ones to them. */
     private void createDefaultPerms() {
         if (this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
             Permission perm = new Permission("multiverse.portal.*");
@@ -219,9 +203,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     }
 
-    /**
-     * Register commands to Multiverse's CommandHandler so we get a super sexy single menu
-     */
+    /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
     private void registerCommands() {
         this.commandHandler = this.core.getCommandHandler();
         this.commandHandler.registerCommand(new InfoCommand(this));
@@ -232,8 +214,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.commandHandler.registerCommand(new ModifyCommand(this));
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
-        for(com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
-            if(c instanceof HelpCommand) {
+        for (com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
+            if (c instanceof HelpCommand) {
                 c.addKey("mvp");
             }
         }
@@ -296,6 +278,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadPortals();
         this.loadConfig();
     }
+
     /**
      * Print messages to the server Log as well as to our DebugLog.
      *

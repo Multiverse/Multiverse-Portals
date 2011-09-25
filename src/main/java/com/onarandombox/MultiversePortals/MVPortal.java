@@ -7,8 +7,11 @@
 
 package com.onarandombox.MultiversePortals;
 
-import java.util.logging.Level;
-
+import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.destination.ExactDestination;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.utils.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,11 +19,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.utils.ExactDestination;
-import com.onarandombox.utils.InvalidDestination;
-import com.onarandombox.utils.MVDestination;
-import com.onarandombox.utils.WorldManager;
+import java.util.logging.Level;
 
 public class MVPortal {
     private String name;

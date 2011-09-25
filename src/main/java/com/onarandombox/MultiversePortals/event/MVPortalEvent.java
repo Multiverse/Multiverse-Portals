@@ -7,7 +7,8 @@
 
 package com.onarandombox.MultiversePortals.event;
 
-import com.onarandombox.utils.MVDestination;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiversePortals.enums.PortalType;
 import org.bukkit.Location;
 import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;
@@ -15,20 +16,11 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
 /**
- * What type of portal was used?
- *
- * If Legacy, a MV1 style portal was used.
- * If Normal, a Nether style portal (with purple goo) was used.
- *
- */
-enum PortalType { Legacy, Normal }
-
-/**
  * Multiverse 2
  *
  * @author fernferret
  */
-public class MVPortalEvent extends Event implements Cancellable{
+public class MVPortalEvent extends Event implements Cancellable {
     private Player teleportee;
     private MVDestination destination;
     private TravelAgent travelAgent;
@@ -42,7 +34,7 @@ public class MVPortalEvent extends Event implements Cancellable{
     }
 
     public MVPortalEvent(MVDestination destination, Player teleportee) {
-        this(destination,teleportee,null);
+        this(destination, teleportee, null);
     }
 
     /**
@@ -74,13 +66,13 @@ public class MVPortalEvent extends Event implements Cancellable{
 
     /**
      * Returns the type of portal that was used.
-     *
+     * <p/>
      * This will be Legacy for MV1 style portals and Normal for Portals that use the swirly purple goo.
      *
      * @return A {@link PortalType}
      */
     public PortalType getPortalType() {
-        if(this.travelAgent == null) {
+        if (this.travelAgent == null) {
             return PortalType.Legacy;
         }
         return PortalType.Legacy;
@@ -88,6 +80,7 @@ public class MVPortalEvent extends Event implements Cancellable{
 
     /**
      * Returns the TravelAgent being used, or null if none.
+     *
      * @return The {@link TravelAgent}.
      */
     public TravelAgent getTravelAgent() {

@@ -7,6 +7,14 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
+import com.onarandombox.MultiverseCore.MVTeleport;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.utils.LocationManipulation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -14,15 +22,6 @@ import org.bukkit.event.Event.Type;
 import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
-
-import com.onarandombox.MultiverseCore.MVTeleport;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.utils.PortalDestination;
-import com.onarandombox.utils.MVDestination;
-import com.onarandombox.utils.InvalidDestination;
-import com.onarandombox.utils.LocationManipulation;
 
 public class MVPVehicleListener extends VehicleListener {
     private MultiversePortals plugin;
@@ -90,7 +89,7 @@ public class MVPVehicleListener extends VehicleListener {
         v.eject();
         Location toLocation = to.getLocation(v);
         // Add an offset to ensure the player is 1 higher than where the cart was.
-        to.getLocation(p).add(0,.5,0);
+        to.getLocation(p).add(0, .5, 0);
         // If they didn't teleport, return false and place them back into their vehicle.
         if (!tp.safelyTeleport(p, to)) {
             v.setPassenger(p);

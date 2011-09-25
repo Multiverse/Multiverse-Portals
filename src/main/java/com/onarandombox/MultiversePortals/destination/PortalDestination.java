@@ -5,20 +5,19 @@
  * with this project
  */
 
-package com.onarandombox.MultiversePortals.utils;
+package com.onarandombox.MultiversePortals.destination;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
-
+import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import com.onarandombox.utils.BlockSafety;
 import com.onarandombox.utils.LocationManipulation;
-import com.onarandombox.utils.MVDestination;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 public class PortalDestination implements MVDestination {
     private MVPortal portal;
@@ -69,6 +68,7 @@ public class PortalDestination implements MVDestination {
      * @param y
      * @param yMax
      * @param w
+     *
      * @return
      */
     private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {

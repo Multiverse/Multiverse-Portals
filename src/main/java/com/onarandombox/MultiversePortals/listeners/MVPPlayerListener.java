@@ -10,6 +10,8 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 
 import org.bukkit.ChatColor;
@@ -37,9 +39,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.onarandombox.utils.InvalidDestination;
 import com.onarandombox.utils.LocationManipulation;
-import com.onarandombox.utils.MVDestination;
 import com.onarandombox.utils.MVTravelAgent;
 
 public class MVPPlayerListener extends PlayerListener {
