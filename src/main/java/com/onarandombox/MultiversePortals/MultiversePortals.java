@@ -47,14 +47,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private CommandHandler commandHandler;
     protected WorldEditAPI worldEditAPI = null;
-    private MVPPluginListener pluginListener;
-    private MVPPlayerListener playerListener;
 
     private PortalManager portalManager;
     private Map<Player, PortalPlayerSession> portalSessions;
-    private BlockListener blockListener;
-    private VehicleListener vehicleListener;
-    private MVPConfigReloadListener customListener;
     private Configuration MVPConfig;
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
@@ -99,32 +94,32 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private void registerEvents() {
         // Initialize our listeners
-        this.pluginListener = new MVPPluginListener(this);
-        this.playerListener = new MVPPlayerListener(this);
-        this.blockListener = new MVPBlockListener(this);
-        this.vehicleListener = new MVPVehicleListener(this);
-        this.customListener = new MVPConfigReloadListener(this);
+        MVPPluginListener pluginListener = new MVPPluginListener(this);
+        MVPPlayerListener playerListener = new MVPPlayerListener(this);
+        BlockListener blockListener = new MVPBlockListener(this);
+        VehicleListener vehicleListener = new MVPVehicleListener(this);
+        MVPConfigReloadListener customListener = new MVPConfigReloadListener(this);
 
         // Register our listeners with the Bukkit Server
-        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
         // Only register this one if they want it
         if (this.MVPConfig.getBoolean("use_onmove", true)) {
-            this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
+            this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Low, this);
         }
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_PHYSICS, this.blockListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, this.customListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, blockListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.BLOCK_PHYSICS, blockListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, vehicleListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, customListener, Priority.Normal, this);
         // High priority so we override NetherPortals
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.High, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.High, this);
         // These will only get used if WE is not found. so they're monitor.
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, this.playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, this.playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, this.playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, playerListener, Priority.Low, this);
     }
 
     /**
@@ -269,6 +264,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.core = multiverseCore;
     }
 
+    @Override
+    public int getProtocolVersion() {
+        return 1;
+    }
+
     public Configuration getMainConfig() {
         return this.MVPConfig;
     }
@@ -279,12 +279,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadConfig();
     }
 
-    /**
-     * Print messages to the server Log as well as to our DebugLog.
-     *
-     * @param level
-     * @param msg
-     */
     public static void staticLog(Level level, String msg) {
         log.log(level, logPrefix + " " + msg);
         debugLog.log(level, logPrefix + " " + msg);
@@ -303,17 +297,13 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public void log(Level level, String msg) {
         if (level == Level.FINE && MultiverseCore.GlobalDebug >= 1) {
             staticDebugLog(Level.INFO, msg);
-            return;
         } else if (level == Level.FINER && MultiverseCore.GlobalDebug >= 2) {
             staticDebugLog(Level.INFO, msg);
-            return;
         } else if (level == Level.FINEST && MultiverseCore.GlobalDebug >= 3) {
             staticDebugLog(Level.INFO, msg);
-            return;
         } else if (level != Level.FINE && level != Level.FINER && level != Level.FINEST) {
             staticLog(level, msg);
         }
-
     }
 
     @Override
@@ -332,10 +322,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private String logAndAddToPasteBinBuffer(String string) {
         this.log(Level.INFO, string);
         return "[Multiverse-Portals] " + string + "\n";
-    }
-
-    public void removePortalPlayerSession(String name) {
-        this.portalSessions.remove(name);
     }
 
     public long getCooldownTime() {

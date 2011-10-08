@@ -8,11 +8,11 @@
 package com.onarandombox.MultiversePortals.destination;
 
 import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.utils.BlockSafety;
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
-import com.onarandombox.utils.BlockSafety;
-import com.onarandombox.utils.LocationManipulation;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;

@@ -9,9 +9,9 @@ package com.onarandombox.MultiversePortals;
 
 import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
-import com.onarandombox.utils.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -33,7 +33,7 @@ public class MVPortal {
     private Permission exempt;
     private int currency = -1;
     private double price = 0.0;
-    private WorldManager worldManager;
+    private MVWorldManager worldManager;
     private boolean safeTeleporter;
 
     public MVPortal(MultiversePortals instance, String name) {
@@ -48,7 +48,7 @@ public class MVPortal {
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
         this.addToUpperLists();
-        this.worldManager = this.plugin.getCore().getWorldManager();
+        this.worldManager = this.plugin.getCore().getMVWorldManager();
     }
 
     private void setUseSafeTeleporter(boolean teleport) {

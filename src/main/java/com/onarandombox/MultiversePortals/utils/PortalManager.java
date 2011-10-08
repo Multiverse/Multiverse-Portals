@@ -38,10 +38,10 @@ public class PortalManager {
     }
 
     public MVPortal isPortal(CommandSender sender, Location l) {
-        if (!this.plugin.getCore().getWorldManager().isMVWorld(l.getWorld().getName())) {
+        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
             return null;
         }
-        MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(l.getWorld().getName());
+        MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
         List<MVPortal> portalList = this.getPortals(sender, world);
         if (portalList == null || portalList.size() == 0) {
             return null;

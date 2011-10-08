@@ -7,22 +7,21 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import java.util.List;
-
+import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.enums.SetProperties;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalLocation;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
-import com.onarandombox.utils.LocationManipulation;
+import java.util.List;
 
 /**
  * Allows modification of portal location, destination and owner. NOT name at this time.
@@ -102,7 +101,7 @@ public class ModifyCommand extends PortalCommand {
                     } else {
                         args.set(1, "e:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw());
                     }
-                }else if (args.get(1).matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
+                } else if (args.get(1).matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
                     // We found a Cannon Destination!
                     Location l = player.getLocation();
                     try {
@@ -130,7 +129,7 @@ public class ModifyCommand extends PortalCommand {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
         MultiverseRegion r = ps.getSelectedRegion();
         if (r != null) {
-            MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(player.getWorld().getName());
+            MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(player.getWorld().getName());
             PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
             selectedPortal.setPortalLocation(location);
             player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");

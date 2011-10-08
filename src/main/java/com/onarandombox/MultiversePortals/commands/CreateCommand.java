@@ -7,21 +7,20 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import java.util.List;
-
+import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalLocation;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
-import com.onarandombox.utils.LocationManipulation;
+import java.util.List;
 
 public class CreateCommand extends PortalCommand {
 
@@ -45,11 +44,11 @@ public class CreateCommand extends PortalCommand {
         }
         p = (Player) sender;
 
-        if (!this.plugin.getCore().getWorldManager().isMVWorld(p.getWorld().getName())) {
+        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(p.getWorld().getName())) {
             this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
             return;
         }
-        MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(p.getWorld().getName());
+        MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(p.getWorld().getName());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
 

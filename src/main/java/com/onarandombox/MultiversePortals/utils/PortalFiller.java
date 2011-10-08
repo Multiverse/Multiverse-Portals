@@ -9,12 +9,12 @@ package com.onarandombox.MultiversePortals.utils;
 
 import java.util.logging.Level;
 
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.utils.LocationManipulation;
 
 public class PortalFiller {
     private MultiverseCore plugin;

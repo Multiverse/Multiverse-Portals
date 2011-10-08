@@ -7,14 +7,14 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.onarandombox.MultiverseCore.MVTeleport;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiverseCore.utils.SafeTTeleporter;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
-import com.onarandombox.utils.LocationManipulation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -69,7 +69,7 @@ public class MVPVehicleListener extends VehicleListener {
             }
             p.setFallDistance(0);
 
-            MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
+            SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
 
             // The worlds are different! Ahhh!
             if (!l.getWorld().equals(p.getWorld())) {
@@ -84,7 +84,7 @@ public class MVPVehicleListener extends VehicleListener {
         return false;
     }
 
-    private boolean teleportVehicleSeperately(Player p, Vehicle v, MVDestination to, PortalPlayerSession ps, MVTeleport tp) {
+    private boolean teleportVehicleSeperately(Player p, Vehicle v, MVDestination to, PortalPlayerSession ps, SafeTTeleporter tp) {
         // Remove the player from the old one.
         v.eject();
         Location toLocation = to.getLocation(v);
