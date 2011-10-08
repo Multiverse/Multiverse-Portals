@@ -39,7 +39,7 @@ public class DebugCommand extends PortalCommand {
         }
         p = (Player) sender;
 
-        if (!this.plugin.getCore().getWorldManager().isMVWorld(p.getWorld().getName())) {
+        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(p.getWorld().getName())) {
             this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
             return;
         }

@@ -7,8 +7,14 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import java.util.Date;
-
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiverseCore.utils.SafeTTeleporter;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -17,14 +23,7 @@ import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
-import com.onarandombox.MultiverseCore.MVTeleport;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.utils.PortalDestination;
-import com.onarandombox.utils.MVDestination;
-import com.onarandombox.utils.InvalidDestination;
-import com.onarandombox.utils.LocationManipulation;
+import java.util.Date;
 
 public class MVPVehicleListener extends VehicleListener {
     private MultiversePortals plugin;
@@ -45,8 +44,8 @@ public class MVPVehicleListener extends VehicleListener {
                 return;
             }
 
-            if(!ps.allowTeleportViaCooldown(new Date())) {
-                p.sendMessage("There is a portal cooldown in effect. Please try again in "+Integer.toString((int)ps.getRemainingCooldown()/1000)+"s.");
+            if (!ps.allowTeleportViaCooldown(new Date())) {
+                p.sendMessage("There is a portal cooldown in effect. Please try again in " + Integer.toString((int) ps.getRemainingCooldown() / 1000) + "s.");
                 return;
             }
 
@@ -79,7 +78,7 @@ public class MVPVehicleListener extends VehicleListener {
             }
             p.setFallDistance(0);
 
-            MVTeleport playerTeleporter = new MVTeleport(this.plugin.getCore());
+            SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
 
             // The worlds are different! Ahhh!
             if (!l.getWorld().equals(p.getWorld())) {
@@ -95,12 +94,12 @@ public class MVPVehicleListener extends VehicleListener {
         return false;
     }
 
-    private boolean teleportVehicleSeperately(Player p, Vehicle v, MVDestination to, PortalPlayerSession ps, MVTeleport tp) {
+    private boolean teleportVehicleSeperately(Player p, Vehicle v, MVDestination to, PortalPlayerSession ps, SafeTTeleporter tp) {
         // Remove the player from the old one.
         v.eject();
         Location toLocation = to.getLocation(v);
         // Add an offset to ensure the player is 1 higher than where the cart was.
-        to.getLocation(p).add(0,.5,0);
+        to.getLocation(p).add(0, .5, 0);
         // If they didn't teleport, return false and place them back into their vehicle.
         if (!tp.safelyTeleport(p, to)) {
             v.setPassenger(p);

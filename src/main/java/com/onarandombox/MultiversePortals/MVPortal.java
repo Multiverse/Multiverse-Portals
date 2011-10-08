@@ -7,8 +7,11 @@
 
 package com.onarandombox.MultiversePortals;
 
-import java.util.logging.Level;
-
+import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import com.onarandombox.MultiverseCore.destination.ExactDestination;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,11 +19,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.utils.ExactDestination;
-import com.onarandombox.utils.InvalidDestination;
-import com.onarandombox.utils.MVDestination;
-import com.onarandombox.utils.WorldManager;
+import java.util.logging.Level;
 
 public class MVPortal {
     private String name;
@@ -34,7 +33,7 @@ public class MVPortal {
     private Permission exempt;
     private int currency = -1;
     private double price = 0.0;
-    private WorldManager worldManager;
+    private MVWorldManager worldManager;
     private boolean safeTeleporter;
 
     public MVPortal(MultiversePortals instance, String name) {
@@ -49,7 +48,7 @@ public class MVPortal {
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
         this.addToUpperLists();
-        this.worldManager = this.plugin.getCore().getWorldManager();
+        this.worldManager = this.plugin.getCore().getMVWorldManager();
     }
 
     private void setUseSafeTeleporter(boolean teleport) {
@@ -187,7 +186,7 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
-        this.destination = this.plugin.getCore().getDestinationFactory().getDestination(destinationString);
+        this.destination = this.plugin.getCore().getDestFactory().getDestination(destinationString);
         if (this.destination instanceof InvalidDestination) {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
             return false;
@@ -219,7 +218,7 @@ public class MVPortal {
     }
 
     public boolean playerCanEnterPortal(Player player) {
-        return (this.plugin.getCore().getPermissions().hasPermission(player, this.permission.getName(), false));
+        return (this.plugin.getCore().getMVPerms().hasPermission(player, this.permission.getName(), false));
     }
 
     public MVDestination getDestination() {

@@ -7,15 +7,19 @@
 
 package com.onarandombox.MultiversePortals;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVPlugin;
+import com.onarandombox.MultiverseCore.commands.HelpCommand;
+import com.onarandombox.MultiverseCore.utils.DebugLog;
+import com.onarandombox.MultiversePortals.commands.*;
+import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
+import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
+import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.MultiversePortals.listeners.*;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
+import com.pneumaticraft.commandhandler.CommandHandler;
+import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,30 +31,10 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.MVPlugin;
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.commands.HelpCommand;
-import com.onarandombox.MultiversePortals.commands.CreateCommand;
-import com.onarandombox.MultiversePortals.commands.DebugCommand;
-import com.onarandombox.MultiversePortals.commands.InfoCommand;
-import com.onarandombox.MultiversePortals.commands.ListCommand;
-import com.onarandombox.MultiversePortals.commands.ModifyCommand;
-import com.onarandombox.MultiversePortals.commands.RemoveCommand;
-import com.onarandombox.MultiversePortals.commands.SelectCommand;
-import com.onarandombox.MultiversePortals.commands.WandCommand;
-import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
-import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
-import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
-import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
-import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
-import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
-import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
-import com.onarandombox.MultiversePortals.utils.PortalDestination;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.onarandombox.utils.DebugLog;
-import com.pneumaticraft.commandhandler.CommandHandler;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import java.io.File;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
@@ -63,18 +47,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private CommandHandler commandHandler;
     protected WorldEditAPI worldEditAPI = null;
-    private MVPPluginListener pluginListener;
-    private MVPPlayerListener playerListener;
 
     private PortalManager portalManager;
     private Map<Player, PortalPlayerSession> portalSessions;
-    private BlockListener blockListener;
-    private VehicleListener vehicleListener;
-    private MVPConfigReloadListener customListener;
     private Configuration MVPConfig;
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
+    private final static int requiresProtocol = 4;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -86,6 +66,15 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Test if the Core was found, if not we'll disable this plugin.
         if (this.core == null) {
             log.info(logPrefix + "Multiverse-Core not found, will keep looking.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        if (this.core.getProtocolVersion() < requiresProtocol) {
+            log.severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
+            log.severe(logPrefix + "This version of SignPortals requires Protocol Level: " + requiresProtocol);
+            log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
+            log.severe(logPrefix + "Grab an updated copy at: ");
+            log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -102,7 +91,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         this.portalManager = new PortalManager(this);
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
-        this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
+        this.getCore().getDestFactory().registerDestinationType(PortalDestination.class, "p");
 
         this.loadPortals();
         this.loadConfig();
@@ -115,45 +104,45 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private void registerEvents() {
         // Initialize our listeners
-        this.pluginListener = new MVPPluginListener(this);
-        this.playerListener = new MVPPlayerListener(this);
-        this.blockListener = new MVPBlockListener(this);
-        this.vehicleListener = new MVPVehicleListener(this);
-        this.customListener = new MVPConfigReloadListener(this);
+        MVPPluginListener pluginListener = new MVPPluginListener(this);
+        MVPPlayerListener playerListener = new MVPPlayerListener(this);
+        BlockListener blockListener = new MVPBlockListener(this);
+        VehicleListener vehicleListener = new MVPVehicleListener(this);
+        MVPConfigReloadListener customListener = new MVPConfigReloadListener(this);
 
         // Register our listeners with the Bukkit Server
-        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, this.pluginListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
         // Only register this one if they want it
-        if(this.MVPConfig.getBoolean("use_onmove", true)) {
-            this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, this.playerListener, Priority.Low, this);
+        if (this.MVPConfig.getBoolean("use_onmove", true)) {
+            this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Low, this);
         }
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, this.playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, this.blockListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_PHYSICS, this.blockListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, this.vehicleListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, this.customListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
+        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, blockListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.BLOCK_PHYSICS, blockListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, vehicleListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, customListener, Priority.Normal, this);
         // High priority so we override NetherPortals
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, this.playerListener, Priority.High, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.High, this);
         // These will only get used if WE is not found. so they're monitor.
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, this.playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, this.playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, this.playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, playerListener, Priority.Low, this);
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, playerListener, Priority.Low, this);
     }
-/**
- * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make sure
- */
+
+    /**
+     * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make
+     * sure
+     */
     private void checkForWorldEdit() {
         if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
             this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
         }
     }
 
-    /**
-     * Create the higher level permissions so we can add finer ones to them.
-     */
+    /** Create the higher level permissions so we can add finer ones to them. */
     private void createDefaultPerms() {
         if (this.getServer().getPluginManager().getPermission("multiverse.portal.*") == null) {
             Permission perm = new Permission("multiverse.portal.*");
@@ -219,9 +208,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     }
 
-    /**
-     * Register commands to Multiverse's CommandHandler so we get a super sexy single menu
-     */
+    /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
     private void registerCommands() {
         this.commandHandler = this.core.getCommandHandler();
         this.commandHandler.registerCommand(new InfoCommand(this));
@@ -232,8 +219,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.commandHandler.registerCommand(new ModifyCommand(this));
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
-        for(com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
-            if(c instanceof HelpCommand) {
+        for (com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
+            if (c instanceof HelpCommand) {
                 c.addKey("mvp");
             }
         }
@@ -287,6 +274,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.core = multiverseCore;
     }
 
+    @Override
+    public int getProtocolVersion() {
+        return 1;
+    }
+
     public Configuration getMainConfig() {
         return this.MVPConfig;
     }
@@ -296,12 +288,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadPortals();
         this.loadConfig();
     }
-    /**
-     * Print messages to the server Log as well as to our DebugLog.
-     *
-     * @param level
-     * @param msg
-     */
+
     public static void staticLog(Level level, String msg) {
         log.log(level, logPrefix + " " + msg);
         debugLog.log(level, logPrefix + " " + msg);
@@ -320,17 +307,13 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public void log(Level level, String msg) {
         if (level == Level.FINE && MultiverseCore.GlobalDebug >= 1) {
             staticDebugLog(Level.INFO, msg);
-            return;
         } else if (level == Level.FINER && MultiverseCore.GlobalDebug >= 2) {
             staticDebugLog(Level.INFO, msg);
-            return;
         } else if (level == Level.FINEST && MultiverseCore.GlobalDebug >= 3) {
             staticDebugLog(Level.INFO, msg);
-            return;
         } else if (level != Level.FINE && level != Level.FINER && level != Level.FINEST) {
             staticLog(level, msg);
         }
-
     }
 
     @Override
@@ -349,10 +332,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private String logAndAddToPasteBinBuffer(String string) {
         this.log(Level.INFO, string);
         return "[Multiverse-Portals] " + string + "\n";
-    }
-
-    public void removePortalPlayerSession(String name) {
-        this.portalSessions.remove(name);
     }
 
     public long getCooldownTime() {

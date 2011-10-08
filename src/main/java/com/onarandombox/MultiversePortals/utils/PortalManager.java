@@ -38,10 +38,10 @@ public class PortalManager {
     }
 
     public MVPortal isPortal(CommandSender sender, Location l) {
-        if (!this.plugin.getCore().getWorldManager().isMVWorld(l.getWorld().getName())) {
+        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
             return null;
         }
-        MVWorld world = this.plugin.getCore().getWorldManager().getMVWorld(l.getWorld().getName());
+        MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
         List<MVPortal> portalList = this.getPortals(sender, world);
         if (portalList == null || portalList.size() == 0) {
             return null;
@@ -151,7 +151,7 @@ public class PortalManager {
     }
 
     public MVPortal getPortal(String portalName, CommandSender sender) {
-        if (!this.plugin.getCore().getPermissions().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
+        if (!this.plugin.getCore().getMVPerms().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
             return null;
         }
         return this.getPortal(portalName);
