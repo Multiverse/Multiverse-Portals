@@ -10,13 +10,13 @@ package com.onarandombox.MultiversePortals;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.commands.HelpCommand;
+import com.onarandombox.MultiverseCore.utils.DebugLog;
 import com.onarandombox.MultiversePortals.commands.*;
 import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
 import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import com.onarandombox.MultiversePortals.listeners.*;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.onarandombox.utils.DebugLog;
 import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -54,6 +54,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
+    private final static int requiresProtocol = 4;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -65,6 +66,15 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Test if the Core was found, if not we'll disable this plugin.
         if (this.core == null) {
             log.info(logPrefix + "Multiverse-Core not found, will keep looking.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        if (this.core.getProtocolVersion() < requiresProtocol) {
+            log.severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
+            log.severe(logPrefix + "This version of SignPortals requires Protocol Level: " + requiresProtocol);
+            log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
+            log.severe(logPrefix + "Grab an updated copy at: ");
+            log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -81,7 +91,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         this.portalManager = new PortalManager(this);
         this.portalSessions = new HashMap<Player, PortalPlayerSession>();
-        this.getCore().getDestinationFactory().registerDestinationType(PortalDestination.class, "p");
+        this.getCore().getDestFactory().registerDestinationType(PortalDestination.class, "p");
 
         this.loadPortals();
         this.loadConfig();

@@ -186,7 +186,7 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
-        this.destination = this.plugin.getCore().getDestinationFactory().getDestination(destinationString);
+        this.destination = this.plugin.getCore().getDestFactory().getDestination(destinationString);
         if (this.destination instanceof InvalidDestination) {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
             return false;
@@ -218,7 +218,7 @@ public class MVPortal {
     }
 
     public boolean playerCanEnterPortal(Player player) {
-        return (this.plugin.getCore().getPermissions().hasPermission(player, this.permission.getName(), false));
+        return (this.plugin.getCore().getMVPerms().hasPermission(player, this.permission.getName(), false));
     }
 
     public MVDestination getDestination() {

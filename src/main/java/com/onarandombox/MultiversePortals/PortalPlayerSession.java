@@ -154,7 +154,7 @@ public class PortalPlayerSession {
                 // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
                 r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMinimumPoint(),
                         this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMaximumPoint(),
-                        this.plugin.getCore().getWorldManager().getMVWorld(this.getPlayerFromName().getWorld().getName()));
+                        this.plugin.getCore().getMVWorldManager().getMVWorld(this.getPlayerFromName().getWorld().getName()));
             } catch (Exception e) {
                 this.getPlayerFromName().sendMessage("You haven't finished your selection.");
                 return null;
@@ -231,7 +231,7 @@ public class PortalPlayerSession {
     }
 
     public boolean showDebugInfo(MVPortal portal) {
-        if (this.plugin.getCore().getPermissions().hasPermission(this.getPlayerFromName(), "multiverse.portal.access." + portal.getName(), true)) {
+        if (this.plugin.getCore().getMVPerms().hasPermission(this.getPlayerFromName(), "multiverse.portal.access." + portal.getName(), true)) {
             showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
             showPortalPriceInfo(portal);
         } else {
@@ -265,16 +265,17 @@ public class PortalPlayerSession {
         this.lastTeleportTime = date;
     }
     public boolean allowTeleportViaCooldown(Date date) {
-        this.plugin.log(Level.FINE, "Checking portal cooldown: Last TP Time: " + this.lastTeleportTime);
-        this.plugin.log(Level.FINER, "Checking portal cooldown: Cooldown: " + this.plugin.getCooldownTime());
-        //this.plugin.log(Level.FINEST, "Checking portal cooldown: Total   : " + (this.lastTeleportTime.getTime() + this.plugin.getCooldownTime()));
-        this.plugin.log(Level.FINE, "Checking portal cooldown: Current date: " + new Date());
-        if(lastTeleportTime == null) {
-            lastTeleportTime = new Date();
-            return true;
-        } else {
-            this.plugin.log(Level.FINE, "Checking portal cooldown: Total   : " + (this.lastTeleportTime.getTime() + this.plugin.getCooldownTime()));
-        }
-        return (date.after(new Date((lastTeleportTime).getTime() + this.plugin.getCooldownTime())));
+        return true;
+//        this.plugin.log(Level.FINE, "Checking portal cooldown: Last TP Time: " + this.lastTeleportTime);
+//        this.plugin.log(Level.FINER, "Checking portal cooldown: Cooldown: " + this.plugin.getCooldownTime());
+//        //this.plugin.log(Level.FINEST, "Checking portal cooldown: Total   : " + (this.lastTeleportTime.getTime() + this.plugin.getCooldownTime()));
+//        this.plugin.log(Level.FINE, "Checking portal cooldown: Current date: " + new Date());
+//        if(lastTeleportTime == null) {
+//            lastTeleportTime = new Date();
+//            return true;
+//        } else {
+//            this.plugin.log(Level.FINE, "Checking portal cooldown: Total   : " + (this.lastTeleportTime.getTime() + this.plugin.getCooldownTime()));
+//        }
+//        return (date.after(new Date((lastTeleportTime).getTime() + this.plugin.getCooldownTime())));
     }
 }

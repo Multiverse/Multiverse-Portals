@@ -151,7 +151,7 @@ public class PortalManager {
     }
 
     public MVPortal getPortal(String portalName, CommandSender sender) {
-        if (!this.plugin.getCore().getPermissions().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
+        if (!this.plugin.getCore().getMVPerms().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
             return null;
         }
         return this.getPortal(portalName);

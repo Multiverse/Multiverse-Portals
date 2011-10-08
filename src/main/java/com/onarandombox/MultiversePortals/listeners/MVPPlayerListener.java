@@ -141,7 +141,7 @@ public class MVPPlayerListener extends PlayerListener {
         }
 
         // Portal Wand stuff
-        if (this.plugin.getWEAPI() != null || !this.plugin.getCore().getPermissions().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+        if (this.plugin.getWEAPI() != null || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;
         }
         int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
