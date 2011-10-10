@@ -7,21 +7,20 @@
 
 package com.onarandombox.MultiversePortals.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalLocation;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.util.config.Configuration;
 
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalLocation;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Manages all portals for all worlds.
@@ -41,7 +40,7 @@ public class PortalManager {
         if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
             return null;
         }
-        MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
         List<MVPortal> portalList = this.getPortals(sender, world);
         if (portalList == null || portalList.size() == 0) {
             return null;
@@ -63,7 +62,7 @@ public class PortalManager {
         return false;
     }
 
-    public boolean addPortal(MVWorld world, String name, String owner, PortalLocation location) {
+    public boolean addPortal(MultiverseWorld world, String name, String owner, PortalLocation location) {
         if (!this.portals.containsKey(name)) {
             this.portals.put(name, new MVPortal(this.plugin, name, owner, location));
             return true;
@@ -116,11 +115,11 @@ public class PortalManager {
         return validItems;
     }
 
-    private List<MVPortal> getPortals(MVWorld world) {
+    private List<MVPortal> getPortals(MultiverseWorld world) {
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         for (MVPortal p : all) {
-            MVWorld portalworld = p.getLocation().getMVWorld();
+            MultiverseWorld portalworld = p.getLocation().getMVWorld();
             if (portalworld != null && portalworld.equals(world)) {
                 validItems.add(p);
             }
@@ -128,7 +127,7 @@ public class PortalManager {
         return validItems;
     }
 
-    public List<MVPortal> getPortals(CommandSender sender, MVWorld world) {
+    public List<MVPortal> getPortals(CommandSender sender, MultiverseWorld world) {
         if (!(sender instanceof Player)) {
             return this.getPortals(world);
         }

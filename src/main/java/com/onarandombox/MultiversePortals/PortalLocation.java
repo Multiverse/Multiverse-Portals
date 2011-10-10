@@ -7,21 +7,20 @@
 
 package com.onarandombox.MultiversePortals;
 
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import org.bukkit.util.Vector;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.bukkit.util.Vector;
-
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 public class PortalLocation {
 
     private MultiverseRegion region;
     private boolean validLocation = false;
 
-    public PortalLocation(Vector pos1, Vector pos2, MVWorld world) {
+    public PortalLocation(Vector pos1, Vector pos2, MultiverseWorld world) {
         this.validLocation = this.setLocation(pos1, pos2, world);
         ;
     }
@@ -35,11 +34,11 @@ public class PortalLocation {
      * @param minPt
      * @param maxPt
      */
-    public PortalLocation(com.sk89q.worldedit.Vector minPt, com.sk89q.worldedit.Vector maxPt, MVWorld world) {
+    public PortalLocation(com.sk89q.worldedit.Vector minPt, com.sk89q.worldedit.Vector maxPt, MultiverseWorld world) {
         this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
     }
 
-    public static PortalLocation parseLocation(String locationString, MVWorld world, String portalName) {
+    public static PortalLocation parseLocation(String locationString, MultiverseWorld world, String portalName) {
         String[] split = locationString.split(":");
         if (split.length != 2) {
             MultiversePortals.staticLog(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
@@ -79,7 +78,7 @@ public class PortalLocation {
         return new Vector(coords[0], coords[1], coords[2]);
     }
 
-    public boolean setLocation(Vector v1, Vector v2, MVWorld world) {
+    public boolean setLocation(Vector v1, Vector v2, MultiverseWorld world) {
         if (v1 == null || v2 == null || world == null) {
             this.validLocation = false;
             this.region = null;
@@ -90,7 +89,7 @@ public class PortalLocation {
         return this.validLocation;
     }
 
-    public boolean setLocation(String v1, String v2, MVWorld world) {
+    public boolean setLocation(String v1, String v2, MultiverseWorld world) {
         if (v1 == null || v2 == null) {
             this.validLocation = false;
             this.region = null;
@@ -132,8 +131,8 @@ public class PortalLocation {
         return sb.toString();
     }
 
-    public MVWorld getMVWorld() {
-        if(this.region == null) {
+    public MultiverseWorld getMVWorld() {
+        if (this.region == null) {
             return null;
         }
         return this.region.getWorld();

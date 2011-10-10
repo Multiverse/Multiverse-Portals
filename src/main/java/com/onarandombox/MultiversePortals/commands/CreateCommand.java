@@ -7,7 +7,7 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -48,7 +48,7 @@ public class CreateCommand extends PortalCommand {
             this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
             return;
         }
-        MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(p.getWorld().getName());
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(p.getWorld().getName());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(p);
 

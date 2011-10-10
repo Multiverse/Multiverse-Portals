@@ -7,7 +7,7 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.MVWorld;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -117,6 +117,9 @@ public class ModifyCommand extends PortalCommand {
                 sender.sendMessage("Property " + args.get(0) + " of Portal " + ChatColor.YELLOW + selectedPortal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + args.get(1));
             } else {
                 sender.sendMessage("Property " + args.get(0) + " of Portal " + ChatColor.YELLOW + selectedPortal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + args.get(1));
+                if (args.get(0).equalsIgnoreCase("dest") || args.get(0).equalsIgnoreCase("destination")) {
+                    sender.sendMessage("Multiverse could not find the destination: " + ChatColor.GOLD + args.get(1));
+                }
             }
         }
     }
@@ -129,7 +132,7 @@ public class ModifyCommand extends PortalCommand {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
         MultiverseRegion r = ps.getSelectedRegion();
         if (r != null) {
-            MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(player.getWorld().getName());
+            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(player.getWorld().getName());
             PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
             selectedPortal.setPortalLocation(location);
             player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");

@@ -7,10 +7,9 @@
 
 package com.onarandombox.MultiversePortals.utils;
 
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
-
-import com.onarandombox.MultiverseCore.MVWorld;
 
 /**
  * This is a placeholder of good things to come...
@@ -21,9 +20,9 @@ public class MultiverseRegion {
 
     private Vector min;
     private Vector max;
-    private MVWorld world;
+    private MultiverseWorld world;
 
-    public MultiverseRegion(Object pos1, Object pos2, MVWorld w) {
+    public MultiverseRegion(Object pos1, Object pos2, MultiverseWorld w) {
         // Creating soft dependencies on WE
         if (pos1 instanceof com.sk89q.worldedit.Vector && pos2 instanceof com.sk89q.worldedit.Vector) {
             com.sk89q.worldedit.Vector weV1 = (com.sk89q.worldedit.Vector) pos1;
@@ -36,7 +35,7 @@ public class MultiverseRegion {
         }
     }
 
-    public MultiverseRegion(Vector pos1, Vector pos2, MVWorld w) {
+    public MultiverseRegion(Vector pos1, Vector pos2, MultiverseWorld w) {
         this.min = Vector.getMinimum(pos1, pos2);
         this.max = Vector.getMaximum(pos1, pos2);
         this.world = w;
@@ -50,7 +49,7 @@ public class MultiverseRegion {
         return this.max;
     }
 
-    public MVWorld getWorld() {
+    public MultiverseWorld getWorld() {
         return this.world;
     }
 

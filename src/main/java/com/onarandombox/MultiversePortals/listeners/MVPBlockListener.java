@@ -40,7 +40,6 @@ public class MVPBlockListener extends BlockListener {
         portal = plugin.getPortalManager().isPortal(null, event.getBlock().getLocation());
         if (portal != null) {
             event.setCancelled(true);
-            return;
         }
     }
 

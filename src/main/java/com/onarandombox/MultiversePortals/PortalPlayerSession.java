@@ -7,9 +7,10 @@
 
 package com.onarandombox.MultiversePortals;
 
-import java.util.Date;
-import java.util.logging.Level;
-
+import com.fernferret.allpay.GenericBank;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -17,10 +18,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
 import org.bukkit.util.Vector;
 
-import com.fernferret.allpay.GenericBank;
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
+import java.util.Date;
+import java.util.logging.Level;
 
 public class PortalPlayerSession {
     private MultiversePortals plugin;
@@ -34,8 +33,8 @@ public class PortalPlayerSession {
     private Location loc;
     private Vector rightClick;
     private Vector leftClick;
-    private MVWorld rightClickWorld;
-    private MVWorld leftClickWorld;
+    private MultiverseWorld rightClickWorld;
+    private MultiverseWorld leftClickWorld;
     private Date lastTeleportTime;
 
     public PortalPlayerSession(MultiversePortals plugin, Player p) {
@@ -124,7 +123,7 @@ public class PortalPlayerSession {
 
     }
 
-    public void setLeftClickSelection(Vector v, MVWorld world) {
+    public void setLeftClickSelection(Vector v, MultiverseWorld world) {
         this.leftClick = v;
         this.leftClickWorld = world;
         String message = ChatColor.AQUA + "First position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
@@ -135,7 +134,7 @@ public class PortalPlayerSession {
         this.getPlayerFromName().sendMessage(message);
     }
 
-    public void setRightClickSelection(Vector v, MVWorld world) {
+    public void setRightClickSelection(Vector v, MultiverseWorld world) {
         this.rightClick = v;
         this.rightClickWorld = world;
         String message = ChatColor.AQUA + "Second position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
@@ -271,7 +270,7 @@ public class PortalPlayerSession {
     }
 
     public long getRemainingCooldown() {
-   	    //Calculate the remaining cooldown period
+        //Calculate the remaining cooldown period
         return (this.plugin.getCooldownTime() - ((new Date()).getTime() - this.lastTeleportTime.getTime()));
     }
 }

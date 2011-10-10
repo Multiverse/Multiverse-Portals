@@ -7,15 +7,14 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import java.util.List;
-
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
-import com.onarandombox.MultiverseCore.MVWorld;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
+import java.util.List;
 
 public class ListCommand extends PortalCommand {
 
@@ -32,7 +31,7 @@ public class ListCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        MVWorld world = null;
+        MultiverseWorld world = null;
         String filter = null;
         if (args.size() > 0) {
             world = this.plugin.getCore().getMVWorldManager().getMVWorld(args.get(args.size() - 1));
@@ -62,7 +61,7 @@ public class ListCommand extends PortalCommand {
 
     }
 
-    private String getPortals(CommandSender sender, MVWorld world, String filter) {
+    private String getPortals(CommandSender sender, MultiverseWorld world, String filter) {
         String portals = "";
         if (filter == null) {
             filter = "";

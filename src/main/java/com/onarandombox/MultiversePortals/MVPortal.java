@@ -7,9 +7,9 @@
 
 package com.onarandombox.MultiversePortals;
 
-import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import org.bukkit.Location;
@@ -135,7 +135,7 @@ public class MVPortal {
         return true;
     }
 
-    public MVPortal(MVWorld world, MultiversePortals instance, String name, String owner, String location) {
+    public MVPortal(MultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location, world);
@@ -148,14 +148,14 @@ public class MVPortal {
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
-        MVWorld world = null;
+        MultiverseWorld world = null;
         if (this.worldManager.isMVWorld(worldString)) {
             world = this.worldManager.getMVWorld(worldString);
         }
         return this.setPortalLocation(locationString, world);
     }
 
-    public boolean setPortalLocation(String locationString, MVWorld world) {
+    public boolean setPortalLocation(String locationString, MultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
 
@@ -166,7 +166,7 @@ public class MVPortal {
             return false;
         }
         this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
-        MVWorld world = this.location.getMVWorld();
+        MultiverseWorld world = this.location.getMVWorld();
         if (world != null) {
 
             this.config.setProperty(this.portalConfigString + ".world", world.getName());

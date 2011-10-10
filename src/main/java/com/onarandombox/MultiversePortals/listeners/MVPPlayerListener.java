@@ -8,8 +8,8 @@
 package com.onarandombox.MultiversePortals.listeners;
 
 import com.fernferret.allpay.GenericBank;
-import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
@@ -146,11 +146,11 @@ public class MVPPlayerListener extends PlayerListener {
         }
         int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
         if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
-            MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
+            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setLeftClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
-            MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
+            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setRightClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
         }
@@ -199,17 +199,17 @@ public class MVPPlayerListener extends PlayerListener {
                 return;
             }
 
-            MVWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(d.getLocation(p).getWorld().getName());
+            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(d.getLocation(p).getWorld().getName());
             if (world == null) {
                 return;
             }
             if (!ps.allowTeleportViaCooldown(new Date())) {
                 // TODO: Tell them how much time is remaining.
-                p.sendMessage("There is a portal cooldown in effect. Please try again in "+Integer.toString((int)ps.getRemainingCooldown()/1000)+"s.");
+                p.sendMessage("There is a portal cooldown in effect. Please try again in " + Integer.toString((int) ps.getRemainingCooldown() / 1000) + "s.");
                 return;
             }
             // If the player does not have to pay, return now.
-            if (world.isExempt(event.getPlayer()) || portal.isExempt(event.getPlayer())) {
+            if (this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), world.getAccessPermission().getName(), true) || portal.isExempt(event.getPlayer())) {
                 performTeleport(event, ps, d);
                 return;
             }
