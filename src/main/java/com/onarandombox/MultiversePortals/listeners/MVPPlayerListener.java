@@ -167,7 +167,7 @@ public class MVPPlayerListener extends PlayerListener {
 
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (event.isCancelled()) {
+        if (event.isCancelled() || !MultiversePortals.UseOnMove) {
             return;
         }
         Player p = event.getPlayer(); // Grab Player

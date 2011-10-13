@@ -50,9 +50,6 @@ public class MVPBlockListener extends BlockListener {
             return;
         }
         PortalManager pm = this.plugin.getPortalManager();
-        this.plugin.log(Level.FINEST, "Found some physics:");
-        this.plugin.log(Level.FINEST, event.getChangedType() + "");
-        this.plugin.log(Level.FINEST, "-------------------");
         MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
         if(portal != null && (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL)){
             event.setCancelled(true);

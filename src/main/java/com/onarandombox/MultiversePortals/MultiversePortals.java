@@ -55,6 +55,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
     private final static int requiresProtocol = 4;
+    public static boolean UseOnMove = true;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -114,9 +115,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
         // Only register this one if they want it
-        if (this.MVPConfig.getBoolean("use_onmove", true)) {
-            this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Low, this);
-        }
+        //if (this.MVPConfig.getBoolean("use_onmove", true)) {
+        this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Low, this);
+        //}
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
@@ -197,7 +198,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPConfig.load();
-        this.MVPConfig.getBoolean("use_onmove", true);
+        UseOnMove = this.MVPConfig.getBoolean("use_onmove", true);
         this.portalCooldown = this.MVPConfig.getInt("portal_cooldown", 1000);
         this.MVPConfig.getBoolean("mvportals_default_to_nether", false);
         this.MVPConfig.save();
