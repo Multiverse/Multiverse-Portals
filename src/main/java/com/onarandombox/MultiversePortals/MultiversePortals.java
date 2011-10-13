@@ -198,7 +198,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPConfig.load();
-        UseOnMove = this.MVPConfig.getBoolean("use_onmove", true);
+        MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("use_onmove", true);
         this.portalCooldown = this.MVPConfig.getInt("portal_cooldown", 1000);
         this.MVPConfig.getBoolean("mvportals_default_to_nether", false);
         this.MVPConfig.save();
