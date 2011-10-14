@@ -182,7 +182,6 @@ public class MVPPlayerListener extends PlayerListener {
         if (ps.isStaleLocation()) {
             return;
         }
-
         MVPortal portal = ps.getStandingInPortal();
         // If the portal is not null
         // AND if we did not show debug info, do the stuff
@@ -208,9 +207,9 @@ public class MVPPlayerListener extends PlayerListener {
                 p.sendMessage("There is a portal cooldown in effect. Please try again in " + Integer.toString((int) ps.getRemainingCooldown() / 1000) + "s.");
                 return;
             }
-            // If the player does not have to pay, return now.
-            if (this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), world.getAccessPermission().getName(), true) || portal.isExempt(event.getPlayer())) {
-                performTeleport(event, ps, d);
+            // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
+            // TODO: This uses world perm, make it use portal perm.
+            if (MultiversePortals.UsePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), world.getAccessPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
                 return;
             }
             GenericBank bank = plugin.getCore().getBank();
@@ -223,7 +222,7 @@ public class MVPPlayerListener extends PlayerListener {
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
         SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
-        if (playerTeleporter.safelyTeleport(event.getPlayer(), d)) {
+        if (playerTeleporter.safelyTeleport(event.getPlayer(), event.getPlayer(), d)) {
             ps.playerDidTeleport(event.getTo());
             ps.setTeleportTime(new Date());
         }

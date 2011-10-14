@@ -54,6 +54,24 @@ public class PortalManager {
         return null;
     }
 
+    public MVPortal isPortal(Location l) {
+        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
+            return null;
+        }
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
+        List<MVPortal> portalList = this.getAllPortals();
+        if (portalList == null || portalList.size() == 0) {
+            return null;
+        }
+        for (MVPortal portal : portalList) {
+            PortalLocation portalLoc = portal.getLocation();
+            if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
+                return portal;
+            }
+        }
+        return null;
+    }
+
     public boolean addPortal(MVPortal portal) {
         if (!this.portals.containsKey(portal.getName())) {
             this.portals.put(portal.getName(), portal);
@@ -107,10 +125,14 @@ public class PortalManager {
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        for (MVPortal p : all) {
-            if (p.playerCanEnterPortal((Player) sender)) {
-                validItems.add(p);
+        if (MultiversePortals.UsePortalAccess) {
+            for (MVPortal p : all) {
+                if (p.playerCanEnterPortal((Player) sender)) {
+                    validItems.add(p);
+                }
             }
+        } else {
+            validItems = new ArrayList<MVPortal>(all);
         }
         return validItems;
     }
@@ -133,11 +155,15 @@ public class PortalManager {
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        for (MVPortal p : all) {
-            if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
-                    p.playerCanEnterPortal((Player) sender)) {
-                validItems.add(p);
+        if (MultiversePortals.UsePortalAccess) {
+            for (MVPortal p : all) {
+                if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
+                        p.playerCanEnterPortal((Player) sender)) {
+                    validItems.add(p);
+                }
             }
+        } else {
+            validItems = new ArrayList<MVPortal>(all);
         }
         return validItems;
     }
@@ -149,7 +175,16 @@ public class PortalManager {
         return null;
     }
 
+    /**
+     * Gets a portal with a commandsender and a name. Used as a convience for portal listing methods
+     *
+     * @param portalName
+     * @param sender
+     *
+     * @return
+     */
     public MVPortal getPortal(String portalName, CommandSender sender) {
+        System.out.print("getPortal with a name.");
         if (!this.plugin.getCore().getMVPerms().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
             return null;
         }

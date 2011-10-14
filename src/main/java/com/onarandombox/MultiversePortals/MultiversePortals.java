@@ -54,8 +54,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 4;
+    private final static int requiresProtocol = 6;
     public static boolean UseOnMove = true;
+    public static boolean UsePortalAccess = true;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -199,6 +200,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPConfig.load();
         MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("use_onmove", true);
+        MultiversePortals.UsePortalAccess = this.MVPConfig.getBoolean("useportalaccess", true);
         this.portalCooldown = this.MVPConfig.getInt("portal_cooldown", 1000);
         this.MVPConfig.getBoolean("mvportals_default_to_nether", false);
         this.MVPConfig.save();
@@ -326,6 +328,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer(this.getPortalsConfig().getAll() + "");
         buffer += logAndAddToPasteBinBuffer("Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
         buffer += logAndAddToPasteBinBuffer("wand: " + this.getMainConfig().getString("wand", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("portal_cooldown: " + this.getMainConfig().getString("portal_cooldown", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("useportalaccess: " + this.getMainConfig().getString("useportalaccess", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("mvportals_default_to_nether: " + this.getMainConfig().getString("mvportals_default_to_nether", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }

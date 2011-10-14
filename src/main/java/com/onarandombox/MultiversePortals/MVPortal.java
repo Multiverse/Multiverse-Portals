@@ -218,6 +218,7 @@ public class MVPortal {
     }
 
     public boolean playerCanEnterPortal(Player player) {
+        System.out.print("Can player enter?");
         return (this.plugin.getCore().getMVPerms().hasPermission(player, this.permission.getName(), false));
     }
 

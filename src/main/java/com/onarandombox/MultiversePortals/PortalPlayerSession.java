@@ -87,6 +87,7 @@ public class PortalPlayerSession {
     private void setStandinginLocation() {
         if (this.standingIn == null) {
             this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
+            this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
         } else if (this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc) == null) {
             this.hasMovedOutOfPortal = true;
             this.standingIn = null;
@@ -114,6 +115,7 @@ public class PortalPlayerSession {
         if (this.getPlayerFromName().isInsideVehicle() && moveType != Type.VEHICLE_MOVE) {
             return;
         }
+
         if (this.getLocation().getBlockX() == loc.getBlockX() && this.getLocation().getBlockY() == loc.getBlockY() && this.getLocation().getBlockZ() == loc.getBlockZ()) {
             this.setStaleLocation(true);
         } else {
@@ -231,7 +233,7 @@ public class PortalPlayerSession {
     }
 
     public boolean showDebugInfo(MVPortal portal) {
-        if (this.plugin.getCore().getMVPerms().hasPermission(this.getPlayerFromName(), "multiverse.portal.access." + portal.getName(), true)) {
+        if (portal.playerCanEnterPortal(this.getPlayerFromName())) {
             showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
             showPortalPriceInfo(portal);
         } else {

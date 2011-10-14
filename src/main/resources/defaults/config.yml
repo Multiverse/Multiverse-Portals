@@ -2,3 +2,6 @@
 # If you are using WorldEdit. Changing this will have NO EFFECT.
 wand: 271
 use_onmove: true
+mvportals_default_to_nether: false
+useportalaccess: true
+version: 1.0
