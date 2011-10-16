@@ -109,6 +109,9 @@ public class MVPPlayerListener extends PlayerListener {
             this.plugin.log(Level.FINER, "Player is ligting block: " + LocationManipulation.strCoordsRaw(event.getClickedBlock().getLocation()));
             PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
             Location translatedLocation = this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace());
+            if(!portalManager.isPortal(translatedLocation)) {
+                return;
+            }
             MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
             if (event.getItem() == null) {
                 return;
@@ -139,7 +142,7 @@ public class MVPPlayerListener extends PlayerListener {
             }
             return;
         }
-        
+
         int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
         // If we Found WorldEdit, return, we're not needed here.
         // If the item is not the Wand we've stetup we're not needed either
