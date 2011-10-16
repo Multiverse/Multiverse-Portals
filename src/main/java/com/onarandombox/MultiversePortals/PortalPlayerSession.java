@@ -41,7 +41,7 @@ public class PortalPlayerSession {
         this.plugin = plugin;
         this.playerName = p.getName();
         this.setLocation(p.getLocation());
-        this.lastTeleportTime = new Date();
+        this.lastTeleportTime = new Date(new Date().getTime() - this.plugin.getCooldownTime());
     }
 
     public boolean selectPortal(MVPortal portal) {
@@ -263,6 +263,8 @@ public class PortalPlayerSession {
     }
 
     public void setTeleportTime(Date date) {
+        System.out.print(date);
+        System.out.print("Next teleport allowed at: " + getRemainingCooldown());
         this.lastTeleportTime = date;
     }
 
@@ -270,8 +272,30 @@ public class PortalPlayerSession {
         return (date.after(new Date(this.lastTeleportTime.getTime() + this.plugin.getCooldownTime())));
     }
 
+    public String getFriendlyRemainingTimeMessage() {
+        String remaining = "There is a portal " + ChatColor.AQUA + "cooldown" + ChatColor.WHITE + " in effect. Please try again in " + ChatColor.GOLD;
+        //+ Integer.toString((int) this.getRemainingCooldown() / 1000) + "s.");
+        int time = (int) this.getRemainingCooldown() / 1000;
+        // Account for the fact that 0 seconds means 1
+        time++;
+        if (time <= 0) {
+            remaining += "< 1s" + ChatColor.WHITE + ".";
+        } else {
+            remaining += time + "s" + ChatColor.WHITE + ".";
+        }
+        return remaining;
+    }
+
     public long getRemainingCooldown() {
         //Calculate the remaining cooldown period
-        return (this.plugin.getCooldownTime() - ((new Date()).getTime() - this.lastTeleportTime.getTime()));
+        System.out.print("Current: " + new Date());
+        System.out.print("Previous: " + this.lastTeleportTime);
+        System.out.print("Milliseconds since last tp: " + ((new Date()).getTime() - this.lastTeleportTime.getTime()));
+        long remainingcooldown = (this.plugin.getCooldownTime() - ((new Date()).getTime() - this.lastTeleportTime.getTime()));
+        if (remainingcooldown < 0) {
+            remainingcooldown = 0;
+        }
+        return remainingcooldown;
+
     }
 }

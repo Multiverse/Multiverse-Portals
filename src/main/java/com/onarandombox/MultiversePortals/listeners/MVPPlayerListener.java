@@ -210,7 +210,7 @@ public class MVPPlayerListener extends PlayerListener {
             }
             if (!ps.allowTeleportViaCooldown(new Date())) {
                 // TODO: Tell them how much time is remaining.
-                p.sendMessage("There is a portal cooldown in effect. Please try again in " + Integer.toString((int) ps.getRemainingCooldown() / 1000) + "s.");
+                p.sendMessage(ps.getFriendlyRemainingTimeMessage());
                 return;
             }
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
@@ -245,8 +245,7 @@ public class MVPPlayerListener extends PlayerListener {
             if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
                 if (!ps.allowTeleportViaCooldown(new Date())) {
-                    // TODO: Tell them how much time is remaining.
-                    event.getPlayer().sendMessage("There is a portal cooldown in effect. Please try again later.");
+                    event.getPlayer().sendMessage(ps.getFriendlyRemainingTimeMessage());
                     event.setCancelled(true);
                     return;
                 }

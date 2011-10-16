@@ -198,25 +198,35 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig.load();
         MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("useonmove", true);
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
+        this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         // Migrate useportalaccess -> enforceportalaccess
-        if (this.MVPConfig.getNode("useportalaccess") != null && this.MVPConfig.getBoolean("useportalaccess", true) != MultiversePortals.EnforcePortalAccess) {
+        if (this.MVPConfig.getProperty("useportalaccess") != null) {
             this.MVPConfig.setProperty("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
+            this.log(Level.INFO, "Migrating useportalaccess -> enforceportalaccess...");
         }
 
-        if (this.MVPConfig.getNode("mvportals_default_to_nether") != null && this.MVPConfig.getBoolean("mvportals_default_to_nether", true) != this.MVPConfig.getBoolean("portalsdefaulttonether", false)) {
+        if (this.MVPConfig.getProperty("mvportals_default_to_nether") != null) {
             this.MVPConfig.setProperty("portalsdefaulttonether", this.MVPConfig.getBoolean("mvportals_default_to_nether", false));
+            this.log(Level.INFO, "Migrating mvportals_default_to_nether -> portalsdefaulttonether...");
         }
 
-        if (this.MVPConfig.getNode("use_onmove") != null && this.MVPConfig.getBoolean("use_onmove", true) != MultiversePortals.UseOnMove) {
+        if (this.MVPConfig.getProperty("use_onmove") != null) {
             this.MVPConfig.setProperty("useonmove", this.MVPConfig.getBoolean("use_onmove", false));
+            this.log(Level.INFO, "Migrating use_onmove -> useonmove...");
+        }
+
+        if (this.MVPConfig.getProperty("portal_cooldown") != null) {
+            this.MVPConfig.setProperty("portalcooldown", this.MVPConfig.getInt("portal_cooldown", 1000));
+            this.log(Level.INFO, "Migrating portal_cooldown -> portalcooldown...");
         }
 
         // Remove old properties
         this.MVPConfig.removeProperty("mvportals_default_to_nether");
         this.MVPConfig.removeProperty("useportalaccess");
         this.MVPConfig.removeProperty("use_onmove");
+        this.MVPConfig.removeProperty("portal_cooldown");
 
-        this.portalCooldown = this.MVPConfig.getInt("portal_cooldown", 1000);
+
 
         this.MVPConfig.save();
 
@@ -347,6 +357,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("useonmove: " + this.getMainConfig().getString("useonmove", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("enforceportalaccess: " + this.getMainConfig().getString("enforceportalaccess", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("portalsdefaulttonether: " + this.getMainConfig().getString("portalsdefaulttonether", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("portalcooldown: " + this.getMainConfig().getString("portalcooldown", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }

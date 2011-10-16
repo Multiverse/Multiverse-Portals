@@ -44,11 +44,6 @@ public class MVPVehicleListener extends VehicleListener {
                 return;
             }
 
-            if (!ps.allowTeleportViaCooldown(new Date())) {
-                p.sendMessage("There is a portal cooldown in effect. Please try again in " + Integer.toString((int) ps.getRemainingCooldown() / 1000) + "s.");
-                return;
-            }
-
             // Teleport the Player
             teleportVehicle(p, v, event.getTo());
         }
@@ -61,6 +56,10 @@ public class MVPVehicleListener extends VehicleListener {
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
         if (portal != null && ps.doTeleportPlayer(Type.VEHICLE_MOVE) && !ps.showDebugInfo()) {
+            if (!ps.allowTeleportViaCooldown(new Date())) {
+                p.sendMessage(ps.getFriendlyRemainingTimeMessage());
+                return false;
+            }
             // TODO: Money
             MVDestination d = portal.getDestination();
             if (d == null || d instanceof InvalidDestination) {
@@ -73,9 +72,16 @@ public class MVPVehicleListener extends VehicleListener {
             // 0 Yaw in dest = 0,X
             if (d instanceof PortalDestination) {
                 PortalDestination pd = (PortalDestination) d;
-                Vector newPos = LocationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
-                v.setVelocity(newPos);
+
+                // Translate the direction of travel.
+                vehicleVec = LocationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
             }
+
+            // Set the velocity
+            // Will set to the destination's velocity if one is present
+            // Or
+            this.setVehicleVelocity(vehicleVec, d, v);
+
             p.setFallDistance(0);
 
             SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
@@ -110,8 +116,7 @@ public class MVPVehicleListener extends VehicleListener {
         Vehicle newVehicle = toLocation.getWorld().spawn(toLocation, v.getClass());
 
         // Set the vehicle's velocity to ours.
-
-        setVehicleVelocity(v.getVelocity(), to, newVehicle);
+        this.setVehicleVelocity(v.getVelocity(), to, newVehicle);
 
         // Set the new player
         newVehicle.setPassenger(p);
@@ -123,6 +128,9 @@ public class MVPVehicleListener extends VehicleListener {
     }
 
     private void setVehicleVelocity(Vector calculated, MVDestination to, Vehicle newVehicle) {
+        // If the destination has a non-zero velocity, use that,
+        // otherwise use the existing velocity, because velocities
+        // are preserved through portals... duh.
         if (!to.getVelocity().equals(new Vector(0, 0, 0))) {
             newVehicle.setVelocity(to.getVelocity());
         } else {
