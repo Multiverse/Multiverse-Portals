@@ -51,12 +51,20 @@ public class MVPortalsConfigMigrator extends MVConfigMigrator {
             return false;
         }
         for (String key : keys) {
-            newConfig.setProperty("portals." + key + ".entryfee.amount", oldConfig.getDouble("portals." + key + ".price", 0.0));
-            newConfig.setProperty("portals." + key + ".entryfee.amount", -1);
-            newConfig.setProperty("portals." + key + ".destination", transformDestination(oldConfig.getString("portals." + key + ".destlocation", "i:Invalid")));
-            newConfig.setProperty("portals." + key + ".world", oldConfig.getProperty("portals." + key + ".world"));
-            newConfig.setProperty("portals." + key + ".location", oldConfig.getProperty("portals." + key + ".location"));
-            newConfig.setProperty("portals." + key + ".owner", oldConfig.getProperty("portals." + key + ".owner"));
+            // Since portal names are lowercase, no reason not to do that here.
+            String lowerkey = key.toLowerCase();
+            if(newConfig.getProperty(lowerkey) != null) {
+                MultiversePortals.staticLog(Level.SEVERE, "Portals are now case-insensitive!");
+                MultiversePortals.staticLog(Level.SEVERE, "Found at least 2 portals named: " + lowerkey);
+                continue;
+            }
+
+            newConfig.setProperty("portals." + lowerkey + ".entryfee.amount", oldConfig.getDouble("portals." + key + ".price", 0.0));
+            newConfig.setProperty("portals." + lowerkey + ".entryfee.amount", -1);
+            newConfig.setProperty("portals." + lowerkey + ".destination", transformDestination(oldConfig.getString("portals." + key + ".destlocation", "i:Invalid")));
+            newConfig.setProperty("portals." + lowerkey + ".world", oldConfig.getProperty("portals." + key + ".world"));
+            newConfig.setProperty("portals." + lowerkey + ".location", oldConfig.getProperty("portals." + key + ".location"));
+            newConfig.setProperty("portals." + lowerkey + ".owner", oldConfig.getProperty("portals." + key + ".owner"));
         }
         newConfig.save();
         MultiversePortals.staticLog(Level.INFO, "Migration SUCCESS!");
