@@ -56,7 +56,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private long portalCooldown = 0;
     private final static int requiresProtocol = 6;
     public static boolean UseOnMove = true;
-    public static boolean UsePortalAccess = true;
+    public static boolean EnforcePortalAccess = true;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -115,10 +115,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Register our listeners with the Bukkit Server
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
-        // Only register this one if they want it
-        //if (this.MVPConfig.getBoolean("use_onmove", true)) {
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Low, this);
-        //}
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
@@ -195,14 +192,32 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     }
 
-    private void loadConfig() {
+    public void loadConfig() {
         new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
         this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
         this.MVPConfig.load();
-        MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("use_onmove", true);
-        MultiversePortals.UsePortalAccess = this.MVPConfig.getBoolean("useportalaccess", true);
+        MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("useonmove", true);
+        MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
+        // Migrate useportalaccess -> enforceportalaccess
+        if (this.MVPConfig.getNode("useportalaccess") != null && this.MVPConfig.getBoolean("useportalaccess", true) != MultiversePortals.EnforcePortalAccess) {
+            this.MVPConfig.setProperty("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
+        }
+
+        if (this.MVPConfig.getNode("mvportals_default_to_nether") != null && this.MVPConfig.getBoolean("mvportals_default_to_nether", true) != this.MVPConfig.getBoolean("portalsdefaulttonether", false)) {
+            this.MVPConfig.setProperty("portalsdefaulttonether", this.MVPConfig.getBoolean("mvportals_default_to_nether", false));
+        }
+
+        if (this.MVPConfig.getNode("use_onmove") != null && this.MVPConfig.getBoolean("use_onmove", true) != MultiversePortals.UseOnMove) {
+            this.MVPConfig.setProperty("useonmove", this.MVPConfig.getBoolean("use_onmove", false));
+        }
+
+        // Remove old properties
+        this.MVPConfig.removeProperty("mvportals_default_to_nether");
+        this.MVPConfig.removeProperty("useportalaccess");
+        this.MVPConfig.removeProperty("use_onmove");
+
         this.portalCooldown = this.MVPConfig.getInt("portal_cooldown", 1000);
-        this.MVPConfig.getBoolean("mvportals_default_to_nether", false);
+
         this.MVPConfig.save();
 
     }
@@ -222,6 +237,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.commandHandler.registerCommand(new ModifyCommand(this));
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
+        this.commandHandler.registerCommand(new ConfigCommand(this));
         for (com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
             if (c instanceof HelpCommand) {
                 c.addKey("mvp");
@@ -328,9 +344,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer(this.getPortalsConfig().getAll() + "");
         buffer += logAndAddToPasteBinBuffer("Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
         buffer += logAndAddToPasteBinBuffer("wand: " + this.getMainConfig().getString("wand", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("portal_cooldown: " + this.getMainConfig().getString("portal_cooldown", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("useportalaccess: " + this.getMainConfig().getString("useportalaccess", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("mvportals_default_to_nether: " + this.getMainConfig().getString("mvportals_default_to_nether", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("useonmove: " + this.getMainConfig().getString("useonmove", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("enforceportalaccess: " + this.getMainConfig().getString("enforceportalaccess", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("portalsdefaulttonether: " + this.getMainConfig().getString("portalsdefaulttonether", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }

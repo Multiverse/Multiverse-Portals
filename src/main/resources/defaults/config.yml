@@ -1,7 +1,7 @@
 # This is the item id of the portal creation wand.
 # If you are using WorldEdit. Changing this will have NO EFFECT.
 wand: 271
-use_onmove: true
-mvportals_default_to_nether: false
-useportalaccess: true
-version: 1.0
+useonmove: true
+portalsdefaulttonether: false
+enforceportalaccess: true
+version: 1.1

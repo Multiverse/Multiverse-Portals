@@ -144,7 +144,7 @@ public class PortalManager {
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        if (MultiversePortals.UsePortalAccess) {
+        if (MultiversePortals.EnforcePortalAccess) {
             for (MVPortal p : all) {
                 if (p.playerCanEnterPortal((Player) sender)) {
                     validItems.add(p);
@@ -174,7 +174,7 @@ public class PortalManager {
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        if (MultiversePortals.UsePortalAccess) {
+        if (MultiversePortals.EnforcePortalAccess) {
             for (MVPortal p : all) {
                 if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
                         p.playerCanEnterPortal((Player) sender)) {

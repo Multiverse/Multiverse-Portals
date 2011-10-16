@@ -208,7 +208,7 @@ public class MVPPlayerListener extends PlayerListener {
                 return;
             }
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
-            if (MultiversePortals.UsePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
+            if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
                 return;
             }
             GenericBank bank = plugin.getCore().getBank();
@@ -260,7 +260,7 @@ public class MVPPlayerListener extends PlayerListener {
                     return;
                 }
                 this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
-            } else if (!this.plugin.getMainConfig().getBoolean("mvportals_default_to_nether", false)) {
+            } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
                 event.getPlayer().sendMessage("This portal " + ChatColor.RED + "doesn't go anywhere." + ChatColor.RED + " You should exit it now.");
                 event.setCancelled(true);

@@ -47,6 +47,7 @@ public class MVPortal {
         this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
+        this.plugin.getServer().getPluginManager().addPermission(this.exempt);
         this.addToUpperLists();
         this.worldManager = this.plugin.getCore().getMVWorldManager();
     }
@@ -82,8 +83,6 @@ public class MVPortal {
         if (all == null) {
             all = new Permission("multiverse.*");
             this.plugin.getServer().getPluginManager().addPermission(all);
-
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         }
         all.getChildren().put("multiverse.portal.*", true);
         allPortals.getChildren().put("multiverse.portal.access.*", true);
