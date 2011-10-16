@@ -263,8 +263,6 @@ public class PortalPlayerSession {
     }
 
     public void setTeleportTime(Date date) {
-        System.out.print(date);
-        System.out.print("Next teleport allowed at: " + getRemainingCooldown());
         this.lastTeleportTime = date;
     }
 
@@ -288,9 +286,6 @@ public class PortalPlayerSession {
 
     public long getRemainingCooldown() {
         //Calculate the remaining cooldown period
-        System.out.print("Current: " + new Date());
-        System.out.print("Previous: " + this.lastTeleportTime);
-        System.out.print("Milliseconds since last tp: " + ((new Date()).getTime() - this.lastTeleportTime.getTime()));
         long remainingcooldown = (this.plugin.getCooldownTime() - ((new Date()).getTime() - this.lastTeleportTime.getTime()));
         if (remainingcooldown < 0) {
             remainingcooldown = 0;
