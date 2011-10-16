@@ -139,17 +139,20 @@ public class MVPPlayerListener extends PlayerListener {
             }
             return;
         }
-
-        // Portal Wand stuff
-        if (this.plugin.getWEAPI() != null || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+        
+        int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
+        // If we Found WorldEdit, return, we're not needed here.
+        // If the item is not the Wand we've stetup we're not needed either
+        // If the player doesn't have the perms, return also.
+        if (this.plugin.getWEAPI() != null || event.getPlayer().getItemInHand().getTypeId() != itemType || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;
         }
-        int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
-        if (event.getAction() == Action.LEFT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
+
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
             MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setLeftClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
-        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getTypeId() == itemType) {
+        } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(event.getPlayer().getWorld().getName());
             this.plugin.getPortalSession(event.getPlayer()).setRightClickSelection(event.getClickedBlock().getLocation().toVector(), world);
             event.setCancelled(true);
