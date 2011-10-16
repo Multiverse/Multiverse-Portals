@@ -22,12 +22,13 @@ public class ConfigCommand extends PortalCommand {
         super(plugin);
         this.setName("Configuration");
         this.setCommandUsage("/mvp config " + ChatColor.GREEN + "{PROPERTY} {VALUE}");
-        this.setArgRange(2, 2);
+        this.setArgRange(1, 2);
         this.addKey("mvp config");
         this.addKey("mvpconfig");
         this.addKey("mvp conf");
         this.addKey("mvpconf");
         this.addCommandExample("All values: " + PortalConfigProperty.getAllValues());
+        this.addCommandExample("/mvp config show");
         this.addCommandExample("/mvp config " + ChatColor.GREEN + "wand" + ChatColor.AQUA + " 271");
         this.addCommandExample("/mvp config " + ChatColor.GREEN + "useonmove" + ChatColor.AQUA + " false");
         this.addCommandExample("/mvp config " + ChatColor.GREEN + "enforceportalaccess" + ChatColor.AQUA + " true");
@@ -36,6 +37,25 @@ public class ConfigCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
+        if (args.size() == 1) {
+            if (args.get(0).equalsIgnoreCase("show")) {
+                String[] allProps = PortalConfigProperty.getAllValues().split(" ");
+                String currentvals = "";
+                for (String prop : allProps) {
+                    currentvals += ChatColor.GREEN;
+                    currentvals += prop;
+                    currentvals += ChatColor.WHITE;
+                    currentvals += " = ";
+                    currentvals += ChatColor.GOLD;
+                    currentvals += this.plugin.getMainConfig().getString(prop, "NOT SET");
+                    currentvals += ChatColor.WHITE;
+                    currentvals += ", ";
+                }
+                sender.sendMessage(currentvals.substring(0,currentvals.length() - 2));
+                return;
+            }
+
+        }
         if (args.get(0).equalsIgnoreCase("wand")) {
             try {
                 this.plugin.getMainConfig().setProperty(args.get(0).toLowerCase(), Integer.parseInt(args.get(1)));

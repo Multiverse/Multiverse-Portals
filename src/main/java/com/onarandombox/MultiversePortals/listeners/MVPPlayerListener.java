@@ -70,7 +70,7 @@ public class MVPPlayerListener extends PlayerListener {
             } else {
                 Material fillMaterial = Material.AIR;
                 this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
-                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial);
+                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
             }
         }
     }
@@ -96,7 +96,7 @@ public class MVPPlayerListener extends PlayerListener {
                 }
 
                 this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
-                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial);
+                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
             }
         }
     }
@@ -134,7 +134,7 @@ public class MVPPlayerListener extends PlayerListener {
                         fillMaterial = Material.AIR;
                     }
                     this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
-                    event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial));
+                    event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer()));
                 }
             }
             return;
