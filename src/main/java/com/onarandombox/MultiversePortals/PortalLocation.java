@@ -141,5 +141,4 @@ public class PortalLocation {
     public MultiverseRegion getRegion() {
         return this.region;
     }
-
 }

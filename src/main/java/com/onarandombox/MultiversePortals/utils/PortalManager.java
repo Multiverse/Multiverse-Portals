@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Manages all portals for all worlds.
  *
@@ -54,23 +55,41 @@ public class PortalManager {
         return null;
     }
 
-    public MVPortal isPortal(Location l) {
-        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
-            return null;
-        }
-        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
-        List<MVPortal> portalList = this.getAllPortals();
-        if (portalList == null || portalList.size() == 0) {
-            return null;
-        }
-        for (MVPortal portal : portalList) {
-            PortalLocation portalLoc = portal.getLocation();
-            if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
-                return portal;
+    /**
+     * Simplified method for seeing if someone is in a portal. We'll check perms later.
+     *
+     * @param l The location of the player
+     *
+     * @return True if it is a valid portal location.
+     */
+    public boolean isPortal(Location l) {
+        for (MVPortal portal : this.portals.values()) {
+            MultiverseRegion r = portal.getLocation().getRegion();
+            if (r != null && r.containsVector(l)) {
+                return true;
             }
         }
-        return null;
+        return false;
     }
+
+//    @Deprecated
+//    public MVPortal isPortal(Location l) {
+//        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
+//            return null;
+//        }
+//        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
+//        List<MVPortal> portalList = this.getAllPortals();
+//        if (portalList == null || portalList.size() == 0) {
+//            return null;
+//        }
+//        for (MVPortal portal : portalList) {
+//            PortalLocation portalLoc = portal.getLocation();
+//            if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
+//                return portal;
+//            }
+//        }
+//        return null;
+//    }
 
     public boolean addPortal(MVPortal portal) {
         if (!this.portals.containsKey(portal.getName())) {
@@ -184,7 +203,6 @@ public class PortalManager {
      * @return
      */
     public MVPortal getPortal(String portalName, CommandSender sender) {
-        System.out.print("getPortal with a name.");
         if (!this.plugin.getCore().getMVPerms().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
             return null;
         }

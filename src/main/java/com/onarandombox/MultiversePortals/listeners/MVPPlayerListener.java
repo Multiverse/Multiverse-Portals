@@ -208,8 +208,7 @@ public class MVPPlayerListener extends PlayerListener {
                 return;
             }
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
-            // TODO: This uses world perm, make it use portal perm.
-            if (MultiversePortals.UsePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), world.getAccessPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
+            if (MultiversePortals.UsePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
                 return;
             }
             GenericBank bank = plugin.getCore().getBank();

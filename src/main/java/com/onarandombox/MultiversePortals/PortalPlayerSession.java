@@ -85,10 +85,9 @@ public class PortalPlayerSession {
     }
 
     private void setStandinginLocation() {
-        if (this.standingIn == null) {
+        if (this.standingIn == null && this.plugin.getPortalManager().isPortal(this.loc)) {
             this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
-            this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
-        } else if (this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc) == null) {
+        } else if (!this.plugin.getPortalManager().isPortal(this.loc)) {
             this.hasMovedOutOfPortal = true;
             this.standingIn = null;
         } else {
