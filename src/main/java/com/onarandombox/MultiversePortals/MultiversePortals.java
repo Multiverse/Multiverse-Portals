@@ -204,6 +204,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         Configuration portalsDefaults = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/defaults/config.yml"));
         this.MVPConfig.setDefaults(portalsDefaults);
         this.MVPConfig.options().copyDefaults(true);
+        this.saveMainConfig();
+        this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 
         MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("useonmove", true);
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
@@ -238,7 +240,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
 
         this.saveMainConfig();
-        this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 
     }
 
