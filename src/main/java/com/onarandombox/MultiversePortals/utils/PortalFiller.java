@@ -104,6 +104,6 @@ public class PortalFiller {
         if (l.getWorld().getBlockAt(l).getType() == portalType) {
             return false;
         }
-        return (type == Material.PORTAL || type == Material.LONG_GRASS || type == Material.SNOW || type == Material.AIR || type == Material.WATER || type == Material.STATIONARY_WATER || type == Material.LAVA || type == Material.STATIONARY_LAVA);
+        return (type == Material.PORTAL || type == Material.LONG_GRASS || type == Material.VINE || type == Material.SNOW || type == Material.AIR || type == Material.WATER || type == Material.STATIONARY_WATER || type == Material.LAVA || type == Material.STATIONARY_LAVA);
     }
 }

@@ -47,7 +47,7 @@ public class ConfigCommand extends PortalCommand {
                     currentvals += ChatColor.WHITE;
                     currentvals += " = ";
                     currentvals += ChatColor.GOLD;
-                    currentvals += this.plugin.getMainConfig().getString(prop, "NOT SET");
+                    currentvals += this.plugin.getMainConfig().get(prop, "NOT SET");
                     currentvals += ChatColor.WHITE;
                     currentvals += ", ";
                 }
@@ -58,7 +58,7 @@ public class ConfigCommand extends PortalCommand {
         }
         if (args.get(0).equalsIgnoreCase("wand")) {
             try {
-                this.plugin.getMainConfig().setProperty(args.get(0).toLowerCase(), Integer.parseInt(args.get(1)));
+                this.plugin.getMainConfig().set(args.get(0).toLowerCase(), Integer.parseInt(args.get(1)));
             } catch (NumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " must be an integer!");
                 return;
@@ -76,7 +76,7 @@ public class ConfigCommand extends PortalCommand {
 
             if (property != null) {
                 try {
-                    this.plugin.getMainConfig().setProperty(args.get(0).toLowerCase(), Boolean.parseBoolean(args.get(1)));
+                    this.plugin.getMainConfig().set(args.get(0).toLowerCase(), Boolean.parseBoolean(args.get(1)));
                 } catch (Exception e) {
                     sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " must be true or false!");
                     return;
@@ -84,7 +84,7 @@ public class ConfigCommand extends PortalCommand {
 
             }
         }
-        if (this.plugin.getMainConfig().save()) {
+        if (this.plugin.saveMainConfig()) {
             sender.sendMessage(ChatColor.GREEN + "SUCCESS!" + ChatColor.WHITE + " Values were updated successfully!");
             this.plugin.loadConfig();
         } else {

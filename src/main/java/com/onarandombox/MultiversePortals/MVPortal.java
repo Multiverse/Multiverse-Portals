@@ -14,6 +14,7 @@ import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -25,7 +26,6 @@ public class MVPortal {
     private String name;
     private PortalLocation location;
     private MVDestination destination;
-    private Configuration config;
     private MultiversePortals plugin;
     private String owner;
     private String portalConfigString;
@@ -35,6 +35,7 @@ public class MVPortal {
     private double price = 0.0;
     private MVWorldManager worldManager;
     private boolean safeTeleporter;
+    private FileConfiguration config;
 
     public MVPortal(MultiversePortals instance, String name) {
         this.plugin = instance;
@@ -54,8 +55,8 @@ public class MVPortal {
 
     private void setUseSafeTeleporter(boolean teleport) {
         this.safeTeleporter = teleport;
-        this.config.setProperty(this.portalConfigString + ".safeteleport", teleport);
-        this.config.save();
+        this.config.set(this.portalConfigString + ".safeteleport", teleport);
+        this.plugin.saveConfig();
     }
 
     public boolean useSafeTeleporter() {
@@ -122,15 +123,15 @@ public class MVPortal {
 
     private boolean setCurrency(int currency) {
         this.currency = currency;
-        config.setProperty(this.portalConfigString + ".entryfee.currency", currency);
-        config.save();
+        config.set(this.portalConfigString + ".entryfee.currency", currency);
+        this.plugin.savePortalsConfig();
         return true;
     }
 
     private boolean setPrice(double price) {
         this.price = price;
-        config.setProperty(this.portalConfigString + ".entryfee.amount", price);
-        config.save();
+        config.set(this.portalConfigString + ".entryfee.amount", price);
+        this.plugin.savePortalsConfig();
         return true;
     }
 
@@ -164,23 +165,23 @@ public class MVPortal {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid LOCATION!");
             return false;
         }
-        this.config.setProperty(this.portalConfigString + ".location", this.location.toString());
+        this.config.set(this.portalConfigString + ".location", this.location.toString());
         MultiverseWorld world = this.location.getMVWorld();
         if (world != null) {
 
-            this.config.setProperty(this.portalConfigString + ".world", world.getName());
+            this.config.set(this.portalConfigString + ".world", world.getName());
         } else {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
             return false;
         }
-        this.config.save();
+        this.plugin.savePortalsConfig();
         return true;
     }
 
     private boolean setOwner(String owner) {
         this.owner = owner;
-        this.config.setProperty(this.portalConfigString + ".owner", this.owner);
-        this.config.save();
+        this.config.set(this.portalConfigString + ".owner", this.owner);
+        this.plugin.savePortalsConfig();
         return true;
     }
 
@@ -190,8 +191,8 @@ public class MVPortal {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
-        this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
-        this.config.save();
+        this.config.set(this.portalConfigString + ".destination", this.destination.toString());
+        this.plugin.savePortalsConfig();
         return !(this.destination instanceof InvalidDestination);
     }
 
@@ -203,8 +204,8 @@ public class MVPortal {
             this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
-        this.config.setProperty(this.portalConfigString + ".destination", this.destination.toString());
-        this.config.save();
+        this.config.set(this.portalConfigString + ".destination", this.destination.toString());
+        this.plugin.savePortalsConfig();
         return true;
     }
 
@@ -249,7 +250,7 @@ public class MVPortal {
         if (property.equalsIgnoreCase("owner")) {
             return this.setOwner(value);
         }
-        if (property.equalsIgnoreCase("owner")) {
+        if (property.equalsIgnoreCase("safe")) {
             try {
                 this.setUseSafeTeleporter(Boolean.parseBoolean(value));
                 return true;

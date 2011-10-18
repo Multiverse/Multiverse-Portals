@@ -12,7 +12,6 @@ import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.commands.HelpCommand;
 import com.onarandombox.MultiverseCore.utils.DebugLog;
 import com.onarandombox.MultiversePortals.commands.*;
-import com.onarandombox.MultiversePortals.configuration.MVPDefaultConfiguration;
 import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import com.onarandombox.MultiversePortals.listeners.*;
@@ -22,6 +21,9 @@ import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -29,9 +31,9 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,14 +45,15 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     protected static DebugLog debugLog;
     private MultiverseCore core;
 
-    private Configuration MVPPortalConfig;
+    private FileConfiguration MVPPortalConfig;
+    private FileConfiguration MVPConfig;
 
     private CommandHandler commandHandler;
     protected WorldEditAPI worldEditAPI = null;
 
     private PortalManager portalManager;
     private Map<Player, PortalPlayerSession> portalSessions;
-    private Configuration MVPConfig;
+
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
@@ -171,10 +174,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     private void loadPortals() {
-        new MVPDefaultConfiguration(getDataFolder(), "portals.yml", this.migrator);
-        this.MVPPortalConfig = new Configuration(new File(getDataFolder(), "portals.yml"));
-        this.MVPPortalConfig.load();
-        List<String> keys = this.MVPPortalConfig.getKeys("portals");
+        this.MVPPortalConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+        Configuration coreDefaults = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/defaults/config.yml"));
+        this.MVPPortalConfig.setDefaults(coreDefaults);
+        this.MVPPortalConfig.options().copyDefaults(true);
+        if(!this.MVPPortalConfig.isConfigurationSection("portals")) {
+            this.MVPPortalConfig.createSection("portals");
+        }
+        Set<String> keys = this.MVPPortalConfig.getConfigurationSection("portals").getKeys(false);
         if (keys != null) {
             for (String pname : keys) {
                 this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
@@ -185,7 +192,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Now Resolve destinations
         for (MVPortal portal : this.portalManager.getAllPortals()) {
             String dest = this.MVPPortalConfig.getString("portals." + portal.getName() + ".destination", "");
-            if (dest != "") {
+            if (!dest.equals("")) {
                 portal.setDestination(dest);
             }
         }
@@ -193,43 +200,67 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public void loadConfig() {
-        new MVPDefaultConfiguration(getDataFolder(), "config.yml", this.migrator);
-        this.MVPConfig = new Configuration(new File(getDataFolder(), "config.yml"));
-        this.MVPConfig.load();
+
+        this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+        Configuration portalsDefaults = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/defaults/config.yml"));
+        this.MVPConfig.setDefaults(portalsDefaults);
+        this.MVPConfig.options().copyDefaults(true);
+
         MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("useonmove", true);
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         // Migrate useportalaccess -> enforceportalaccess
-        if (this.MVPConfig.getProperty("useportalaccess") != null) {
-            this.MVPConfig.setProperty("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
+        if (this.MVPConfig.get("useportalaccess") != null) {
+            this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
             this.log(Level.INFO, "Migrating useportalaccess -> enforceportalaccess...");
         }
 
-        if (this.MVPConfig.getProperty("mvportals_default_to_nether") != null) {
-            this.MVPConfig.setProperty("portalsdefaulttonether", this.MVPConfig.getBoolean("mvportals_default_to_nether", false));
+        if (this.MVPConfig.get("mvportals_default_to_nether") != null) {
+            this.MVPConfig.set("portalsdefaulttonether", this.MVPConfig.getBoolean("mvportals_default_to_nether", false));
             this.log(Level.INFO, "Migrating mvportals_default_to_nether -> portalsdefaulttonether...");
         }
 
-        if (this.MVPConfig.getProperty("use_onmove") != null) {
-            this.MVPConfig.setProperty("useonmove", this.MVPConfig.getBoolean("use_onmove", false));
+        if (this.MVPConfig.get("use_onmove") != null) {
+            this.MVPConfig.set("useonmove", this.MVPConfig.getBoolean("use_onmove", false));
             this.log(Level.INFO, "Migrating use_onmove -> useonmove...");
         }
 
-        if (this.MVPConfig.getProperty("portal_cooldown") != null) {
-            this.MVPConfig.setProperty("portalcooldown", this.MVPConfig.getInt("portal_cooldown", 1000));
+        if (this.MVPConfig.get("portal_cooldown") != null) {
+            this.MVPConfig.set("portalcooldown", this.MVPConfig.getInt("portal_cooldown", 1000));
             this.log(Level.INFO, "Migrating portal_cooldown -> portalcooldown...");
         }
 
         // Remove old properties
-        this.MVPConfig.removeProperty("mvportals_default_to_nether");
-        this.MVPConfig.removeProperty("useportalaccess");
-        this.MVPConfig.removeProperty("use_onmove");
-        this.MVPConfig.removeProperty("portal_cooldown");
+        this.MVPConfig.set("mvportals_default_to_nether", null);
+        this.MVPConfig.set("useportalaccess", null);
+        this.MVPConfig.set("use_onmove", null);
+        this.MVPConfig.set("portal_cooldown", null);
 
 
 
-        this.MVPConfig.save();
+        this.saveMainConfig();
+        this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 
+    }
+
+    public boolean saveMainConfig() {
+        try {
+            this.MVPConfig.save(new File(this.getDataFolder(), "config.yml"));
+            return true;
+        } catch (IOException e) {
+            this.log(Level.SEVERE, "Failed to save Portals config.yml.");
+            return false;
+        }
+    }
+
+    public boolean savePortalsConfig() {
+        try {
+            this.MVPPortalConfig.save(new File(this.getDataFolder(), "portals.yml"));
+            return true;
+        } catch (IOException e) {
+            this.log(Level.SEVERE, "Failed to save Portals portals.yml.");
+            return false;
+        }
     }
 
     public void onDisable() {
@@ -295,7 +326,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return this.portalManager;
     }
 
-    public Configuration getPortalsConfig() {
+    public FileConfiguration getPortalsConfig() {
         return this.MVPPortalConfig;
     }
 
@@ -308,7 +339,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return 1;
     }
 
-    public Configuration getMainConfig() {
+    public FileConfiguration getMainConfig() {
         return this.MVPConfig;
     }
 
@@ -350,9 +381,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("Multiverse-Portals Version: " + this.getDescription().getVersion());
         buffer += logAndAddToPasteBinBuffer("Bukkit Version: " + this.getServer().getVersion());
         buffer += logAndAddToPasteBinBuffer("Loaded Portals: " + this.getPortalManager().getAllPortals().size());
-        buffer += logAndAddToPasteBinBuffer("Dumping Portal Values: (version " + this.getPortalsConfig().getString("version", "NOT SET") + ")");
-        buffer += logAndAddToPasteBinBuffer(this.getPortalsConfig().getAll() + "");
-        buffer += logAndAddToPasteBinBuffer("Dumping Config Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
+        buffer += logAndAddToPasteBinBuffer("Dumping Portal Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
         buffer += logAndAddToPasteBinBuffer("wand: " + this.getMainConfig().getString("wand", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("useonmove: " + this.getMainConfig().getString("useonmove", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("enforceportalaccess: " + this.getMainConfig().getString("enforceportalaccess", "NOT SET"));

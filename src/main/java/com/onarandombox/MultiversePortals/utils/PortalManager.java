@@ -13,6 +13,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.util.config.Configuration;
@@ -112,9 +113,9 @@ public class PortalManager {
             return null;
         }
         if (removeFromConfigs) {
-            Configuration config = this.plugin.getPortalsConfig();
-            config.removeProperty("portals." + portalName);
-            config.save();
+            FileConfiguration config = this.plugin.getPortalsConfig();
+            config.set("portals." + portalName, null);
+            this.plugin.savePortalsConfig();
         }
 
         MVPortal removed = this.portals.remove(portalName);
