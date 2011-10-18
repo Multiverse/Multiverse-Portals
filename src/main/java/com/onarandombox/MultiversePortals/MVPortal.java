@@ -56,7 +56,7 @@ public class MVPortal {
     private void setUseSafeTeleporter(boolean teleport) {
         this.safeTeleporter = teleport;
         this.config.set(this.portalConfigString + ".safeteleport", teleport);
-        this.plugin.saveConfig();
+        this.plugin.savePortalsConfig();
     }
 
     public boolean useSafeTeleporter() {
@@ -162,7 +162,7 @@ public class MVPortal {
     public boolean setPortalLocation(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid LOCATION!");
+            this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid LOCATION!");
             return false;
         }
         this.config.set(this.portalConfigString + ".location", this.location.toString());
@@ -171,7 +171,7 @@ public class MVPortal {
 
             this.config.set(this.portalConfigString + ".world", world.getName());
         } else {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
+            this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
             return false;
         }
         this.plugin.savePortalsConfig();

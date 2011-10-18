@@ -174,10 +174,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     private void loadPortals() {
-        this.MVPPortalConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
-        Configuration coreDefaults = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/defaults/config.yml"));
-        this.MVPPortalConfig.setDefaults(coreDefaults);
-        this.MVPPortalConfig.options().copyDefaults(true);
+        this.MVPPortalConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "portals.yml"));
         if(!this.MVPPortalConfig.isConfigurationSection("portals")) {
             this.MVPPortalConfig.createSection("portals");
         }
@@ -196,6 +193,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
                 portal.setDestination(dest);
             }
         }
+
+        this.savePortalsConfig();
 
     }
 
