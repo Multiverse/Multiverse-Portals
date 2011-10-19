@@ -244,7 +244,7 @@ public class MVPPlayerListener extends PlayerListener {
         // someone wasn't exactly on (because they can do this).
         if (portal == null) {
             // Check around the player to make sure
-            Location newLoc = this.findPortalBlockNextTo(event.getFrom());
+            Location newLoc = SafeTTeleporter.findPortalBlockNextTo(event.getFrom());
             if (newLoc != null) {
                 this.plugin.log(Level.FINER, "Player was outside of portal, The location has been successfully translated.");
                 portal = pm.isPortal(event.getPlayer(), newLoc);
@@ -282,44 +282,5 @@ public class MVPPlayerListener extends PlayerListener {
                 event.setCancelled(true);
             }
         }
-    }
-
-    private Location findPortalBlockNextTo(Location l) {
-        Block b = l.getWorld().getBlockAt(l);
-        Location foundLocation = null;
-
-        if (b.getRelative(BlockFace.NORTH).getType() == Material.PORTAL) {
-            foundLocation = getCloserBlock(l, b.getRelative(BlockFace.NORTH).getLocation(), foundLocation);
-        }
-        if (b.getRelative(BlockFace.SOUTH).getType() == Material.PORTAL) {
-            foundLocation = getCloserBlock(l, b.getRelative(BlockFace.SOUTH).getLocation(), foundLocation);
-        }
-        if (b.getRelative(BlockFace.EAST).getType() == Material.PORTAL) {
-            foundLocation = getCloserBlock(l, b.getRelative(BlockFace.EAST).getLocation(), foundLocation);
-        }
-        if (b.getRelative(BlockFace.WEST).getType() == Material.PORTAL) {
-            foundLocation = getCloserBlock(l, b.getRelative(BlockFace.WEST).getLocation(), foundLocation);
-        }
-        return foundLocation;
-    }
-
-    private Location getCloserBlock(Location source, Location blockA, Location blockB) {
-        // If B wasn't given, return a.
-        if (blockB == null) {
-            return blockA;
-        }
-        // Center our calculations
-        blockA.add(.5,0,.5);
-        blockB.add(.5,0,.5);
-
-        // Retrieve the distance to the normalized blocks
-        double testA = source.distance(blockA);
-        double testB = source.distance(blockB);
-
-        // Compare and return
-        if(testA <= testB) {
-            return blockA;
-        }
-        return blockB;
     }
 }
