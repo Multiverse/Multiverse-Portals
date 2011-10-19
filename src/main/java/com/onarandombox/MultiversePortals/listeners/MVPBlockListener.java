@@ -27,7 +27,8 @@ public class MVPBlockListener extends BlockListener {
 
     @Override
     public void onBlockFromTo(BlockFromToEvent event) {
-        if (event.getBlock() == null)
+        // The to block should never be null, but apparently it is sometimes...
+        if (event.getBlock() == null || event.getToBlock() == null)
             return;
 
         // If lava/something else is trying to flow in...
