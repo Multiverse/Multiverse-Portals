@@ -57,7 +57,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 6;
+    private final static int requiresProtocol = 7;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
 
