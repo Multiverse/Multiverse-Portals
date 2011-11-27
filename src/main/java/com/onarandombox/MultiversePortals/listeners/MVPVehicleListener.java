@@ -9,6 +9,7 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.enums.TeleportResult;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiverseCore.utils.SafeTTeleporter;
 import com.onarandombox.MultiversePortals.MVPortal;
@@ -91,7 +92,7 @@ public class MVPVehicleListener extends VehicleListener {
                 return teleportVehicleSeperately(p, v, d, ps, playerTeleporter);
             }
 
-            if (playerTeleporter.safelyTeleport(p, v, d)) {
+            if (playerTeleporter.safelyTeleport(p, v, d) == TeleportResult.SUCCESS) {
                 ps.playerDidTeleport(to);
                 ps.setTeleportTime(new Date());
             }
@@ -107,7 +108,7 @@ public class MVPVehicleListener extends VehicleListener {
         // Add an offset to ensure the player is 1 higher than where the cart was.
         to.getLocation(p).add(0, .5, 0);
         // If they didn't teleport, return false and place them back into their vehicle.
-        if (!tp.safelyTeleport(p, p, to)) {
+        if (!(tp.safelyTeleport(p, p, to) == TeleportResult.SUCCESS)) {
             v.setPassenger(p);
             return false;
         }

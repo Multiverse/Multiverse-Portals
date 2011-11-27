@@ -11,6 +11,7 @@ import com.fernferret.allpay.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.enums.TeleportResult;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import com.onarandombox.MultiverseCore.utils.SafeTTeleporter;
@@ -228,7 +229,8 @@ public class MVPPlayerListener extends PlayerListener {
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
         SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
-        if (playerTeleporter.safelyTeleport(event.getPlayer(), event.getPlayer(), d)) {
+        TeleportResult result = playerTeleporter.safelyTeleport(event.getPlayer(), event.getPlayer(), d);
+        if (result == TeleportResult.SUCCESS) {
             ps.playerDidTeleport(event.getTo());
             ps.setTeleportTime(new Date());
         }
