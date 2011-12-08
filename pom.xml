@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>4.7-20110720.170756-2</version>
+            <version>4.7</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
