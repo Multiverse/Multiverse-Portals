@@ -8,7 +8,6 @@
     <description>Multiverse Portals module</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.number>UNKNOWN</project.build.number>
     </properties>
 
     <repositories>
