@@ -15,6 +15,14 @@
             <id>OnARandomBox</id>
             <url>http://repo.onarandombox.com/artifactory/repo</url>
         </repository>
+        <repository>
+            <id>sk89q</id>
+            <url>http://pneumaticsystem.com:25578/nexus/content/repositories/sk89q</url>
+        </repository>
+        <repository>
+            <id>multiverse</id>
+            <url>http://pneumaticsystem.com:25578/nexus/content/repositories/multiverse</url>
+        </repository>
     </repositories>
 
     <build>
@@ -68,7 +76,7 @@
                     <replacements>
                         <replacement>
                             <token>maven-version-number</token>
-                            <value>${project.version}-${project.build.number}</value>
+                            <value>${project.version}-${BUILD_NUMBER}</value>
                         </replacement>
                     </replacements>
                 </configuration>
