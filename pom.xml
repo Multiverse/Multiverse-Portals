@@ -13,8 +13,8 @@
 
     <repositories>
         <repository>
-            <id>pneumaticsystem</id>
-            <url>http://pneumaticsystem.com:25578/nexus/content/groups/public</url>
+            <id>OnARandomBox</id>
+            <url>http://repo.onarandombox.com/content/groups/public</url>
         </repository>
     </repositories>
 
@@ -127,4 +127,10 @@
         <!-- End of WorldEdit Dependency -->
 
     </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>OnARandomBox</id>
+            <url>http://repo.onarandombox.com/content/repositories/multiverse</url>
+        </repository>
+    </distributionManagement>
 </project>
