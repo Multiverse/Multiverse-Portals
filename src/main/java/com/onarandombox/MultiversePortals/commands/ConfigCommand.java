@@ -56,12 +56,17 @@ public class ConfigCommand extends PortalCommand {
             }
 
         }
-        if (args.get(0).equalsIgnoreCase("wand")) {
-            try {
-                this.plugin.getMainConfig().set(args.get(0).toLowerCase(), Integer.parseInt(args.get(1)));
-            } catch (NumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " must be an integer!");
+        if (args.get(0).equalsIgnoreCase("wand") || args.get(0).equalsIgnoreCase("portalcooldown")) {
+            if(args.size() == 1) {
+                sender.sendMessage(ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " has value " + ChatColor.GREEN + this.plugin.getMainConfig().get(args.get(0).toLowerCase()));
                 return;
+            } else {
+                try {
+                    this.plugin.getMainConfig().set(args.get(0).toLowerCase(), Integer.parseInt(args.get(1)));
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " must be an integer!");
+                    return;
+                }
             }
         } else {
             PortalConfigProperty property = null;
