@@ -60,6 +60,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private final static int requiresProtocol = 9;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
+    public static boolean WandEnabled = true;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -398,5 +399,13 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public long getCooldownTime() {
         return this.portalCooldown;
+    }
+
+    public boolean isWandEnabled() {
+        return WandEnabled;
+    }
+
+    public void setWandEnabled(boolean enabled) {
+        WandEnabled = enabled;
     }
 }

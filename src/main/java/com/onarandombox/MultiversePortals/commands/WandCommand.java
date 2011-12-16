@@ -23,7 +23,7 @@ public class WandCommand extends PortalCommand {
         super(plugin);
         this.setName("Gives a Portal Creation Wand");
         this.setCommandUsage("/mvp wand");
-        this.setArgRange(0, 0);
+        this.setArgRange(0, 1);
         this.addKey("mvp wand");
         this.addKey("mvpwand");
         this.addKey("mvpw");
@@ -32,6 +32,22 @@ public class WandCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
+        // Check for enabling/disabling wand
+        if (args.size() > 0) {
+            String arg = args.get(0);
+            if (arg.equals("enable")) {
+                this.plugin.setWandEnabled(true);
+            } else if (arg.equals("disable")) {
+                this.plugin.setWandEnabled(false);
+            } else if (arg.equals("toggle")) {
+                this.plugin.setWandEnabled(!this.plugin.isWandEnabled());
+            } else {
+                sender.sendMessage(ChatColor.RED + "You must specify one of 'enable,' 'disable,' or 'toggle!'");
+            }
+            return;
+        }
+
+        // Do the normal wand thing
         if (sender instanceof Player) {
             Player p = (Player) sender;
             if (this.plugin.getWEAPI() != null) {

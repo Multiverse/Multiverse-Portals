@@ -125,6 +125,9 @@ public class PortalPlayerSession {
     }
 
     public void setLeftClickSelection(Vector v, MultiverseWorld world) {
+        if(!this.plugin.isWandEnabled()) {
+            return;
+        }
         this.leftClick = v;
         this.leftClickWorld = world;
         String message = ChatColor.AQUA + "First position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
@@ -136,6 +139,9 @@ public class PortalPlayerSession {
     }
 
     public void setRightClickSelection(Vector v, MultiverseWorld world) {
+        if(!this.plugin.isWandEnabled()) {
+            return;
+        }
         this.rightClick = v;
         this.rightClickWorld = world;
         String message = ChatColor.AQUA + "Second position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
@@ -164,11 +170,11 @@ public class PortalPlayerSession {
         }
         // They're using our crappy selection:
         if (this.leftClick == null) {
-            this.getPlayerFromName().sendMessage("You need to LEFT click on a block with your wand(INSERT WAND NAME HERE)!");
+            this.getPlayerFromName().sendMessage("You need to LEFT click on a block with your wand!");
             return null;
         }
         if (this.rightClick == null) {
-            this.getPlayerFromName().sendMessage("You need to RIGHT click on a block with your wand(INSERT WAND NAME HERE)!");
+            this.getPlayerFromName().sendMessage("You need to RIGHT click on a block with your wand!");
             return null;
         }
         if (!this.leftClickWorld.equals(this.rightClickWorld)) {
