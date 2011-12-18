@@ -17,6 +17,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Event.Type;
@@ -47,6 +48,38 @@ public class MVPVehicleListener extends VehicleListener {
 
             // Teleport the Player
             teleportVehicle(p, v, event.getTo());
+        } else {
+            MVPortal portal = this.plugin.getPortalManager().isPortal(null, event.getFrom());
+            if ((portal != null) && (portal.getTeleportNonPlayers())) {
+                MVDestination dest = portal.getDestination();
+                if (dest == null || dest instanceof InvalidDestination)
+                    return;
+
+                Vector vehicleVec = event.getVehicle().getVelocity();
+                Location target = dest.getLocation(event.getVehicle());
+                if (dest instanceof PortalDestination) {
+                    PortalDestination pd = (PortalDestination) dest;
+                    // Translate the direction of travel.
+                    vehicleVec = LocationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
+                }
+
+                this.setVehicleVelocity(vehicleVec, dest, event.getVehicle());
+
+                Entity formerPassenger = event.getVehicle().getPassenger();
+                event.getVehicle().eject();
+
+                Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());
+
+                if (formerPassenger != null) {
+                    formerPassenger.teleport(target);
+                    newVehicle.setPassenger(formerPassenger);
+                }
+
+                this.setVehicleVelocity(vehicleVec, dest, newVehicle);
+
+                // remove the old one
+                event.getVehicle().remove();
+            }
         }
     }
 

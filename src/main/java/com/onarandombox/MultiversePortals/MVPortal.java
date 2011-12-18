@@ -18,8 +18,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.util.config.Configuration;
-
 import java.util.logging.Level;
 
 public class MVPortal {
@@ -35,6 +33,7 @@ public class MVPortal {
     private double price = 0.0;
     private MVWorldManager worldManager;
     private boolean safeTeleporter;
+    private boolean teleportNonPlayers;
     private FileConfiguration config;
 
     public MVPortal(MultiversePortals instance, String name) {
@@ -45,12 +44,23 @@ public class MVPortal {
         this.setCurrency(this.config.getInt(this.portalConfigString + ".entryfee.currency", -1));
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
+        this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
         this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
         this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
         this.plugin.getServer().getPluginManager().addPermission(this.permission);
         this.plugin.getServer().getPluginManager().addPermission(this.exempt);
         this.addToUpperLists();
         this.worldManager = this.plugin.getCore().getMVWorldManager();
+    }
+
+    private void setTeleportNonPlayers(boolean b) {
+        this.teleportNonPlayers = b;
+        this.config.set(this.portalConfigString + ".teleportnonplayers", this.teleportNonPlayers);
+        this.plugin.savePortalsConfig();
+    }
+
+    public boolean getTeleportNonPlayers() {
+        return teleportNonPlayers;
     }
 
     private void setUseSafeTeleporter(boolean teleport) {
@@ -256,6 +266,13 @@ public class MVPortal {
                 return true;
             } catch (Exception e) {
 
+            }
+        }
+        if (property.equalsIgnoreCase("telenonplayers")) {
+            try {
+                this.setTeleportNonPlayers(Boolean.parseBoolean(value));
+                return true;
+            } catch (Exception e) {
             }
         }
         return false;
