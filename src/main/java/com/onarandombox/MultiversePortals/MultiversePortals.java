@@ -77,7 +77,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         }
         if (this.core.getProtocolVersion() < requiresProtocol) {
             log.severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
-            log.severe(logPrefix + "This version of SignPortals requires Protocol Level: " + requiresProtocol);
+            log.severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
             log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
             log.severe(logPrefix + "Grab an updated copy at: ");
             log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
