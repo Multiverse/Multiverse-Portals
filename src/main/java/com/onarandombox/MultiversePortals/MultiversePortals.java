@@ -11,10 +11,22 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.commands.HelpCommand;
 import com.onarandombox.MultiverseCore.utils.DebugLog;
-import com.onarandombox.MultiversePortals.commands.*;
+import com.onarandombox.MultiversePortals.commands.ConfigCommand;
+import com.onarandombox.MultiversePortals.commands.CreateCommand;
+import com.onarandombox.MultiversePortals.commands.DebugCommand;
+import com.onarandombox.MultiversePortals.commands.InfoCommand;
+import com.onarandombox.MultiversePortals.commands.ListCommand;
+import com.onarandombox.MultiversePortals.commands.ModifyCommand;
+import com.onarandombox.MultiversePortals.commands.RemoveCommand;
+import com.onarandombox.MultiversePortals.commands.SelectCommand;
+import com.onarandombox.MultiversePortals.commands.WandCommand;
 import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
-import com.onarandombox.MultiversePortals.listeners.*;
+import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
+import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
+import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.pneumaticraft.commandhandler.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
@@ -34,7 +46,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -176,7 +192,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private void loadPortals() {
         this.MVPPortalConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "portals.yml"));
-        if(!this.MVPPortalConfig.isConfigurationSection("portals")) {
+        if (!this.MVPPortalConfig.isConfigurationSection("portals")) {
             this.MVPPortalConfig.createSection("portals");
         }
         Set<String> keys = this.MVPPortalConfig.getConfigurationSection("portals").getKeys(false);
@@ -238,10 +254,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig.set("use_onmove", null);
         this.MVPConfig.set("portal_cooldown", null);
 
-
-
         this.saveMainConfig();
-
     }
 
     public boolean saveMainConfig() {
@@ -390,6 +403,20 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("portalcooldown: " + this.getMainConfig().getString("portalcooldown", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
+    }
+
+    public String getVersionInfo() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("[Multiverse-Portals] Multiverse-Portals Version: ").append(this.getDescription().getVersion()).append('\n');
+        buffer.append("[Multiverse-Portals] Loaded Portals: ").append(this.getPortalManager().getAllPortals().size()).append('\n');
+        buffer.append("[Multiverse-Portals] Dumping Portal Values: (version ").append(this.getMainConfig().getString("version", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals] wand: ").append(this.getMainConfig().getString("wand", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals] useonmove: ").append(this.getMainConfig().getString("useonmove", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals] enforceportalaccess: ").append(this.getMainConfig().getString("enforceportalaccess", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals] portalsdefaulttonether: ").append(this.getMainConfig().getString("portalsdefaulttonether", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals] portalcooldown: ").append(this.getMainConfig().getString("portalcooldown", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals] Special Code: FRN001").append('\n');
+        return buffer.toString();
     }
 
     private String logAndAddToPasteBinBuffer(String string) {
