@@ -4,4 +4,5 @@ wand: 271
 useonmove: true
 portalsdefaulttonether: false
 enforceportalaccess: true
-version: 1.1
+portalcooldown: 1000
+version: 2.6
