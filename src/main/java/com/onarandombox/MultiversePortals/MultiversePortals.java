@@ -23,7 +23,7 @@ import com.onarandombox.MultiversePortals.commands.WandCommand;
 import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
-import com.onarandombox.MultiversePortals.listeners.MVPConfigReloadListener;
+import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
 import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
@@ -39,8 +39,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.vehicle.VehicleListener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -128,9 +126,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Initialize our listeners
         MVPPluginListener pluginListener = new MVPPluginListener(this);
         MVPPlayerListener playerListener = new MVPPlayerListener(this);
-        BlockListener blockListener = new MVPBlockListener(this);
-        VehicleListener vehicleListener = new MVPVehicleListener(this);
-        MVPConfigReloadListener customListener = new MVPConfigReloadListener(this);
+        MVPBlockListener blockListener = new MVPBlockListener(this);
+        MVPVehicleListener vehicleListener = new MVPVehicleListener(this);
+        MVPCoreListener coreListener = new MVPCoreListener(this);
 
         // Register our listeners with the Bukkit Server
         this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
@@ -142,7 +140,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, blockListener, Priority.Low, this);
         this.getServer().getPluginManager().registerEvent(Type.BLOCK_PHYSICS, blockListener, Priority.Normal, this);
         this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, vehicleListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, customListener, Priority.Normal, this);
+        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, coreListener, Priority.Normal, this);
         // High priority so we override NetherPortals
         this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.High, this);
         // These will only get used if WE is not found. so they're monitor.
