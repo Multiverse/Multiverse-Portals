@@ -251,6 +251,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig.set("useportalaccess", null);
         this.MVPConfig.set("use_onmove", null);
         this.MVPConfig.set("portal_cooldown", null);
+        // Update the version
+        this.MVPConfig.set("version", portalsDefaults.get("version"));
 
         this.saveMainConfig();
     }
@@ -407,7 +409,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         StringBuilder buffer = new StringBuilder();
         buffer.append("[Multiverse-Portals] Multiverse-Portals Version: ").append(this.getDescription().getVersion()).append('\n');
         buffer.append("[Multiverse-Portals] Loaded Portals: ").append(this.getPortalManager().getAllPortals().size()).append('\n');
-        buffer.append("[Multiverse-Portals] Dumping Portal Values: (version ").append(this.getMainConfig().getDouble("version", -1)).append('\n');
+        buffer.append("[Multiverse-Portals] Dumping Portal Values: (version ").append(this.getMainConfig().getDouble("version", -1)).append(')').append('\n');
         buffer.append("[Multiverse-Portals]  wand: ").append(this.getMainConfig().get("wand", "NOT SET")).append('\n');
         buffer.append("[Multiverse-Portals]  useonmove: ").append(this.getMainConfig().get("useonmove", "NOT SET")).append('\n');
         buffer.append("[Multiverse-Portals]  enforceportalaccess: ").append(this.getMainConfig().get("enforceportalaccess", "NOT SET")).append('\n');

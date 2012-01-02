@@ -1,5 +1,10 @@
-# This is the item id of the portal creation wand.
-# If you are using WorldEdit. Changing this will have NO EFFECT.
+# This is the MV-Portals Config. If you mess it up, copy the values out
+# delete it, and it will be regenerated. Then use the ingame interface
+# to add your values back via the "/mvp conf" command.
+# When in-game, simply type: "/mvp conf ?" for help.
+# A config with explanations can be found here:
+# https://github.com/Multiverse/Multiverse-Portals/wiki/config.yml
+
 wand: 271
 useonmove: true
 portalsdefaulttonether: false
