@@ -124,9 +124,9 @@ public class PortalPlayerSession {
 
     }
 
-    public void setLeftClickSelection(Vector v, MultiverseWorld world) {
+    public boolean setLeftClickSelection(Vector v, MultiverseWorld world) {
         if(!this.plugin.isWandEnabled()) {
-            return;
+            return false;
         }
         this.leftClick = v;
         this.leftClickWorld = world;
@@ -136,11 +136,12 @@ public class PortalPlayerSession {
             message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
         }
         this.getPlayerFromName().sendMessage(message);
+        return true;
     }
 
-    public void setRightClickSelection(Vector v, MultiverseWorld world) {
+    public boolean setRightClickSelection(Vector v, MultiverseWorld world) {
         if(!this.plugin.isWandEnabled()) {
-            return;
+            return false;
         }
         this.rightClick = v;
         this.rightClickWorld = world;
@@ -150,6 +151,7 @@ public class PortalPlayerSession {
             message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
         }
         this.getPlayerFromName().sendMessage(message);
+        return true;
 
     }
 
