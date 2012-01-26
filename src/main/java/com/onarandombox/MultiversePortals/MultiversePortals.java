@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -131,22 +132,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         MVPCoreListener coreListener = new MVPCoreListener(this);
 
         // Register our listeners with the Bukkit Server
-        this.getServer().getPluginManager().registerEvent(Type.PLUGIN_ENABLE, pluginListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_FROMTO, blockListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.BLOCK_PHYSICS, blockListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.VEHICLE_MOVE, vehicleListener, Priority.Normal, this);
-        this.getServer().getPluginManager().registerEvent(Type.CUSTOM_EVENT, coreListener, Priority.Normal, this);
-        // High priority so we override NetherPortals
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.High, this);
-        // These will only get used if WE is not found. so they're monitor.
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, playerListener, Priority.Low, this);
-        this.getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, playerListener, Priority.Low, this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(pluginListener, this);
+        pm.registerEvents(playerListener, this);
+        pm.registerEvents(blockListener, this);
+        pm.registerEvents(vehicleListener, this);
+        pm.registerEvents(coreListener, this);
     }
 
     /**
