@@ -8,10 +8,15 @@
 package com.onarandombox.MultiversePortals.listeners;
 
 import com.onarandombox.MultiverseCore.event.MVConfigReloadEvent;
+import com.onarandombox.MultiverseCore.event.MVPlayerTouchedPortalEvent;
 import com.onarandombox.MultiverseCore.event.MVVersionEvent;
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import java.util.logging.Level;
 
 public class MVPCoreListener implements Listener {
     private MultiversePortals plugin;
@@ -37,5 +42,20 @@ public class MVPCoreListener implements Listener {
         plugin.reloadConfigs();
         event.addConfig("Multiverse-Portals - portals.yml");
         event.addConfig("Multiverse-Portals - config.yml");
+    }
+
+    /**
+     * This method is called when a player touches a portal.
+     * It's used to handle the intriquite messiness of priority between MV plugins.
+     * @param event The PTP event.
+     */
+    @EventHandler
+    public void portalTouchEvent(MVPlayerTouchedPortalEvent event) {
+        this.plugin.log(Level.FINER, "Found The TouchedPortal event.");
+        Player p = event.getPlayer();
+        Location l = event.getBlockTouched();
+        if (this.plugin.getPortalManager().isPortal(p, l) != null) {
+            event.setCancelled(true);
+        }
     }
 }
