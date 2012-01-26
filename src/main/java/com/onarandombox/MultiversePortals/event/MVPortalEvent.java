@@ -14,6 +14,7 @@ import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 /**
  * Multiverse 2
@@ -35,6 +36,24 @@ public class MVPortalEvent extends Event implements Cancellable {
 
     public MVPortalEvent(MVDestination destination, Player teleportee) {
         this(destination, teleportee, null);
+    }
+
+    private static final HandlerList HANDLERS = new HandlerList();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public HandlerList getHandlers() {
+        return HANDLERS;
+    }
+
+    /**
+     * Gets the handler list. This is required by the event system.
+     * @return A list of HANDLERS.
+     */
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
     }
 
     /**

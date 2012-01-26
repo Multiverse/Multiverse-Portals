@@ -29,14 +29,16 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
-import org.junit.Test;
 
 import java.util.Date;
 import java.util.logging.Level;
 
-public class MVPPlayerListener extends PlayerListener {
+public class MVPPlayerListener implements Listener {
 
     private MultiversePortals plugin;
     private PortalFiller filler;
@@ -47,8 +49,8 @@ public class MVPPlayerListener extends PlayerListener {
         this.filler = new PortalFiller(plugin.getCore());
     }
 
-    @Override
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void playerTeleport(PlayerTeleportEvent event) {
         if (event.isCancelled()) {
             return;
         }
@@ -56,8 +58,8 @@ public class MVPPlayerListener extends PlayerListener {
         ps.playerDidTeleport(event.getTo());
     }
 
-    @Override
-    public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void playerBucketFill(PlayerBucketFillEvent event) {
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
@@ -77,8 +79,8 @@ public class MVPPlayerListener extends PlayerListener {
         }
     }
 
-    @Override
-    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void playerBucketEmpty(PlayerBucketEmptyEvent event) {
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
@@ -103,8 +105,8 @@ public class MVPPlayerListener extends PlayerListener {
         }
     }
 
-    @Override
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void playerInteract(PlayerInteractEvent event) {
         // Portal lighting stuff
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
@@ -171,8 +173,8 @@ public class MVPPlayerListener extends PlayerListener {
         return newLoc;
     }
 
-    @Override
-    public void onPlayerMove(PlayerMoveEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void playerMove(PlayerMoveEvent event) {
         if (event.isCancelled() || !MultiversePortals.UseOnMove) {
             return;
         }
@@ -219,7 +221,7 @@ public class MVPPlayerListener extends PlayerListener {
             }
             GenericBank bank = plugin.getCore().getBank();
             if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
-                bank.pay(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
                 performTeleport(event, ps, d);
             }
         }
@@ -234,8 +236,8 @@ public class MVPPlayerListener extends PlayerListener {
         }
     }
 
-    @Override
-    public void onPlayerPortal(PlayerPortalEvent event) {
+    @EventHandler
+    public void playerPortal(PlayerPortalEvent event) {
         this.plugin.log(Level.FINER, "onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
         // Determine if we're in a portal

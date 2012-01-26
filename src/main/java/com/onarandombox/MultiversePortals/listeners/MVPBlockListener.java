@@ -7,26 +7,26 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import java.util.logging.Level;
-
 import org.bukkit.Material;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 
-public class MVPBlockListener extends BlockListener {
+public class MVPBlockListener implements Listener {
     private MultiversePortals plugin;
 
     public MVPBlockListener(MultiversePortals plugin) {
         this.plugin = plugin;
     }
 
-    @Override
-    public void onBlockFromTo(BlockFromToEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void blockFromTo(BlockFromToEvent event) {
         // The to block should never be null, but apparently it is sometimes...
         if (event.getBlock() == null || event.getToBlock() == null)
             return;
@@ -45,8 +45,8 @@ public class MVPBlockListener extends BlockListener {
     }
 
 
-    @Override
-    public void onBlockPhysics(BlockPhysicsEvent event) {
+    @EventHandler
+    public void blockPhysics(BlockPhysicsEvent event) {
         if(event.isCancelled()) {
             return;
         }

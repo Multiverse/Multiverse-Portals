@@ -21,21 +21,22 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.Event.Type;
-import org.bukkit.event.vehicle.VehicleListener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
 import java.util.Date;
 
-public class MVPVehicleListener extends VehicleListener {
+public class MVPVehicleListener implements Listener {
     private MultiversePortals plugin;
 
     public MVPVehicleListener(MultiversePortals plugin) {
         this.plugin = plugin;
     }
 
-    @Override
-    public void onVehicleMove(VehicleMoveEvent event) {
+    @EventHandler
+    public void vehicleMove(VehicleMoveEvent event) {
         if (event.getVehicle().getPassenger() instanceof Player) {
             Vehicle v = event.getVehicle();
             Player p = (Player) v.getPassenger();

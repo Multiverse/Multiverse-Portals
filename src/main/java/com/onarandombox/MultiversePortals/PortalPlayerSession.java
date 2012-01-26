@@ -159,6 +159,7 @@ public class PortalPlayerSession {
         // Did not find WE
         MultiverseRegion r = null;
         if (this.plugin.getWEAPI() != null) {
+            System.out.println("WEAPI");
             try {
                 // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
                 r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMinimumPoint(),

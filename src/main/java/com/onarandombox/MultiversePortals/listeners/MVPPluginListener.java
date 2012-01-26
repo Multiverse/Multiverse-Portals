@@ -9,16 +9,17 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import java.util.logging.Level;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.server.ServerListener;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-public class MVPPluginListener extends ServerListener {
+public class MVPPluginListener implements Listener {
 
     private MultiversePortals plugin;
 
@@ -26,8 +27,8 @@ public class MVPPluginListener extends ServerListener {
         this.plugin = plugin;
     }
 
-    @Override
-    public void onPluginEnable(PluginEnableEvent event) {
+    @EventHandler
+    public void pluginEnable(PluginEnableEvent event) {
         if (event.getPlugin().getDescription().getName().equals("Multiverse-Core")) {
             this.plugin.setCore(((MultiverseCore) this.plugin.getServer().getPluginManager().getPlugin("Multiverse-Core")));
             this.plugin.getServer().getPluginManager().enablePlugin(this.plugin);
@@ -42,8 +43,8 @@ public class MVPPluginListener extends ServerListener {
         }
     }
 
-    @Override
-    public void onPluginDisable(PluginDisableEvent event) {
+    @EventHandler
+    public void pluginDisable(PluginDisableEvent event) {
         if (event.getPlugin().getDescription().getName().equals("Multiverse-Core")) {
             this.plugin.setCore(null);
             this.plugin.getServer().getPluginManager().disablePlugin(this.plugin);

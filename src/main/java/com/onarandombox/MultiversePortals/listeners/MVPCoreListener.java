@@ -9,10 +9,11 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import com.onarandombox.MultiverseCore.event.MVConfigReloadEvent;
 import com.onarandombox.MultiverseCore.event.MVVersionEvent;
-import com.onarandombox.MultiverseCore.listeners.MultiverseCoreListener;
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
-public class MVPCoreListener extends MultiverseCoreListener {
+public class MVPCoreListener implements Listener {
     private MultiversePortals plugin;
 
     public MVPCoreListener(MultiversePortals plugin) {
@@ -20,18 +21,19 @@ public class MVPCoreListener extends MultiverseCoreListener {
     }
 
     /**
-     * {@inheritDoc}
+     * This method is called when Multiverse-Core wants to know what version we are.
+     * @param event The Version event.
      */
-    @Override
-    public void onVersionRequest(MVVersionEvent event) {
+    @EventHandler
+    public void versionRequest(MVVersionEvent event) {
         event.appendVersionInfo(this.plugin.getVersionInfo());
     }
-
     /**
-     * {@inheritDoc}
+     * This method is called when Multiverse-Core wants to reload the configs.
+     * @param event The Config Reload event.
      */
-    @Override
-    public void onMVConfigReload(MVConfigReloadEvent event) {
+    @EventHandler
+    public void configReload(MVConfigReloadEvent event) {
         plugin.reloadConfigs();
         event.addConfig("Multiverse-Portals - portals.yml");
         event.addConfig("Multiverse-Portals - config.yml");
