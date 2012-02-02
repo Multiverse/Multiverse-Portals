@@ -7,7 +7,7 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.fernferret.allpay.GenericBank;
+import com.fernferret.allpay.multiverse.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;

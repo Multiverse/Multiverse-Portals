@@ -12,7 +12,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.pneumaticraft.commandhandler.Command;
+import com.pneumaticraft.commandhandler.multiverse.Command;
 /**
  * Convenience class so we don't have to cast each time.
  * @author fernferret

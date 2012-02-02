@@ -7,7 +7,7 @@
 
 package com.onarandombox.MultiversePortals;
 
-import com.fernferret.allpay.GenericBank;
+import com.fernferret.allpay.multiverse.GenericBank;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;

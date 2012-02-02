@@ -28,7 +28,7 @@ import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
 import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.pneumaticraft.commandhandler.CommandHandler;
+import com.pneumaticraft.commandhandler.multiverse.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.command.Command;
@@ -37,8 +37,6 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -284,7 +282,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
         this.commandHandler.registerCommand(new ConfigCommand(this));
-        for (com.pneumaticraft.commandhandler.Command c : this.commandHandler.getAllCommands()) {
+        for (com.pneumaticraft.commandhandler.multiverse.Command c : this.commandHandler.getAllCommands()) {
             if (c instanceof HelpCommand) {
                 c.addKey("mvp");
             }
@@ -370,11 +368,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     @Override
     public void log(Level level, String msg) {
-        if (level == Level.FINE && MultiverseCore.GlobalDebug >= 1) {
+        if (level == Level.FINE && MultiverseCore.getStaticConfig().getGlobalDebug() >= 1) {
             staticDebugLog(Level.INFO, msg);
-        } else if (level == Level.FINER && MultiverseCore.GlobalDebug >= 2) {
+        } else if (level == Level.FINER && MultiverseCore.getStaticConfig().getGlobalDebug() >= 2) {
             staticDebugLog(Level.INFO, msg);
-        } else if (level == Level.FINEST && MultiverseCore.GlobalDebug >= 3) {
+        } else if (level == Level.FINEST && MultiverseCore.getStaticConfig().getGlobalDebug() >= 3) {
             staticDebugLog(Level.INFO, msg);
         } else if (level != Level.FINE && level != Level.FINER && level != Level.FINEST) {
             staticLog(level, msg);
