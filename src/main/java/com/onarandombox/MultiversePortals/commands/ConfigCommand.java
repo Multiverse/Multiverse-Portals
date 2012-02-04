@@ -7,7 +7,6 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.enums.ConfigProperty;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import org.bukkit.ChatColor;
@@ -75,7 +74,7 @@ public class ConfigCommand extends PortalCommand {
             } catch (IllegalArgumentException e) {
                 sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " you can't set " + ChatColor.AQUA + args.get(0));
                 sender.sendMessage(ChatColor.GREEN + "Valid values are:");
-                sender.sendMessage(ConfigProperty.getAllValues());
+                sender.sendMessage(PortalConfigProperty.getAllValues());
                 return;
             }
 

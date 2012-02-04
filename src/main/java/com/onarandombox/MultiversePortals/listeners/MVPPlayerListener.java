@@ -12,9 +12,8 @@ import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
-import com.onarandombox.MultiverseCore.utils.SafeTTeleporter;
+import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
@@ -110,7 +109,7 @@ public class MVPPlayerListener implements Listener {
         // Portal lighting stuff
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
-            this.plugin.log(Level.FINER, "Player is ligting block: " + LocationManipulation.strCoordsRaw(event.getClickedBlock().getLocation()));
+            this.plugin.log(Level.FINER, "Player is ligting block: " + this.plugin.getCore().getLocationManipulation().strCoordsRaw(event.getClickedBlock().getLocation()));
             PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
             Location translatedLocation = this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace());
             if (!portalManager.isPortal(translatedLocation)) {
@@ -228,7 +227,7 @@ public class MVPPlayerListener implements Listener {
     }
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
-        SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
+        SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
         TeleportResult result = playerTeleporter.safelyTeleport(event.getPlayer(), event.getPlayer(), d);
         if (result == TeleportResult.SUCCESS) {
             ps.playerDidTeleport(event.getTo());
@@ -246,7 +245,7 @@ public class MVPPlayerListener implements Listener {
         // someone wasn't exactly on (because they can do this).
         if (portal == null) {
             // Check around the player to make sure
-            Location newLoc = SafeTTeleporter.findPortalBlockNextTo(event.getFrom());
+            Location newLoc = this.plugin.getCore().getSafeTTeleporter().findPortalBlockNextTo(event.getFrom());
             if (newLoc != null) {
                 this.plugin.log(Level.FINER, "Player was outside of portal, The location has been successfully translated.");
                 portal = pm.isPortal(event.getPlayer(), newLoc);
@@ -265,7 +264,7 @@ public class MVPPlayerListener implements Listener {
                 TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
                 event.setTo(portalDest.getLocation(event.getPlayer()));
                 if (portalDest.useSafeTeleporter()) {
-                    SafeTTeleporter teleporter = this.plugin.getCore().getTeleporter();
+                    SafeTTeleporter teleporter = this.plugin.getCore().getSafeTTeleporter();
                     event.setTo(teleporter.getSafeLocation(event.getPlayer(), portalDest));
                 }
                 event.setPortalTravelAgent(agent);
