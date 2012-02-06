@@ -97,6 +97,7 @@ public class PortalDestination implements MVDestination {
         }
         if (split.length >= 2 && split[0].equalsIgnoreCase("p")) {
             if (!portalPlugin.getPortalManager().isPortal(split[1])) {
+                this.isValid = false;
                 return;
             }
             this.isValid = true;
@@ -105,9 +106,6 @@ public class PortalDestination implements MVDestination {
                 this.orientationString = split[2];
             }
         }
-        this.isValid = false;
-        return;
-
     }
 
     @Override
