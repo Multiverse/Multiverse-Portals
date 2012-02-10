@@ -177,18 +177,18 @@ public class MVPPlayerListener implements Listener {
         if (event.isCancelled() || !MultiversePortals.UseOnMove) {
             return;
         }
-        Player p = event.getPlayer(); // Grab Player
-        Location loc = p.getLocation(); // Grab Location
         /**
-         * Check the Player has actually moved a block to prevent unneeded calculations... This is to prevent huge performance drops on high player count servers.
+         * Check the Player has actually moved a block to prevent unneeded calculations...
+         * This is to prevent huge performance drops on high player count servers.
          */
-        PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
-        ps.setStaleLocation(loc, Type.PLAYER_MOVE);
-
-        // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
-        if (ps.isStaleLocation()) {
+        if (!this.hasChangedBlockCoordinates(event.getFrom(), event.getTo())) {
             return;
         }
+
+        Player p = event.getPlayer(); // Grab Player
+        Location loc = p.getLocation(); // Grab Location
+        PortalPlayerSession ps = this.plugin.getPortalSession(p);
+
         MVPortal portal = ps.getStandingInPortal();
         // If the portal is not null
         // AND if we did not show debug info, do the stuff
@@ -224,6 +224,15 @@ public class MVPPlayerListener implements Listener {
                 performTeleport(event, ps, d);
             }
         }
+    }
+    
+    private boolean hasChangedBlockCoordinates(Location fromLoc, Location toLoc) {
+        if (fromLoc.getBlockX() == toLoc.getBlockX()
+                && fromLoc.getBlockY() == toLoc.getBlockY()
+                && fromLoc.getBlockZ() == toLoc.getBlockZ()) {
+            return false;
+        }
+        return true;
     }
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
