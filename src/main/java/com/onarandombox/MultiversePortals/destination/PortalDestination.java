@@ -7,17 +7,18 @@
 
 package com.onarandombox.MultiversePortals.destination;
 
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
+
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.utils.BlockSafety;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 
 public class PortalDestination implements MVDestination {
     private MVPortal portal;

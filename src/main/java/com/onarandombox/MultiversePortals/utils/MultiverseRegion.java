@@ -7,9 +7,10 @@
 
 package com.onarandombox.MultiversePortals.utils;
 
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 
 /**
  * This is a placeholder of good things to come...
