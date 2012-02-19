@@ -7,16 +7,17 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.onarandombox.MultiverseCore.event.MVConfigReloadEvent;
-import com.onarandombox.MultiverseCore.event.MVPlayerTouchedPortalEvent;
-import com.onarandombox.MultiverseCore.event.MVVersionEvent;
-import com.onarandombox.MultiversePortals.MultiversePortals;
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.logging.Level;
+import com.onarandombox.MultiverseCore.event.MVConfigReloadEvent;
+import com.onarandombox.MultiverseCore.event.MVPlayerTouchedPortalEvent;
+import com.onarandombox.MultiverseCore.event.MVVersionEvent;
+import com.onarandombox.MultiversePortals.MultiversePortals;
 
 public class MVPCoreListener implements Listener {
     private MultiversePortals plugin;

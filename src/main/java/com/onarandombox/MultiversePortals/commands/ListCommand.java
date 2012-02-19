@@ -7,14 +7,15 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
-import java.util.List;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
 
 public class ListCommand extends PortalCommand {
 
