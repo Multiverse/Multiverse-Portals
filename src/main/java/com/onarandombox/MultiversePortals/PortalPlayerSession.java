@@ -7,10 +7,9 @@
 
 package com.onarandombox.MultiversePortals;
 
-import com.fernferret.allpay.multiverse.GenericBank;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
+import java.util.Date;
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -18,8 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
 import org.bukkit.util.Vector;
 
-import java.util.Date;
-import java.util.logging.Level;
+import com.fernferret.allpay.multiverse.GenericBank;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class PortalPlayerSession {
     private MultiversePortals plugin;

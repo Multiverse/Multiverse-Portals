@@ -7,19 +7,9 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.fernferret.allpay.multiverse.GenericBank;
-import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.destination.InvalidDestination;
-import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
-import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.event.MVPortalEvent;
-import com.onarandombox.MultiversePortals.utils.PortalFiller;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
+import java.util.Date;
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,10 +22,26 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.Date;
-import java.util.logging.Level;
+import com.fernferret.allpay.multiverse.GenericBank;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.enums.TeleportResult;
+import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.event.MVPortalEvent;
+import com.onarandombox.MultiversePortals.utils.PortalFiller;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MVPPlayerListener implements Listener {
 
@@ -220,8 +226,15 @@ public class MVPPlayerListener implements Listener {
             }
             GenericBank bank = plugin.getCore().getBank();
             if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
-                bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                performTeleport(event, ps, d);
+                // call event for other plugins
+                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
+                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
+                this.plugin.getServer().getPluginManager().callEvent(portalEvent);
+                if (!portalEvent.isCancelled()) {
+                	bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                	performTeleport(event, ps, d);
+                	return;
+                }
             }
         }
     }
