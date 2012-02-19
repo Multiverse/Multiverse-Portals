@@ -7,15 +7,16 @@
 
 package com.onarandombox.MultiversePortals.utils;
 
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.logging.Level;
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 
 public class PortalFiller {
     private MultiverseCore plugin;
