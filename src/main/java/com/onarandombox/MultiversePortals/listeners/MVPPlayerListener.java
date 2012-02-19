@@ -226,13 +226,15 @@ public class MVPPlayerListener implements Listener {
             }
             GenericBank bank = plugin.getCore().getBank();
             if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
-                bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                performTeleport(event, ps, d);
-                
                 // call event for other plugins
                 TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
                 MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
+                if (!portalEvent.isCancelled()) {
+                	bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                	performTeleport(event, ps, d);
+                	return;
+                }
             }
         }
     }
