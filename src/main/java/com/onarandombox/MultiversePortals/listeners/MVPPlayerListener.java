@@ -225,7 +225,7 @@ public class MVPPlayerListener implements Listener {
                 
                 // call event for other plugins
                 TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent);
+                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
             }
         }
