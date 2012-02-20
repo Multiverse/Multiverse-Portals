@@ -229,7 +229,8 @@ public class MVPPlayerListener implements Listener {
     private boolean hasChangedBlockCoordinates(Location fromLoc, Location toLoc) {
         if (fromLoc.getBlockX() == toLoc.getBlockX()
                 && fromLoc.getBlockY() == toLoc.getBlockY()
-                && fromLoc.getBlockZ() == toLoc.getBlockZ()) {
+                && fromLoc.getBlockZ() == toLoc.getBlockZ()
+                && fromLoc.getWorld().equals(toLoc.getworld())) {
             return false;
         }
         return true;
