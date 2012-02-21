@@ -28,7 +28,6 @@ public class MVPortalEvent extends Event implements Cancellable {
     private boolean isCancelled;
 
     public MVPortalEvent(MVDestination destination, Player teleportee, TravelAgent travelAgent) {
-        super("MVPortal");
         this.teleportee = teleportee;
         this.destination = destination;
         this.travelAgent = travelAgent;
