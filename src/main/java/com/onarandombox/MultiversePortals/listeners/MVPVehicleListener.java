@@ -10,17 +10,17 @@ package com.onarandombox.MultiversePortals.listeners;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
-import com.onarandombox.MultiverseCore.utils.SafeTTeleporter;
+import com.onarandombox.MultiverseCore.api.LocationManipulation;
+import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.Event.Type;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
@@ -30,9 +30,13 @@ import java.util.Date;
 
 public class MVPVehicleListener implements Listener {
     private MultiversePortals plugin;
+    private LocationManipulation locationManipulation;
+    private SafeTTeleporter safeTTeleporter;
 
     public MVPVehicleListener(MultiversePortals plugin) {
         this.plugin = plugin;
+        this.locationManipulation = this.plugin.getCore().getLocationManipulation();
+        this.safeTTeleporter = this.plugin.getCore().getSafeTTeleporter();
     }
 
     @EventHandler
@@ -41,7 +45,7 @@ public class MVPVehicleListener implements Listener {
             Vehicle v = event.getVehicle();
             Player p = (Player) v.getPassenger();
             PortalPlayerSession ps = this.plugin.getPortalSession(p);
-            ps.setStaleLocation(v.getLocation(), Type.VEHICLE_MOVE);
+            ps.setStaleLocation(v.getLocation(), MoveType.VEHICLE_MOVE);
 
             if (ps.isStaleLocation()) {
                 return;
@@ -61,7 +65,7 @@ public class MVPVehicleListener implements Listener {
                 if (dest instanceof PortalDestination) {
                     PortalDestination pd = (PortalDestination) dest;
                     // Translate the direction of travel.
-                    vehicleVec = LocationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
+                    vehicleVec = this.locationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
                 }
 
                 this.setVehicleVelocity(vehicleVec, dest, event.getVehicle());
@@ -90,7 +94,7 @@ public class MVPVehicleListener implements Listener {
         // If the portal is not null
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
-        if (portal != null && ps.doTeleportPlayer(Type.VEHICLE_MOVE) && !ps.showDebugInfo()) {
+        if (portal != null && ps.doTeleportPlayer(MoveType.VEHICLE_MOVE) && !ps.showDebugInfo()) {
             if (!ps.allowTeleportViaCooldown(new Date())) {
                 p.sendMessage(ps.getFriendlyRemainingTimeMessage());
                 return false;
@@ -109,7 +113,7 @@ public class MVPVehicleListener implements Listener {
                 PortalDestination pd = (PortalDestination) d;
 
                 // Translate the direction of travel.
-                vehicleVec = LocationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
+                vehicleVec = this.locationManipulation.getTranslatedVector(vehicleVec, pd.getOrientationString());
             }
 
             // Set the velocity
@@ -119,14 +123,12 @@ public class MVPVehicleListener implements Listener {
 
             p.setFallDistance(0);
 
-            SafeTTeleporter playerTeleporter = new SafeTTeleporter(this.plugin.getCore());
-
             // The worlds are different! Ahhh!
             if (!l.getWorld().equals(p.getWorld())) {
-                return teleportVehicleSeperately(p, v, d, ps, playerTeleporter);
+                return teleportVehicleSeperately(p, v, d, ps, this.safeTTeleporter);
             }
 
-            if (playerTeleporter.safelyTeleport(p, v, d) == TeleportResult.SUCCESS) {
+            if (this.safeTTeleporter.safelyTeleport(p, v, d) == TeleportResult.SUCCESS) {
                 ps.playerDidTeleport(to);
                 ps.setTeleportTime(new Date());
             }

@@ -9,13 +9,13 @@ package com.onarandombox.MultiversePortals;
 
 import com.fernferret.allpay.multiverse.GenericBank;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Type;
 import org.bukkit.util.Vector;
 
 import java.util.Date;
@@ -95,8 +95,8 @@ public class PortalPlayerSession {
         }
     }
 
-    public boolean doTeleportPlayer(Type eventType) {
-        if (eventType == Type.PLAYER_MOVE && this.getPlayerFromName().isInsideVehicle()) {
+    public boolean doTeleportPlayer(MoveType eventType) {
+        if (eventType == MoveType.PLAYER_MOVE && this.getPlayerFromName().isInsideVehicle()) {
             return false;
         }
         return this.hasMovedOutOfPortal && this.standingIn != null;
@@ -106,12 +106,12 @@ public class PortalPlayerSession {
         return this.loc;
     }
 
-    public void setStaleLocation(Location loc, Type moveType) {
+    public void setStaleLocation(Location loc, MoveType moveType) {
         if (this.getPlayerFromName() == null) {
             // This should never happen, but seems to when someone gets kicked.
             return;
         }
-        if (this.getPlayerFromName().isInsideVehicle() && moveType != Type.VEHICLE_MOVE) {
+        if (this.getPlayerFromName().isInsideVehicle() && moveType != MoveType.VEHICLE_MOVE) {
             return;
         }
 

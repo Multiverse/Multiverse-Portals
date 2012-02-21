@@ -20,7 +20,6 @@ import com.onarandombox.MultiversePortals.commands.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.commands.WandCommand;
-import com.onarandombox.MultiversePortals.configuration.MVPortalsConfigMigrator;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
@@ -67,7 +66,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private PortalManager portalManager;
     private Map<Player, PortalPlayerSession> portalSessions;
 
-    protected MVPortalsConfigMigrator migrator = new MVPortalsConfigMigrator(this);
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
     private final static int requiresProtocol = 9;

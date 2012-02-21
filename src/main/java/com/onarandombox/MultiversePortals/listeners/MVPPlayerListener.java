@@ -17,6 +17,7 @@ import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
@@ -27,7 +28,6 @@ import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Type;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -183,7 +183,7 @@ public class MVPPlayerListener implements Listener {
          * Check the Player has actually moved a block to prevent unneeded calculations... This is to prevent huge performance drops on high player count servers.
          */
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
-        ps.setStaleLocation(loc, Type.PLAYER_MOVE);
+        ps.setStaleLocation(loc, MoveType.PLAYER_MOVE);
 
         // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
         if (ps.isStaleLocation()) {
@@ -193,7 +193,7 @@ public class MVPPlayerListener implements Listener {
         // If the portal is not null
         // AND if we did not show debug info, do the stuff
         // The debug is meant to toggle.
-        if (portal != null && ps.doTeleportPlayer(Type.PLAYER_MOVE) && !ps.showDebugInfo()) {
+        if (portal != null && ps.doTeleportPlayer(MoveType.PLAYER_MOVE) && !ps.showDebugInfo()) {
             MVDestination d = portal.getDestination();
             if (d == null) {
                 return;

@@ -16,11 +16,6 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-/**
- * Multiverse 2
- *
- * @author fernferret
- */
 public class MVPortalEvent extends Event implements Cancellable {
     private Player teleportee;
     private MVDestination destination;
