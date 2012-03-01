@@ -10,4 +10,5 @@ useonmove: true
 portalsdefaulttonether: false
 enforceportalaccess: true
 portalcooldown: 1000
+clearonremove: false
 version: 2.6
