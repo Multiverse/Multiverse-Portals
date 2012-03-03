@@ -72,6 +72,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
+    public static boolean ClearOnRemove = false;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -212,6 +213,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("useonmove", true);
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
+        MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
             this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
@@ -388,6 +390,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("enforceportalaccess: " + this.getMainConfig().getString("enforceportalaccess", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("portalsdefaulttonether: " + this.getMainConfig().getString("portalsdefaulttonether", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("portalcooldown: " + this.getMainConfig().getString("portalcooldown", "NOT SET"));
+        buffer += logAndAddToPasteBinBuffer("clearonremove: " + this.getMainConfig().getString("clearonremove", "NOT SET"));
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }
@@ -402,6 +405,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer.append("[Multiverse-Portals]  enforceportalaccess: ").append(this.getMainConfig().get("enforceportalaccess", "NOT SET")).append('\n');
         buffer.append("[Multiverse-Portals]  portalsdefaulttonether: ").append(this.getMainConfig().get("portalsdefaulttonether", "NOT SET")).append('\n');
         buffer.append("[Multiverse-Portals]  portalcooldown: ").append(this.getMainConfig().get("portalcooldown", "NOT SET")).append('\n');
+        buffer.append("[Multiverse-Portals]  clearonremove: ").append(this.getMainConfig().get("clearonremove", "NOT SET")).append('\n');
         buffer.append("[Multiverse-Portals] Special Code: FRN001").append('\n');
         return buffer.toString();
     }
