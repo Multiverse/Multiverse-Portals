@@ -21,6 +21,7 @@ import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.commands.WandCommand;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
@@ -73,6 +74,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
     public static boolean ClearOnRemove = false;
+    public static boolean TeleportVehicles = true;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -133,7 +135,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         pm.registerEvents(pluginListener, this);
         pm.registerEvents(playerListener, this);
         pm.registerEvents(blockListener, this);
-        pm.registerEvents(vehicleListener, this);
+        if (MultiversePortals.TeleportVehicles) {
+            pm.registerEvents(vehicleListener, this);
+        }
         pm.registerEvents(coreListener, this);
     }
 
@@ -214,6 +218,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
+        MultiversePortals.TeleportVehicles = this.MVPConfig.getBoolean("teleportvehicles", true);
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
             this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
@@ -385,12 +390,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("Bukkit Version: " + this.getServer().getVersion());
         buffer += logAndAddToPasteBinBuffer("Loaded Portals: " + this.getPortalManager().getAllPortals().size());
         buffer += logAndAddToPasteBinBuffer("Dumping Portal Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
-        buffer += logAndAddToPasteBinBuffer("wand: " + this.getMainConfig().getString("wand", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("useonmove: " + this.getMainConfig().getString("useonmove", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("enforceportalaccess: " + this.getMainConfig().getString("enforceportalaccess", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("portalsdefaulttonether: " + this.getMainConfig().getString("portalsdefaulttonether", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("portalcooldown: " + this.getMainConfig().getString("portalcooldown", "NOT SET"));
-        buffer += logAndAddToPasteBinBuffer("clearonremove: " + this.getMainConfig().getString("clearonremove", "NOT SET"));
+        for (PortalConfigProperty property : PortalConfigProperty.values()) {
+            String propStr = property.toString();
+            if (!("version".equals(propStr))) {
+                buffer += logAndAddToPasteBinBuffer(propStr + ": " + this.getMainConfig().getString(propStr, "NOT SET"));
+            }
+        }
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }
