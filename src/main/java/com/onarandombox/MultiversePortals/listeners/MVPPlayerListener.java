@@ -65,7 +65,7 @@ public class MVPPlayerListener implements Listener {
         this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
-        MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+        MVPortal portal = portalManager.getPortal(event.getPlayer(), translatedLocation);
         if (portal != null) {
             if (ps.isDebugModeOn()) {
                 ps.showDebugInfo(portal);
@@ -86,7 +86,7 @@ public class MVPPlayerListener implements Listener {
         this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
-        MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+        MVPortal portal = portalManager.getPortal(event.getPlayer(), translatedLocation);
         if (portal != null) {
             if (ps.isDebugModeOn()) {
                 ps.showDebugInfo(portal);
@@ -115,7 +115,7 @@ public class MVPPlayerListener implements Listener {
             if (!portalManager.isPortal(translatedLocation)) {
                 return;
             }
-            MVPortal portal = portalManager.isPortal(event.getPlayer(), translatedLocation);
+            MVPortal portal = portalManager.getPortal(event.getPlayer(), translatedLocation);
             if (event.getItem() == null) {
                 return;
             }
@@ -198,7 +198,7 @@ public class MVPPlayerListener implements Listener {
             if (d == null) {
                 return;
             }
-            event.getPlayer().setFallDistance(0);
+            p.setFallDistance(0);
 
             if (d instanceof InvalidDestination) {
                 this.plugin.log(Level.FINE, "Invalid Destination!");
@@ -210,20 +210,35 @@ public class MVPPlayerListener implements Listener {
                 return;
             }
             if (!ps.allowTeleportViaCooldown(new Date())) {
-                // TODO: Tell them how much time is remaining.
                 p.sendMessage(ps.getFriendlyRemainingTimeMessage());
                 return;
             }
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
             if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
+                this.stateFailure(p.getDisplayName(), portal.getName());
                 return;
             }
             GenericBank bank = plugin.getCore().getBank();
-            if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
+            if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(),
+                    String.format("You need %s to enter the %s portal.",
+                                  bank.getFormattedAmount(event.getPlayer(), portal.getPrice(),
+                                  portal.getCurrency()), portal.getName()))) {
                 bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                performTeleport(event, ps, d);
+                this.performTeleport(event, ps, d);
             }
         }
+    }
+
+    private void stateSuccess(String playerName, String worldName) {
+        this.plugin.log(Level.FINE, String.format(
+                                        "MV-Portals is allowing Player '%s' to use the portal '%s'.",
+                                        playerName, worldName));
+    }
+
+    private void stateFailure(String playerName, String portalName) {
+        this.plugin.log(Level.FINE, String.format(
+                                        "MV-Portals is DENYING Player '%s' access to use the portal '%s'.",
+                                        playerName, portalName));
     }
 
     private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
@@ -232,6 +247,9 @@ public class MVPPlayerListener implements Listener {
         if (result == TeleportResult.SUCCESS) {
             ps.playerDidTeleport(event.getTo());
             ps.setTeleportTime(new Date());
+            this.stateSuccess(event.getPlayer().getDisplayName(), d.getName());
+        } else {
+            this.stateFailure(event.getPlayer().getDisplayName(), d.getName());
         }
     }
 
@@ -240,7 +258,7 @@ public class MVPPlayerListener implements Listener {
         this.plugin.log(Level.FINER, "onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
         // Determine if we're in a portal
-        MVPortal portal = pm.isPortal(event.getPlayer(), event.getPlayer().getLocation());
+        MVPortal portal = pm.getPortal(event.getPlayer(), event.getPlayer().getLocation());
         // Even if the location was null, we still have to see if
         // someone wasn't exactly on (because they can do this).
         if (portal == null) {
@@ -248,7 +266,7 @@ public class MVPPlayerListener implements Listener {
             Location newLoc = this.plugin.getCore().getSafeTTeleporter().findPortalBlockNextTo(event.getFrom());
             if (newLoc != null) {
                 this.plugin.log(Level.FINER, "Player was outside of portal, The location has been successfully translated.");
-                portal = pm.isPortal(event.getPlayer(), newLoc);
+                portal = pm.getPortal(event.getPlayer(), newLoc);
             }
         }
         if (portal != null) {

@@ -55,9 +55,7 @@ public class PortalDestination implements MVDestination {
         // double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
         double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), this.portal.getWorld());
-        Location l = new Location(this.portal.getWorld(), finalX, finalY, finalZ, LocationManipulation.getYaw(this.orientationString), 0);
-
-        return l;
+        return new Location(this.portal.getWorld(), finalX, finalY, finalZ, LocationManipulation.getYaw(this.orientationString), 0);
     }
 
     /**
