@@ -40,8 +40,13 @@ public class PortalManager {
         this.filler = new PortalFiller(plugin.getCore());
         this.portals = new HashMap<String, MVPortal>();
     }
-
-    public MVPortal isPortal(CommandSender sender, Location l) {
+    /**
+     * Method that checks to see if a player is inside a portal AND if they have perms to use it.
+     * @param sender The sender to check.
+     * @param l The location they're standing.
+     * @return A MVPortal if it's valid, null if not.
+     */
+    public MVPortal getPortal(Player sender, Location l) {
         if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
             return null;
         }
@@ -58,6 +63,14 @@ public class PortalManager {
         }
         return null;
     }
+    /**
+     * Deprecated, use getPortal instead.
+     * @deprecated
+     */
+    @Deprecated
+    public MVPortal isPortal(Player sender, Location l) {
+        return this.getPortal(sender, l);
+    }
 
     /**
      * Simplified method for seeing if someone is in a portal. We'll check perms later.
@@ -67,33 +80,25 @@ public class PortalManager {
      * @return True if it is a valid portal location.
      */
     public boolean isPortal(Location l) {
-        for (MVPortal portal : this.portals.values()) {
-            MultiverseRegion r = portal.getLocation().getRegion();
-            if (r != null && r.containsVector(l)) {
-                return true;
-            }
-        }
-        return false;
+        return this.getPortal(l) != null;
     }
 
-//    @Deprecated
-//    public MVPortal isPortal(Location l) {
-//        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
-//            return null;
-//        }
-//        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
-//        List<MVPortal> portalList = this.getAllPortals();
-//        if (portalList == null || portalList.size() == 0) {
-//            return null;
-//        }
-//        for (MVPortal portal : portalList) {
-//            PortalLocation portalLoc = portal.getLocation();
-//            if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
-//                return portal;
-//            }
-//        }
-//        return null;
-//    }
+    /**
+     * Return a portal at a location.
+     * NOTE: If there are more than one portal, order is effectively indeterminate.
+     * @param l The location to check at
+     * @return Null if no portal found, otherwise the MVPortal at that location.
+     */
+    public MVPortal getPortal(Location l) {
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
+        for (MVPortal portal : this.getPortals(world)) {
+            MultiverseRegion r = portal.getLocation().getRegion();
+            if (r != null && r.containsVector(l)) {
+                return portal;
+            }
+        }
+        return null;
+    }
 
     public boolean addPortal(MVPortal portal) {
         if (!this.portals.containsKey(portal.getName())) {

@@ -27,6 +27,10 @@ public class MVPBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void blockFromTo(BlockFromToEvent event) {
+        // Always check if the event has been canceled by someone else.
+        if(event.isCancelled()) {
+            return;
+        }
         // If UseOnMove is false, every usable portal will be lit. Since water
         // and lava don't flow into portal blocks, no special action is
         // required -- we can simply skip the rest of this function.
@@ -39,18 +43,15 @@ public class MVPBlockListener implements Listener {
             return;
 
         // If lava/something else is trying to flow in...
-        MVPortal portal = plugin.getPortalManager().isPortal(null, event.getToBlock().getLocation());
-        if (portal != null) {
+        if (plugin.getPortalManager().isPortal(event.getToBlock().getLocation())) {
             event.setCancelled(true);
             return;
         }
         // If something is trying to flow out, stop that too.
-        portal = plugin.getPortalManager().isPortal(null, event.getBlock().getLocation());
-        if (portal != null) {
+        if (plugin.getPortalManager().isPortal(event.getBlock().getLocation())) {
             event.setCancelled(true);
         }
     }
-
 
     @EventHandler
     public void blockPhysics(BlockPhysicsEvent event) {
@@ -59,8 +60,7 @@ public class MVPBlockListener implements Listener {
         }
         if (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL) {
             PortalManager pm = this.plugin.getPortalManager();
-            MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
-            if (portal != null) {
+            if (pm.isPortal(event.getBlock().getLocation())) {
                 event.setCancelled(true);
             }
         }

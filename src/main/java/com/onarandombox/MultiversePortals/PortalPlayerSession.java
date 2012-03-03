@@ -85,8 +85,10 @@ public class PortalPlayerSession {
     }
 
     private void setStandinginLocation() {
+        // If they're not in a portal and this location is a portal
         if (this.standingIn == null && this.plugin.getPortalManager().isPortal(this.loc)) {
-            this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
+            this.standingIn = this.plugin.getPortalManager().getPortal(this.loc);
+        // There is no portal here.
         } else if (!this.plugin.getPortalManager().isPortal(this.loc)) {
             this.hasMovedOutOfPortal = true;
             this.standingIn = null;
@@ -114,14 +116,15 @@ public class PortalPlayerSession {
         if (this.getPlayerFromName().isInsideVehicle() && moveType != MoveType.VEHICLE_MOVE) {
             return;
         }
-
+        // If the player has not moved, they have a stale location
         if (this.getLocation().getBlockX() == loc.getBlockX() && this.getLocation().getBlockY() == loc.getBlockY() && this.getLocation().getBlockZ() == loc.getBlockZ()) {
             this.setStaleLocation(true);
         } else {
-            this.setLocation(loc); // Update the Players Session to the new Location.
+            // Update the Players Session to the new Location.
+            this.setLocation(loc);
+            // The location is no longer stale.
             this.setStaleLocation(false);
         }
-
     }
 
     public boolean setLeftClickSelection(Vector v, MultiverseWorld world) {
@@ -205,7 +208,7 @@ public class PortalPlayerSession {
      * @return The {@link MVPortal} the player is standing in.
      */
     public MVPortal getUncachedStandingInPortal() {
-        return this.standingIn = this.plugin.getPortalManager().isPortal(this.getPlayerFromName(), this.loc);
+        return this.standingIn = this.plugin.getPortalManager().getPortal(this.loc);
     }
 
     /**
@@ -215,7 +218,7 @@ public class PortalPlayerSession {
      */
     public void playerDidTeleport(Location location) {
         PortalManager pm = this.plugin.getPortalManager();
-        if (pm.isPortal(this.getPlayerFromName(), location) != null) {
+        if (pm.getPortal(location) != null) {
             this.hasMovedOutOfPortal = false;
             return;
         }
@@ -236,7 +239,7 @@ public class PortalPlayerSession {
         }
 
         showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
-        showPortalPriceInfo(this.standingIn);
+        this.showPortalPriceInfo(this.standingIn);
         return true;
     }
 
@@ -280,8 +283,8 @@ public class PortalPlayerSession {
     }
 
     public String getFriendlyRemainingTimeMessage() {
-        String remaining = "There is a portal " + ChatColor.AQUA + "cooldown" + ChatColor.WHITE + " in effect. Please try again in " + ChatColor.GOLD;
-        //+ Integer.toString((int) this.getRemainingCooldown() / 1000) + "s.");
+        String remaining = "There is a portal " + ChatColor.AQUA + "cooldown" + ChatColor.WHITE + " in effect. Please try again in " + ChatColor.GOLD
+        + Integer.toString((int) this.getRemainingCooldown() / 1000) + "s.";
         int time = (int) this.getRemainingCooldown() / 1000;
         // Account for the fact that 0 seconds means 1
         time++;
