@@ -35,8 +35,22 @@ public class MVPortal {
     private boolean safeTeleporter;
     private boolean teleportNonPlayers;
     private FileConfiguration config;
+    private boolean allowSave;
 
     public MVPortal(MultiversePortals instance, String name) {
+        init(instance, name, true);
+    }
+
+    private MVPortal(MultiversePortals instance, String name, boolean allowSave) {
+        init(instance, name, allowSave);
+    }
+
+    // If this is called with allowSave=false, the caller needs to be sure to
+    // call allowSave() when they're finished modifying it.
+    private void init(MultiversePortals instance, String name, boolean allowSave) {
+        // Disallow saving until initialization is finished.
+        this.allowSave = false;
+
         this.plugin = instance;
         this.config = this.plugin.getPortalsConfig();
         this.name = name;
@@ -51,12 +65,21 @@ public class MVPortal {
         this.plugin.getServer().getPluginManager().addPermission(this.exempt);
         this.addToUpperLists();
         this.worldManager = this.plugin.getCore().getMVWorldManager();
+
+        if (allowSave) {
+            this.allowSave = true;
+            saveConfig();
+        }
+    }
+
+    private void allowSave() {
+        this.allowSave = true;
     }
 
     private void setTeleportNonPlayers(boolean b) {
         this.teleportNonPlayers = b;
         this.config.set(this.portalConfigString + ".teleportnonplayers", this.teleportNonPlayers);
-        this.plugin.savePortalsConfig();
+        saveConfig();
     }
 
     public boolean getTeleportNonPlayers() {
@@ -66,7 +89,7 @@ public class MVPortal {
     private void setUseSafeTeleporter(boolean teleport) {
         this.safeTeleporter = teleport;
         this.config.set(this.portalConfigString + ".safeteleport", teleport);
-        this.plugin.savePortalsConfig();
+        saveConfig();
     }
 
     public boolean useSafeTeleporter() {
@@ -108,7 +131,9 @@ public class MVPortal {
     }
 
     public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
-        MVPortal portal = new MVPortal(instance, name);
+        boolean allowSave = false;
+        MVPortal portal = new MVPortal(instance, name, allowSave);
+
         // Don't load portals from configs, as we have a linked list issue
         // Have to load all portals first, then resolve their destinations.
 
@@ -119,6 +144,10 @@ public class MVPortal {
         portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
         portal.setCurrency(portal.config.getInt(portal.portalConfigString + ".entryfee.currency", -1));
         portal.setPrice(portal.config.getDouble(portal.portalConfigString + ".entryfee.amount", 0.0));
+
+        // We've finished reading the portal from the config file. Any further
+        // changes to this portal should be saved.
+        portal.allowSave();
 
         return portal;
     }
@@ -134,15 +163,21 @@ public class MVPortal {
     private boolean setCurrency(int currency) {
         this.currency = currency;
         config.set(this.portalConfigString + ".entryfee.currency", currency);
-        this.plugin.savePortalsConfig();
+        saveConfig();
         return true;
     }
 
     private boolean setPrice(double price) {
         this.price = price;
         config.set(this.portalConfigString + ".entryfee.amount", price);
-        this.plugin.savePortalsConfig();
+        saveConfig();
         return true;
+    }
+
+    private void saveConfig() {
+        if (this.allowSave) {
+            this.plugin.savePortalsConfig();
+        }
     }
 
     public MVPortal(MultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
@@ -184,14 +219,14 @@ public class MVPortal {
             this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
             return false;
         }
-        this.plugin.savePortalsConfig();
+        saveConfig();
         return true;
     }
 
     private boolean setOwner(String owner) {
         this.owner = owner;
         this.config.set(this.portalConfigString + ".owner", this.owner);
-        this.plugin.savePortalsConfig();
+        saveConfig();
         return true;
     }
 
@@ -202,7 +237,7 @@ public class MVPortal {
             return false;
         }
         this.config.set(this.portalConfigString + ".destination", this.destination.toString());
-        this.plugin.savePortalsConfig();
+        saveConfig();
         return !(this.destination instanceof InvalidDestination);
     }
 
@@ -215,7 +250,7 @@ public class MVPortal {
             return false;
         }
         this.config.set(this.portalConfigString + ".destination", this.destination.toString());
-        this.plugin.savePortalsConfig();
+        saveConfig();
         return true;
     }
 
