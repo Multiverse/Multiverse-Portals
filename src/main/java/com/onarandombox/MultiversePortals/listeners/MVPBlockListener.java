@@ -27,6 +27,13 @@ public class MVPBlockListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void blockFromTo(BlockFromToEvent event) {
+        // If UseOnMove is false, every usable portal will be lit. Since water
+        // and lava don't flow into portal blocks, no special action is
+        // required -- we can simply skip the rest of this function.
+        if (!MultiversePortals.UseOnMove) {
+            return;
+        }
+
         // The to block should never be null, but apparently it is sometimes...
         if (event.getBlock() == null || event.getToBlock() == null)
             return;
@@ -47,13 +54,15 @@ public class MVPBlockListener implements Listener {
 
     @EventHandler
     public void blockPhysics(BlockPhysicsEvent event) {
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
         }
-        PortalManager pm = this.plugin.getPortalManager();
-        MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
-        if(portal != null && (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL)){
-            event.setCancelled(true);
+        if (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL) {
+            PortalManager pm = this.plugin.getPortalManager();
+            MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
+            if (portal != null) {
+                event.setCancelled(true);
+            }
         }
     }
 }
