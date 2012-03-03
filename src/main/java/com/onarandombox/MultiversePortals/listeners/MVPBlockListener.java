@@ -54,13 +54,15 @@ public class MVPBlockListener implements Listener {
 
     @EventHandler
     public void blockPhysics(BlockPhysicsEvent event) {
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
         }
-        PortalManager pm = this.plugin.getPortalManager();
-        MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
-        if(portal != null && (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL)){
-            event.setCancelled(true);
+        if (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL) {
+            PortalManager pm = this.plugin.getPortalManager();
+            MVPortal portal = pm.isPortal(null, event.getBlock().getLocation());
+            if (portal != null) {
+                event.setCancelled(true);
+            }
         }
     }
 }
