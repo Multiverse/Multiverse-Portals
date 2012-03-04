@@ -293,10 +293,10 @@ public class PortalManager {
     
     private void addToWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
 
-        Map<Integer, Collection<MVPortal>> chunksToPortals = worldChunkPortals.get(world);
+        Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
         if (chunksToPortals == null) {
             chunksToPortals = new HashMap<Integer, Collection<MVPortal>>();
-            worldChunkPortals.put(world, chunksToPortals);
+            this.worldChunkPortals.put(world, chunksToPortals);
         }
 
         // If this portal spans multiple chunks, we'll add it to each chunk that
@@ -323,7 +323,7 @@ public class PortalManager {
     }
     
     private void removeFromWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
-        Map<Integer, Collection<MVPortal>> chunksToPortals = worldChunkPortals.get(world);
+        Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
 
         PortalLocation location = portal.getLocation();
         Vector min = location.getMinimum();
@@ -349,7 +349,7 @@ public class PortalManager {
 
         Collection<MVPortal> nearbyPortals = null;
 
-        Map<Integer, Collection<MVPortal>> chunkMap = worldChunkPortals.get(world);
+        Map<Integer, Collection<MVPortal>> chunkMap = this.worldChunkPortals.get(world);
         if (chunkMap != null) {
             int cx = blockToChunk(location.getBlockX());
             int cz = blockToChunk(location.getBlockZ());
