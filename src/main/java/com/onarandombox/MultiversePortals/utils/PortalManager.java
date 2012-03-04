@@ -13,6 +13,8 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -32,12 +34,10 @@ import java.util.Map;
  */
 public class PortalManager {
     private MultiversePortals plugin;
-    private PortalFiller filler;
     private Map<String, MVPortal> portals;
 
     public PortalManager(MultiversePortals plugin) {
         this.plugin = plugin;
-        this.filler = new PortalFiller(plugin.getCore());
         this.portals = new HashMap<String, MVPortal>();
     }
     /**
@@ -139,22 +139,31 @@ public class PortalManager {
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(portalAccess);
         }
         if (MultiversePortals.ClearOnRemove) {
-            // Fill the interior of the portal with air. This means removing
-            // a portal no longer leaves behind portal blocks (which would take
-            // a player to the nether).
+            // Replace portal blocks in the portal with air. This keeps us from
+            // leaving behind portal blocks (which would take an unsuspecting
+            // player to the nether instead of their expected destination).            
 
-            Material clearMaterial = Material.AIR;
+            int portalMaterialId = Material.PORTAL.getId();
+            int airMaterialId    = Material.AIR.getId();
 
-            // Start the fill at the region's center.
+            // Determine the bounds of the portal.
             MultiverseRegion removedRegion = removed.getLocation().getRegion();
-            Vector fillPoint1 = removedRegion.getMinimumPoint();
-            Vector fillPoint2 = removedRegion.getMaximumPoint();
-            double fillX = (fillPoint1.getBlockX() + fillPoint2.getBlockX()) / 2;
-            double fillY = (fillPoint1.getBlockY() + fillPoint2.getBlockY()) / 2;
-            double fillZ = (fillPoint1.getBlockZ() + fillPoint2.getBlockZ()) / 2;
-            Location fillLocation = new Location(removed.getWorld(), fillX, fillY, fillZ);
+            Vector min = removedRegion.getMinimumPoint();
+            Vector max = removedRegion.getMaximumPoint();
+            int minX = min.getBlockX(), minY = min.getBlockY(), minZ = min.getBlockZ();
+            int maxX = max.getBlockX(), maxY = max.getBlockY(), maxZ = max.getBlockZ();
 
-            this.filler.fillRegion(removedRegion, fillLocation, clearMaterial);
+            World world = removed.getWorld();
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        Block b = world.getBlockAt(x, y, z);
+                        if (b.getTypeId() == portalMaterialId) {
+                            b.setTypeId(airMaterialId, false);
+                        }
+                    }
+                }
+            }
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
