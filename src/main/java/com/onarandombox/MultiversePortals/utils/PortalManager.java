@@ -143,27 +143,8 @@ public class PortalManager {
             // leaving behind portal blocks (which would take an unsuspecting
             // player to the nether instead of their expected destination).            
 
-            int portalMaterialId = Material.PORTAL.getId();
-            int airMaterialId    = Material.AIR.getId();
-
-            // Determine the bounds of the portal.
-            MultiverseRegion removedRegion = removed.getLocation().getRegion();
-            Vector min = removedRegion.getMinimumPoint();
-            Vector max = removedRegion.getMaximumPoint();
-            int minX = min.getBlockX(), minY = min.getBlockY(), minZ = min.getBlockZ();
-            int maxX = max.getBlockX(), maxY = max.getBlockY(), maxZ = max.getBlockZ();
-
-            World world = removed.getWorld();
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    for (int z = minZ; z <= maxZ; z++) {
-                        Block b = world.getBlockAt(x, y, z);
-                        if (b.getTypeId() == portalMaterialId) {
-                            b.setTypeId(airMaterialId, false);
-                        }
-                    }
-                }
-            }
+            MultiverseRegion region = removed.getLocation().getRegion();
+            replaceInRegion(removed.getWorld(), region, Material.PORTAL, Material.AIR);
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
@@ -253,6 +234,29 @@ public class PortalManager {
         List<String> iterList = new ArrayList<String>(this.portals.keySet());
         for (String s : iterList) {
             this.removePortal(s, removeFromConfigs);
+        }
+    }
+    
+    private void replaceInRegion(World world, MultiverseRegion removedRegion, Material oldMaterial, Material newMaterial) {
+
+        int oldMaterialId = oldMaterial.getId();
+        int newMaterialId = newMaterial.getId();
+        
+        // Determine the bounds of the region.
+        Vector min = removedRegion.getMinimumPoint();
+        Vector max = removedRegion.getMaximumPoint();
+        int minX = min.getBlockX(), minY = min.getBlockY(), minZ = min.getBlockZ();
+        int maxX = max.getBlockX(), maxY = max.getBlockY(), maxZ = max.getBlockZ();
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    Block b = world.getBlockAt(x, y, z);
+                    if (b.getTypeId() == oldMaterialId) {
+                        b.setTypeId(newMaterialId, false);
+                    }
+                }
+            }
         }
     }
 
