@@ -22,11 +22,10 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -37,11 +36,18 @@ import java.util.Set;
 public class PortalManager {
     private MultiversePortals plugin;
     private Map<String, MVPortal> portals;
-    private Map<Integer, Set<MVPortal>> chunkPortals;
+
+    // For each world, keep a map of chunk hashes (see hashChunk()) to lists of
+    // portals in those chunks.
+    private Map<MultiverseWorld, Map<Integer, Collection<MVPortal>>> worldChunkPortals;
+
+    // getNearbyPortals() returns this instead of null. =)
+    private static final Collection<MVPortal> emptyPortalSet = new ArrayList<MVPortal>();
 
     public PortalManager(MultiversePortals plugin) {
         this.plugin = plugin;
         this.portals = new HashMap<String, MVPortal>();
+        this.worldChunkPortals = new HashMap<MultiverseWorld, Map<Integer, Collection<MVPortal>>>();
     }
     /**
      * Method that checks to see if a player is inside a portal AND if they have perms to use it.
@@ -53,17 +59,19 @@ public class PortalManager {
         if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
             return null;
         }
+
         MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
-        List<MVPortal> portalList = this.getPortals(sender, world);
-        if (portalList == null || portalList.size() == 0) {
-            return null;
-        }
-        for (MVPortal portal : portalList) {
-            PortalLocation portalLoc = portal.getLocation();
-            if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
-                return portal;
+        for (MVPortal portal : getNearbyPortals(world, l)) {
+
+            // Ignore portals the player can't use.
+            if (!MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal((Player) sender)) {
+                PortalLocation portalLoc = portal.getLocation();
+                if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
+                    return portal;
+                }
             }
         }
+
         return null;
     }
     /**
@@ -94,7 +102,7 @@ public class PortalManager {
      */
     public MVPortal getPortal(Location l) {
         MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
-        for (MVPortal portal : this.getPortals(world)) {
+        for (MVPortal portal : getNearbyPortals(world, l)) {
             MultiverseRegion r = portal.getLocation().getRegion();
             if (r != null && r.containsVector(l)) {
                 return portal;
@@ -105,7 +113,8 @@ public class PortalManager {
 
     public boolean addPortal(MVPortal portal) {
         if (!this.portals.containsKey(portal.getName())) {
-            addUniquePortal(portal.getName(), portal);
+            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(portal.getWorld());
+            addUniquePortal(world, portal.getName(), portal);
             return true;
         }
         return false;
@@ -113,16 +122,16 @@ public class PortalManager {
 
     public boolean addPortal(MultiverseWorld world, String name, String owner, PortalLocation location) {
         if (!this.portals.containsKey(name)) {
-            addUniquePortal(name, new MVPortal(this.plugin, name, owner, location));
+            addUniquePortal(world, name, new MVPortal(this.plugin, name, owner, location));
             return true;
         }
         return false;
     }
     
     // Add a portal whose name is already known to be unique.
-    private void addUniquePortal(String name, MVPortal portal) {
+    private void addUniquePortal(MultiverseWorld world, String name, MVPortal portal) {
         this.portals.put(name, portal);
-        addToChunkPortals(portal);
+        addToWorldChunkPortals(world, portal);
     }
 
     public MVPortal removePortal(String portalName, boolean removeFromConfigs) {
@@ -136,7 +145,8 @@ public class PortalManager {
         }
 
         MVPortal removed = this.portals.remove(portalName);
-        removeFromChunkPortals(removed);
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(removed.getWorld());
+        removeFromWorldChunkPortals(world, removed);
 
         removed.removePermission();
         Permission portalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
@@ -281,7 +291,14 @@ public class PortalManager {
         return (cz << 16) | (cz & 0xFFFF);
     }
     
-    private void addToChunkPortals(MVPortal portal) {
+    private void addToWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
+
+        Map<Integer, Collection<MVPortal>> chunksToPortals = worldChunkPortals.get(world);
+        if (chunksToPortals == null) {
+            chunksToPortals = new HashMap<Integer, Collection<MVPortal>>();
+            worldChunkPortals.put(world, chunksToPortals);
+        }
+
         // If this portal spans multiple chunks, we'll add it to each chunk that
         // contains part of it.
         PortalLocation location = portal.getLocation();
@@ -292,27 +309,57 @@ public class PortalManager {
         for (int cx = c1x; cx <= c2x; cx++) {
             for (int cz = c1z; cz <= c2z; cz++) {
                 Integer hashCode = hashChunk(cx, cz);
-                Set<MVPortal> chunkSet = this.chunkPortals.get(hashCode);
-                if (chunkSet == null) {
-                    chunkSet = new HashSet<MVPortal>();
-                    this.chunkPortals.put(hashCode, chunkSet);
+                Collection<MVPortal> portals = chunksToPortals.get(hashCode);
+                if (portals == null) {
+                    // For this collection, iteration will be -much- more common
+                    // than addition or removal. ArrayList has better iteration
+                    // performance than HashSet.
+                    portals = new ArrayList<MVPortal>();
+                    chunksToPortals.put(hashCode, portals);
                 }
-                chunkSet.add(portal);
+                portals.add(portal);
             }
         }
     }
     
-    private void removeFromChunkPortals(MVPortal portal) {
+    private void removeFromWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
+        Map<Integer, Collection<MVPortal>> chunksToPortals = worldChunkPortals.get(world);
+
         PortalLocation location = portal.getLocation();
         Vector min = location.getMinimum();
         Vector max = location.getMaximum();
         int c1x = blockToChunk(min.getBlockX()), c1z = blockToChunk(min.getBlockZ());
         int c2x = blockToChunk(max.getBlockX()), c2z = blockToChunk(max.getBlockZ());
+
         for (int cx = c1x; cx <= c2x; cx++) {
             for (int cz = c1z; cz <= c2z; cz++) {
                 Integer hashCode = hashChunk(cx, cz);
-                this.chunkPortals.get(hashCode).remove(portal);
+                chunksToPortals.get(hashCode).remove(portal);
             }
         }
+    }
+
+    /**
+     * Returns portals in the same chunk as the given location.
+     *
+     * @param location the location
+     * @return a collection of nearby portals; may be empty, but will not be null
+     */
+    private Collection<MVPortal> getNearbyPortals(MultiverseWorld world, Location location) {
+
+        Collection<MVPortal> nearbyPortals = null;
+
+        Map<Integer, Collection<MVPortal>> chunkMap = worldChunkPortals.get(world);
+        if (chunkMap != null) {
+            int cx = blockToChunk(location.getBlockX());
+            int cz = blockToChunk(location.getBlockZ());
+            Integer hash = hashChunk(cx, cz);
+
+            nearbyPortals = chunkMap.get(hash);
+        }
+
+        // Never return null. (This just keeps the caller from having to do a
+        // null check.)
+        return nearbyPortals != null ? nearbyPortals : emptyPortalSet;
     }
 }
