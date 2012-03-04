@@ -23,8 +23,10 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -35,6 +37,7 @@ import java.util.Map;
 public class PortalManager {
     private MultiversePortals plugin;
     private Map<String, MVPortal> portals;
+    private Map<Integer, Set<MVPortal>> chunkPortals;
 
     public PortalManager(MultiversePortals plugin) {
         this.plugin = plugin;
@@ -102,7 +105,7 @@ public class PortalManager {
 
     public boolean addPortal(MVPortal portal) {
         if (!this.portals.containsKey(portal.getName())) {
-            this.portals.put(portal.getName(), portal);
+            addUniquePortal(portal.getName(), portal);
             return true;
         }
         return false;
@@ -110,10 +113,16 @@ public class PortalManager {
 
     public boolean addPortal(MultiverseWorld world, String name, String owner, PortalLocation location) {
         if (!this.portals.containsKey(name)) {
-            this.portals.put(name, new MVPortal(this.plugin, name, owner, location));
+            addUniquePortal(name, new MVPortal(this.plugin, name, owner, location));
             return true;
         }
         return false;
+    }
+    
+    // Add a portal whose name is already known to be unique.
+    private void addUniquePortal(String name, MVPortal portal) {
+        this.portals.put(name, portal);
+        addToChunkPortals(portal);
     }
 
     public MVPortal removePortal(String portalName, boolean removeFromConfigs) {
@@ -127,6 +136,8 @@ public class PortalManager {
         }
 
         MVPortal removed = this.portals.remove(portalName);
+        removeFromChunkPortals(removed);
+
         removed.removePermission();
         Permission portalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
         Permission exemptAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
@@ -141,7 +152,7 @@ public class PortalManager {
         if (MultiversePortals.ClearOnRemove) {
             // Replace portal blocks in the portal with air. This keeps us from
             // leaving behind portal blocks (which would take an unsuspecting
-            // player to the nether instead of their expected destination).            
+            // player to the nether instead of their expected destination).
 
             MultiverseRegion region = removed.getLocation().getRegion();
             replaceInRegion(removed.getWorld(), region, Material.PORTAL, Material.AIR);
@@ -205,14 +216,12 @@ public class PortalManager {
     }
 
     public MVPortal getPortal(String portalName) {
-        if (this.portals.containsKey(portalName)) {
-            return this.portals.get(portalName);
-        }
-        return null;
+        // Returns null if the portal doesn't exist.
+        return this.portals.get(portalName);
     }
 
     /**
-     * Gets a portal with a commandsender and a name. Used as a convience for portal listing methods
+     * Gets a portal with a commandsender and a name. Used as a convenience for portal listing methods
      *
      * @param portalName
      * @param sender
@@ -259,5 +268,51 @@ public class PortalManager {
             }
         }
     }
-
+    
+    private int blockToChunk(int b) {
+        // A block at -5 should be in chunk -1 instead of chunk 0.
+        if (b < 0) {
+            b -= 16;
+        }
+        return b / 16;
+    }
+    
+    private int hashChunk(int cx, int cz) {
+        return (cz << 16) | (cz & 0xFFFF);
+    }
+    
+    private void addToChunkPortals(MVPortal portal) {
+        // If this portal spans multiple chunks, we'll add it to each chunk that
+        // contains part of it.
+        PortalLocation location = portal.getLocation();
+        Vector min = location.getMinimum();
+        Vector max = location.getMaximum();
+        int c1x = blockToChunk(min.getBlockX()), c1z = blockToChunk(min.getBlockZ());
+        int c2x = blockToChunk(max.getBlockX()), c2z = blockToChunk(max.getBlockZ());
+        for (int cx = c1x; cx <= c2x; cx++) {
+            for (int cz = c1z; cz <= c2z; cz++) {
+                Integer hashCode = hashChunk(cx, cz);
+                Set<MVPortal> chunkSet = this.chunkPortals.get(hashCode);
+                if (chunkSet == null) {
+                    chunkSet = new HashSet<MVPortal>();
+                    this.chunkPortals.put(hashCode, chunkSet);
+                }
+                chunkSet.add(portal);
+            }
+        }
+    }
+    
+    private void removeFromChunkPortals(MVPortal portal) {
+        PortalLocation location = portal.getLocation();
+        Vector min = location.getMinimum();
+        Vector max = location.getMaximum();
+        int c1x = blockToChunk(min.getBlockX()), c1z = blockToChunk(min.getBlockZ());
+        int c2x = blockToChunk(max.getBlockX()), c2z = blockToChunk(max.getBlockZ());
+        for (int cx = c1x; cx <= c2x; cx++) {
+            for (int cz = c1z; cz <= c2z; cz++) {
+                Integer hashCode = hashChunk(cx, cz);
+                this.chunkPortals.get(hashCode).remove(portal);
+            }
+        }
+    }
 }
