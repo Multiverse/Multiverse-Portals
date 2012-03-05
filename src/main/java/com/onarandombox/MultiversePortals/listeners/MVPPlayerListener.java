@@ -109,7 +109,7 @@ public class MVPPlayerListener implements Listener {
         // Portal lighting stuff
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
-            this.plugin.log(Level.FINER, "Player is ligting block: " + this.plugin.getCore().getLocationManipulation().strCoordsRaw(event.getClickedBlock().getLocation()));
+            this.plugin.log(Level.FINER, "Player is lighting block: " + this.plugin.getCore().getLocationManipulation().strCoordsRaw(event.getClickedBlock().getLocation()));
             PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
             Location translatedLocation = this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace());
             if (!portalManager.isPortal(translatedLocation)) {
@@ -127,6 +127,13 @@ public class MVPPlayerListener implements Listener {
             // Cancel the event if there was a portal.
 
             if (portal != null) {
+
+                // Make sure the portal's frame around this point is made out of
+                // a valid material.
+                if (!portal.isFrameValid(translatedLocation)) {
+                    return;
+                }
+
                 this.plugin.log(Level.FINER, "Right Clicked: ");
                 this.plugin.log(Level.FINER, "Block Clicked: " + event.getClickedBlock() + ":" + event.getClickedBlock().getType());
                 this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
@@ -218,6 +225,12 @@ public class MVPPlayerListener implements Listener {
                 this.stateFailure(p.getDisplayName(), portal.getName());
                 return;
             }
+
+            if (!portal.isFrameValid(loc)) {
+                //event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
+                return;
+            }
+
             GenericBank bank = plugin.getCore().getBank();
             if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(),
                     String.format("You need %s to enter the %s portal.",
@@ -257,16 +270,17 @@ public class MVPPlayerListener implements Listener {
     public void playerPortal(PlayerPortalEvent event) {
         this.plugin.log(Level.FINER, "onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
+        Location playerPortalLoc = event.getPlayer().getLocation();
         // Determine if we're in a portal
-        MVPortal portal = pm.getPortal(event.getPlayer(), event.getPlayer().getLocation());
+        MVPortal portal = pm.getPortal(event.getPlayer(), playerPortalLoc);
         // Even if the location was null, we still have to see if
         // someone wasn't exactly on (because they can do this).
         if (portal == null) {
             // Check around the player to make sure
-            Location newLoc = this.plugin.getCore().getSafeTTeleporter().findPortalBlockNextTo(event.getFrom());
-            if (newLoc != null) {
+            playerPortalLoc = this.plugin.getCore().getSafeTTeleporter().findPortalBlockNextTo(event.getFrom());
+            if (playerPortalLoc != null) {
                 this.plugin.log(Level.FINER, "Player was outside of portal, The location has been successfully translated.");
-                portal = pm.getPortal(event.getPlayer(), newLoc);
+                portal = pm.getPortal(event.getPlayer(), playerPortalLoc);
             }
         }
         if (portal != null) {
@@ -298,6 +312,10 @@ public class MVPPlayerListener implements Listener {
             } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
                 event.getPlayer().sendMessage("This portal " + ChatColor.RED + "doesn't go anywhere." + ChatColor.RED + " You should exit it now.");
+                event.setCancelled(true);
+            }
+            else if (!portal.isFrameValid(playerPortalLoc)) {
+                event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
                 event.setCancelled(true);
             }
         }

@@ -9,6 +9,8 @@ package com.onarandombox.MultiversePortals.utils;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiversePortals.MVPortal;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -104,6 +106,6 @@ public class PortalFiller {
         if (l.getWorld().getBlockAt(l).getType() == portalType) {
             return false;
         }
-        return (type == Material.PORTAL || type == Material.LONG_GRASS || type == Material.VINE || type == Material.SNOW || type == Material.AIR || type == Material.WATER || type == Material.STATIONARY_WATER || type == Material.LAVA || type == Material.STATIONARY_LAVA);
+        return MVPortal.INTERIOR_MATERIALS.contains(type);
     }
 }

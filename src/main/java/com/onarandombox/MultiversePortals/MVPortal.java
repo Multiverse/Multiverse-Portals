@@ -12,12 +12,23 @@ import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.util.Vector;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 
 public class MVPortal {
@@ -36,6 +47,11 @@ public class MVPortal {
     private boolean teleportNonPlayers;
     private FileConfiguration config;
     private boolean allowSave;
+
+    public static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
+        Material.PORTAL, Material.LONG_GRASS, Material.VINE,
+        Material.SNOW, Material.AIR, Material.WATER,
+        Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA });
 
     public MVPortal(MultiversePortals instance, String name) {
         init(instance, name, true);
@@ -344,6 +360,94 @@ public class MVPortal {
             allPortalAccess.getChildren().remove(this.permission.getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
         }
+    }
+
+    /**
+     * Determines whether a point within the portal has a valid frame around it.
+     *
+     * @param location the location
+     * @return true if the frame around the location is valid; false otherwise
+     */
+    public boolean isFrameValid(Location l) {
+        List<Integer> validMaterialIds = MultiversePortals.FrameMaterials;
+        if (validMaterialIds == null || validMaterialIds.isEmpty()) {
+            // All frame materials are valid.
+            return true;
+        }
+
+        MultiversePortals.staticLog(Level.FINER, String.format("checking portal frame at %d,%d,%d",
+                l.getBlockX(), l.getBlockY(), l.getBlockZ()));
+
+        int commonMaterialId = -1;
+
+        Set<Location> visited = new HashSet<Location>();
+        Stack<Location> frontier = new Stack<Location>();
+        frontier.push(l);
+
+        World world = l.getWorld();
+
+        // Limit the search to the portal's region, extended by 1 block.
+        MultiverseRegion searchRegion;
+        int useX, useZ;
+        {
+            MultiverseRegion r = getLocation().getRegion();
+            useX = (r.getWidth() == 1) ? 0 : 1;
+            useZ = (r.getDepth() == 1) ? 0 : 1;
+
+            // Require the portal to be flat in the X dimension or the Z
+            // dimension but not both. (This is more strict than the overall
+            // rule for portals.)
+            if (!((useX != 0) ^ (useZ != 0))) {
+                return false;
+            }
+            Vector min = new Vector().copy(r.getMinimumPoint());
+            Vector max = new Vector().copy(r.getMaximumPoint());
+            Vector ones = new Vector(useX, 1, useZ);
+            min.subtract(ones);
+            max.add(ones);
+            searchRegion = new MultiverseRegion(min, max, r.getWorld());
+        }
+
+        while (!frontier.isEmpty()) {
+            Location toCheck = frontier.pop();
+            visited.add(toCheck);
+
+            if (INTERIOR_MATERIALS.contains(toCheck.getBlock().getType())) {
+                // This is an empty block in the portal. Check each of the four
+                // neighboring locations.
+                for (int i = 0; i < 4; i++) {
+                    int d = (i % 2 == 0) ? -1 : 1;
+                    int dx = (i < 2) ? 0 : useX * d;
+                    int dy = (i < 2) ? d : 0;
+                    int dz = (i < 2) ? 0 : useZ * d;
+
+                    int newX = toCheck.getBlockX() + dx;
+                    int newY = toCheck.getBlockY() + dy;
+                    int newZ = toCheck.getBlockZ() + dz;
+
+                    Location toVisit = new Location(world, newX, newY, newZ);
+                    if (searchRegion.containsVector(toVisit) && !visited.contains(toVisit)) {
+                        frontier.add(toVisit);
+                    }
+                }
+            }
+            else {
+                // This is a frame block. Check its material.
+                int materialId = toCheck.getBlock().getTypeId();
+                if (commonMaterialId == -1) {
+                    // This is the first frame block we've found.
+                    commonMaterialId = materialId;
+                }
+                else if (commonMaterialId != materialId) {
+                    // This frame block doesn't match other frame blocks.
+                    MultiversePortals.staticLog(Level.FINER, "frame has multiple materials");
+                    return false;
+                }
+            }
+        }
+        MultiversePortals.staticLog(Level.FINER, String.format("frame has common material %d", commonMaterialId));
+
+        return validMaterialIds.contains(commonMaterialId);
     }
 
     public boolean isExempt(Player player) {
