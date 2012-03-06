@@ -106,6 +106,6 @@ public class PortalFiller {
         if (l.getWorld().getBlockAt(l).getType() == portalType) {
             return false;
         }
-        return MVPortal.INTERIOR_MATERIALS.contains(type);
+        return MVPortal.isPortalInterior(type);
     }
 }

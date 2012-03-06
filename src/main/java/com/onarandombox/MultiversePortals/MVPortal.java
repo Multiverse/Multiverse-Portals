@@ -48,10 +48,14 @@ public class MVPortal {
     private FileConfiguration config;
     private boolean allowSave;
 
-    public static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
+    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
         Material.PORTAL, Material.LONG_GRASS, Material.VINE,
         Material.SNOW, Material.AIR, Material.WATER,
         Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA });
+
+    public static boolean isPortalInterior(Material material) {
+        return INTERIOR_MATERIALS.contains(material);
+    }
 
     public MVPortal(MultiversePortals instance, String name) {
         init(instance, name, true);
@@ -412,7 +416,7 @@ public class MVPortal {
             Location toCheck = frontier.pop();
             visited.add(toCheck);
 
-            if (INTERIOR_MATERIALS.contains(toCheck.getBlock().getType())) {
+            if (isPortalInterior(toCheck.getBlock().getType())) {
                 // This is an empty block in the portal. Check each of the four
                 // neighboring locations.
                 for (int i = 0; i < 4; i++) {
