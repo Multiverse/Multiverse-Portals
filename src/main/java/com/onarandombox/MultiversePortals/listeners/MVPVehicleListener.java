@@ -60,6 +60,11 @@ public class MVPVehicleListener implements Listener {
                 if (dest == null || dest instanceof InvalidDestination)
                     return;
 
+                // Check the portal's frame.
+                if (!portal.isFrameValid(event.getVehicle().getLocation())) {
+                    return;
+                }
+
                 Vector vehicleVec = event.getVehicle().getVelocity();
                 Location target = dest.getLocation(event.getVehicle());
                 if (dest instanceof PortalDestination) {
@@ -102,6 +107,11 @@ public class MVPVehicleListener implements Listener {
             // TODO: Money
             MVDestination d = portal.getDestination();
             if (d == null || d instanceof InvalidDestination) {
+                return false;
+            }
+
+            // Check the portal's frame.
+            if (!portal.isFrameValid(v.getLocation())) {
                 return false;
             }
 
