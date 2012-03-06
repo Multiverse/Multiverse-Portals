@@ -287,6 +287,11 @@ public class MVPPlayerListener implements Listener {
             this.plugin.log(Level.FINER, "There was a portal found!");
             MVDestination portalDest = portal.getDestination();
             if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
+                if (!portal.isFrameValid(playerPortalLoc)) {
+                    event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
+                    event.setCancelled(true);
+                    return;
+                }
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
                 if (!ps.allowTeleportViaCooldown(new Date())) {
                     event.getPlayer().sendMessage(ps.getFriendlyRemainingTimeMessage());
@@ -312,10 +317,6 @@ public class MVPPlayerListener implements Listener {
             } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
                 event.getPlayer().sendMessage("This portal " + ChatColor.RED + "doesn't go anywhere." + ChatColor.RED + " You should exit it now.");
-                event.setCancelled(true);
-            }
-            else if (!portal.isFrameValid(playerPortalLoc)) {
-                event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
                 event.setCancelled(true);
             }
         }
