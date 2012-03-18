@@ -9,6 +9,7 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import java.util.logging.Level;
 
+import com.onarandombox.MultiversePortals.MVPortal;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,10 +54,27 @@ public class MVPCoreListener implements Listener {
     @EventHandler
     public void portalTouchEvent(MVPlayerTouchedPortalEvent event) {
         this.plugin.log(Level.FINER, "Found The TouchedPortal event.");
-        Player p = event.getPlayer();
         Location l = event.getBlockTouched();
-        if (this.plugin.getPortalManager().isPortal(p, l) != null) {
-            event.setCancelled(true);
+        if (event.canUseThisPortal() && (this.plugin.getPortalManager().isPortal(l))) {
+            if (this.plugin.getPortalSession(event.getPlayer()).isDebugModeOn()) {
+                event.setCancelled(true);
+                return;
+            }
+            // This is a valid portal, and they can use it so far...
+            MVPortal p = this.plugin.getPortalManager().getPortal(event.getPlayer(), l);
+            if (p == null) {
+                // The player can't see this portal, and can't use it.
+                this.plugin.log(Level.FINER, String.format("'%s' was DENIED access to this portal event.", event.getPlayer().getName()));
+                event.setCanUseThisPortal(false);
+            } else if (p.getDestination() == null || !p.getDestination().isValid()) {
+                if (this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
+                    this.plugin.log(Level.FINE, "Allowing MVPortal to act as nether portal.");
+                    return;
+                }
+                // They can see it, is it val
+                this.plugin.getCore().getMessaging().sendMessage(event.getPlayer(), "This Multiverse Portal does not have a valid destination!", false);
+                event.setCanUseThisPortal(false);
+            }
         }
     }
 }
