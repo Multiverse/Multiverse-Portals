@@ -264,6 +264,10 @@ public class MVPPlayerListener implements Listener {
 
     @EventHandler
     public void playerPortal(PlayerPortalEvent event) {
+        if (event.isCancelled()) {
+            this.plugin.log(Level.FINE, "This Portal event was already cancelled.");
+            return;
+        }
         this.plugin.log(Level.FINER, "onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
         // Determine if we're in a portal
@@ -296,7 +300,7 @@ public class MVPPlayerListener implements Listener {
                 }
                 event.setPortalTravelAgent(agent);
                 event.useTravelAgent(true);
-                MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent);
+                MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (portalEvent.isCancelled()) {
                     event.setCancelled(true);
@@ -306,7 +310,9 @@ public class MVPPlayerListener implements Listener {
                 this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
             } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
-                event.getPlayer().sendMessage("This portal " + ChatColor.RED + "doesn't go anywhere." + ChatColor.RED + " You should exit it now.");
+                event.getPlayer().sendMessage(String.format(
+                        "This portal %sdoesn't go anywhere. You should exit it now.", ChatColor.RED));
+                this.plugin.log(Level.FINE, "Event canceled because this was a MVPortal with an invalid destination. But you had 'portalsdefaulttonether' set to false!");
                 event.setCancelled(true);
             }
         }

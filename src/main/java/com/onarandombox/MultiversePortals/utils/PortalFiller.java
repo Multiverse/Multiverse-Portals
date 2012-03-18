@@ -65,7 +65,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Right/Left: " + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
+            this.plugin.log(Level.FINEST, "Moving Right/Left: " + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 0, 1, useZ * 0).getLocation(), type)) {
@@ -73,7 +73,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Up" + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
+            this.plugin.log(Level.FINEST, "Moving Up" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * -1, 0, useZ * -1).getLocation(), type)) {
@@ -81,7 +81,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Left/Right" + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
+            this.plugin.log(Level.FINEST, "Moving Left/Right" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 0, -1, useZ * 0).getLocation(), type)) {
@@ -89,7 +89,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Down" + LocationManipulation.strCoordsRaw(tmpLoc.getLocation()));
+            this.plugin.log(Level.FINEST, "Moving Down" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
     }
