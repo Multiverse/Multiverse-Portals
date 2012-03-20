@@ -13,7 +13,8 @@ package com.onarandombox.MultiversePortals.enums;
  * @author fernferret
  */
 public enum PortalConfigProperty {
-    wand, useonmove, portalsdefaulttonether, enforceportalaccess, portalcooldown, clearonremove;
+    wand, useonmove, portalsdefaulttonether, enforceportalaccess,
+    portalcooldown, clearonremove, teleportvehicles;
 
 
     public static String getAllValues() {
