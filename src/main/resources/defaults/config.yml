@@ -13,4 +13,4 @@ portalcooldown: 1000
 clearonremove: false
 teleportvehicles: true
 framematerials: []
-version: 2.6
+version: 2.7
