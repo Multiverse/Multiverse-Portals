@@ -7,20 +7,29 @@
 
 package com.onarandombox.MultiversePortals;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 public class MVPortal {
     private String name;
@@ -38,6 +47,15 @@ public class MVPortal {
     private boolean teleportNonPlayers;
     private FileConfiguration config;
     private boolean allowSave;
+
+    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
+        Material.PORTAL, Material.LONG_GRASS, Material.VINE,
+        Material.SNOW, Material.AIR, Material.WATER,
+        Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA });
+
+    public static boolean isPortalInterior(Material material) {
+        return INTERIOR_MATERIALS.contains(material);
+    }
 
     public MVPortal(MultiversePortals instance, String name) {
         init(instance, name, true);
@@ -348,12 +366,151 @@ public class MVPortal {
         }
     }
 
+    /**
+     * Determines whether a point within the portal has a valid frame around it.
+     *
+     * @param location the location
+     * @return true if the frame around the location is valid; false otherwise
+     */
+    public boolean isFrameValid(Location l) {
+        List<Integer> validMaterialIds = MultiversePortals.FrameMaterials;
+        if (validMaterialIds == null || validMaterialIds.isEmpty()) {
+            // All frame materials are valid.
+            return true;
+        }
+
+        MultiversePortals.staticLog(Level.FINER, String.format("checking portal frame at %d,%d,%d",
+                l.getBlockX(), l.getBlockY(), l.getBlockZ()));
+
+        // Limit the search to the portal's region, extended by 1 block.
+        boolean frameValid = false;
+        {
+            MultiverseRegion r = getLocation().getRegion();
+            int useX = (r.getWidth()  == 1) ? 0 : 1;
+            int useY = (r.getHeight() == 1) ? 0 : 1;
+            int useZ = (r.getDepth()  == 1) ? 0 : 1;
+
+            // Search for a frame in each of the portal's "flat" (size 1)
+            // dimensions. If a portal's size is greater than 1 in all three
+            // dimensions, an invalid frame will be reported.
+
+            // Try a frame that's flat in the X dimension.
+            if (!frameValid && useX == 0) {
+                frameValid = isFrameValid(l, expandedRegion(r, 0, 1, 1));
+            }
+
+            // Try a frame that's flat in the Y dimension.
+            if (!frameValid && useY == 0) {
+                frameValid = isFrameValid(l, expandedRegion(r, 1, 0, 1));
+            }
+
+            // Try a frame that's flat in the Z dimension.
+            if (!frameValid && useZ == 0) {
+                frameValid = isFrameValid(l, expandedRegion(r, 1, 1, 0));
+            }
+        }
+        return frameValid;
+    }
+
+    /**
+     * Examines a frame around a location, bounded by a search region which has
+     * one dimension of size 1 and two dimensions which of size greater than
+     * one.
+     * @param location
+     * @param searchRegion
+     * @return
+     */
+    private boolean isFrameValid(Location location, MultiverseRegion searchRegion) {
+
+        int useX = (searchRegion.getWidth()  == 1) ? 0 : 1;
+        int useY = (searchRegion.getHeight() == 1) ? 0 : 1;
+        int useZ = (searchRegion.getDepth()  == 1) ? 0 : 1;
+
+        // Make sure the search region is flat in exactly one dimension.
+        if (useX + useY + useZ != 2) {
+            return false;
+        }
+
+        Level debugLevel = Level.INFO;
+
+        MultiversePortals.staticLog(debugLevel, String.format("checking portal around %d,%d,%d",
+                location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+        int commonMaterialId = -1;
+
+        World world = location.getWorld();
+
+        Set<Location> visited = new HashSet<Location>();
+        Stack<Location> frontier = new Stack<Location>();
+        frontier.push(location);
+
+        while (!frontier.isEmpty()) {
+            Location toCheck = frontier.pop();
+            visited.add(toCheck);
+
+            MultiversePortals.staticLog(debugLevel, String.format("          ... block at %d,%d,%d",
+                    toCheck.getBlockX(), toCheck.getBlockY(), toCheck.getBlockZ()));
+
+            if (isPortalInterior(toCheck.getBlock().getType())) {
+                // This is an empty block in the portal. Check each of the four
+                // neighboring locations.
+                for (int d1 = -1; d1 <= 1; d1++) {
+                    for (int d2 = -1; d2 <= 1; d2++) {
+                        if ((d1 == 0) ^ (d2 == 0)) {
+                            int dx = useX * d1;
+                            int dy = useY * (useX == 0 ? d1 : d2);
+                            int dz = useZ * d2;
+
+                            int newX = toCheck.getBlockX() + dx;
+                            int newY = toCheck.getBlockY() + dy;
+                            int newZ = toCheck.getBlockZ() + dz;
+
+                            Location toVisit = new Location(world, newX, newY, newZ);
+                            if (!searchRegion.containsVector(toVisit)) {
+                                // This empty block is on the edge of the search
+                                // region. Assume the frame is bad.
+                                return false;
+                            }
+                            if (!visited.contains(toVisit)) {
+                                frontier.add(toVisit);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                // This is a frame block. Check its material.
+                int materialId = toCheck.getBlock().getTypeId();
+                if (commonMaterialId == -1) {
+                    // This is the first frame block we've found.
+                    commonMaterialId = materialId;
+                }
+                else if (commonMaterialId != materialId) {
+                    // This frame block doesn't match other frame blocks.
+                    MultiversePortals.staticLog(debugLevel, "frame has multiple materials");
+                    return false;
+                }
+            }
+        }
+        MultiversePortals.staticLog(debugLevel, String.format("frame has common material %d", commonMaterialId));
+
+        return MultiversePortals.FrameMaterials.contains(commonMaterialId);
+    }
+
     public boolean isExempt(Player player) {
         return false;
     }
 
     public Permission getExempt() {
         return this.exempt;
+    }
+
+    private MultiverseRegion expandedRegion(MultiverseRegion r, int x, int y, int z) {
+        Vector min = new Vector().copy(r.getMinimumPoint());
+        Vector max = new Vector().copy(r.getMaximumPoint());
+        min.add(new Vector(-x, -y, -z));
+        max.add(new Vector( x,  y,  z));
+        return new MultiverseRegion(min, max, r.getWorld());
     }
 
 }
