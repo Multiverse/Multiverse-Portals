@@ -7,13 +7,14 @@
 
 package com.onarandombox.MultiversePortals;
 
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
-import org.bukkit.util.Vector;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+
+import org.bukkit.util.Vector;
+
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 public class PortalLocation {
 

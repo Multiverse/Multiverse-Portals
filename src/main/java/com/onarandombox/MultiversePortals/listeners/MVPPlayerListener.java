@@ -7,20 +7,10 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.fernferret.allpay.multiverse.GenericBank;
-import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.destination.InvalidDestination;
-import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
-import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import java.util.Date;
+import java.util.logging.Level;
+
 import com.onarandombox.MultiversePortals.enums.MoveType;
-import com.onarandombox.MultiversePortals.event.MVPortalEvent;
-import com.onarandombox.MultiversePortals.utils.PortalFiller;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,10 +22,26 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.Date;
-import java.util.logging.Level;
+import com.fernferret.allpay.multiverse.GenericBank;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.enums.TeleportResult;
+import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.event.MVPortalEvent;
+import com.onarandombox.MultiversePortals.utils.PortalFiller;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MVPPlayerListener implements Listener {
 
@@ -232,12 +238,15 @@ public class MVPPlayerListener implements Listener {
             }
 
             GenericBank bank = plugin.getCore().getBank();
-            if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(),
-                    String.format("You need %s to enter the %s portal.",
-                                  bank.getFormattedAmount(event.getPlayer(), portal.getPrice(),
-                                  portal.getCurrency()), portal.getName()))) {
-                bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                this.performTeleport(event, ps, d);
+            if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
+                // call event for other plugins
+                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
+                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
+                this.plugin.getServer().getPluginManager().callEvent(portalEvent);
+                if (!portalEvent.isCancelled()) {
+                    bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                    performTeleport(event, ps, d);
+                }
             }
         }
     }
@@ -268,6 +277,10 @@ public class MVPPlayerListener implements Listener {
 
     @EventHandler
     public void playerPortal(PlayerPortalEvent event) {
+        if (event.isCancelled()) {
+            this.plugin.log(Level.FINE, "This Portal event was already cancelled.");
+            return;
+        }
         this.plugin.log(Level.FINER, "onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
         Location playerPortalLoc = event.getPlayer().getLocation();
@@ -306,7 +319,7 @@ public class MVPPlayerListener implements Listener {
                 }
                 event.setPortalTravelAgent(agent);
                 event.useTravelAgent(true);
-                MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent);
+                MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (portalEvent.isCancelled()) {
                     event.setCancelled(true);
@@ -316,7 +329,9 @@ public class MVPPlayerListener implements Listener {
                 this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
             } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
-                event.getPlayer().sendMessage("This portal " + ChatColor.RED + "doesn't go anywhere." + ChatColor.RED + " You should exit it now.");
+                event.getPlayer().sendMessage(String.format(
+                        "This portal %sdoesn't go anywhere. You should exit it now.", ChatColor.RED));
+                this.plugin.log(Level.FINE, "Event canceled because this was a MVPortal with an invalid destination. But you had 'portalsdefaulttonether' set to false!");
                 event.setCancelled(true);
             }
         }

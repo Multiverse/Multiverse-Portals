@@ -7,13 +7,14 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
-import java.util.List;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 
 public class ConfigCommand extends PortalCommand {
 

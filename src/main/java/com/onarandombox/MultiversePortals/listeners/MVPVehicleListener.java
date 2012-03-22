@@ -7,15 +7,8 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.destination.InvalidDestination;
-import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.api.LocationManipulation;
-import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import java.util.Date;
+
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -26,7 +19,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
-import java.util.Date;
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.enums.TeleportResult;
+import com.onarandombox.MultiverseCore.api.LocationManipulation;
+import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.destination.PortalDestination;
 
 public class MVPVehicleListener implements Listener {
     private MultiversePortals plugin;
@@ -54,7 +55,7 @@ public class MVPVehicleListener implements Listener {
             // Teleport the Player
             teleportVehicle(p, v, event.getTo());
         } else {
-            MVPortal portal = this.plugin.getPortalManager().isPortal(null, event.getFrom());
+            MVPortal portal = this.plugin.getPortalManager().getPortal(event.getFrom());
             if ((portal != null) && (portal.getTeleportNonPlayers())) {
                 MVDestination dest = portal.getDestination();
                 if (dest == null || dest instanceof InvalidDestination)
