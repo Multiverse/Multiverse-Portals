@@ -11,4 +11,5 @@ portalsdefaulttonether: false
 enforceportalaccess: true
 portalcooldown: 1000
 clearonremove: false
+teleportvehicles: true
 version: 2.6
