@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -76,6 +77,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static boolean WandEnabled = true;
     public static boolean ClearOnRemove = false;
     public static boolean TeleportVehicles = true;
+
+    // Restricts the materials that can be used for the frames of portals.
+    // An empty or null list means all materials are okay.
+    public static List<Integer> FrameMaterials = null;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -220,6 +225,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
         MultiversePortals.TeleportVehicles = this.MVPConfig.getBoolean("teleportvehicles", true);
+        MultiversePortals.FrameMaterials = this.MVPConfig.getIntegerList("framematerials");
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
             this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
