@@ -431,7 +431,7 @@ public class MVPortal {
             return false;
         }
 
-        Level debugLevel = Level.INFO;
+        Level debugLevel = Level.FINER;
 
         MultiversePortals.staticLog(debugLevel, String.format("checking portal around %d,%d,%d",
                 location.getBlockX(), location.getBlockY(), location.getBlockZ()));
