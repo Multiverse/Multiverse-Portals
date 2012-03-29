@@ -289,7 +289,7 @@ public class PortalManager {
     }
     
     private int hashChunk(int cx, int cz) {
-        return (cz << 16) | (cz & 0xFFFF);
+        return (cx << 16) | (cz & 0xFFFF);
     }
     
     private void addToWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
