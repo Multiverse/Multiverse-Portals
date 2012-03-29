@@ -326,6 +326,13 @@ public class PortalManager {
     private void removeFromWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
         Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
 
+        if (chunksToPortals == null) {
+            // 'world' might be a new instance of an adventure world that's
+            // being reloaded. If that's the case, the world object won't be
+            // found in worldChunkPortals.
+            return;
+        }
+
         PortalLocation location = portal.getLocation();
         Vector min = location.getMinimum();
         Vector max = location.getMaximum();
