@@ -79,11 +79,13 @@ public class MVPortal {
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
         this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
-        if (this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.name) == null) {
+        this.permission = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.name);
+        if (this.permission == null) {
             this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
             this.plugin.getServer().getPluginManager().addPermission(this.permission);
         }
-        if (this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt." + this.name) == null) {
+        this.exempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt." + this.name);
+        if (exempt == null) {
             this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
             this.plugin.getServer().getPluginManager().addPermission(this.exempt);
         }
