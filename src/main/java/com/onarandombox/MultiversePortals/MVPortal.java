@@ -338,7 +338,11 @@ public class MVPortal {
     }
 
     public World getWorld() {
-        return this.location.getMVWorld().getCBWorld();
+        MultiverseWorld mvWorld = this.location.getMVWorld();
+        if (mvWorld == null) {
+            return null;
+        }
+        return mvWorld.getCBWorld();
     }
 
     public Permission getPermission() {

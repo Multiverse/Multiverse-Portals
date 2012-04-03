@@ -194,7 +194,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         Set<String> keys = this.MVPPortalConfig.getConfigurationSection("portals").getKeys(false);
         if (keys != null) {
             for (String pname : keys) {
-                this.portalManager.addPortal(MVPortal.loadMVPortalFromConfig(this, pname));
+                MVPortal portal = MVPortal.loadMVPortalFromConfig(this, pname);
+                if (portal.getLocation().isValidLocation()) {
+                    this.portalManager.addPortal(portal);
+                } else {
+                    staticLog(Level.WARNING, String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));
+                }
             }
             staticLog(Level.INFO, keys.size() + " - Portals(s) loaded");
         }
