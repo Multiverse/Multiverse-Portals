@@ -373,7 +373,7 @@ public class MVPortal {
     /**
      * Determines whether a point within the portal has a valid frame around it.
      *
-     * @param location the location
+     * @param l the location
      * @return true if the frame around the location is valid; false otherwise
      */
     public boolean isFrameValid(Location l) {
