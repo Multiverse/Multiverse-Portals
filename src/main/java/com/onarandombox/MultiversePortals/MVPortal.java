@@ -154,6 +154,9 @@ public class MVPortal {
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalExempt);
+        for(Player player : this.plugin.getServer().getOnlinePlayers()){
+            player.recalculatePermissions();
+        }
     }
 
     public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
