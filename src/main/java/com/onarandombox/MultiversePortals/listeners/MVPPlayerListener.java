@@ -98,7 +98,10 @@ public class MVPPlayerListener implements Listener {
                 ps.showDebugInfo(portal);
                 event.setCancelled(true);
             } else {
-
+                if (!portal.playerCanFillPortal(event.getPlayer())) {
+                    event.setCancelled(true);
+                    return;
+                }
                 Material fillMaterial = Material.WATER;
                 if (event.getBucket().equals(Material.LAVA_BUCKET)) {
                     fillMaterial = Material.LAVA;

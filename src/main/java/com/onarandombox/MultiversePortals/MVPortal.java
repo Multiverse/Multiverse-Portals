@@ -39,6 +39,7 @@ public class MVPortal {
     private String owner;
     private String portalConfigString;
     private Permission permission;
+    private Permission fillPermission;
     private Permission exempt;
     private int currency = -1;
     private double price = 0.0;
@@ -84,6 +85,12 @@ public class MVPortal {
             this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
             this.plugin.getServer().getPluginManager().addPermission(this.permission);
         }
+
+        this.fillPermission = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill." + this.name);
+        if (this.fillPermission == null) {
+            this.fillPermission = new Permission("multiverse.portal.fill." + this.name, "Allows filling the " + this.name + " portal", PermissionDefault.OP);
+            this.plugin.getServer().getPluginManager().addPermission(this.fillPermission);
+        }
         this.exempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt." + this.name);
         if (exempt == null) {
             this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
@@ -127,6 +134,7 @@ public class MVPortal {
         Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
         Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
         Permission allPortalExempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
+        Permission allPortalFill = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill.*");
         if (allPortalAccess == null) {
             allPortalAccess = new Permission("multiverse.portal.access.*");
             this.plugin.getServer().getPluginManager().addPermission(allPortalAccess);
@@ -134,6 +142,10 @@ public class MVPortal {
         if (allPortalExempt == null) {
             allPortalExempt = new Permission("multiverse.portal.exempt.*");
             this.plugin.getServer().getPluginManager().addPermission(allPortalExempt);
+        }
+        if (allPortalFill == null) {
+            allPortalFill = new Permission("multiverse.portal.fill.*");
+            this.plugin.getServer().getPluginManager().addPermission(allPortalFill);
         }
         if (allPortals == null) {
             allPortals = new Permission("multiverse.portal.*");
@@ -147,13 +159,16 @@ public class MVPortal {
         all.getChildren().put("multiverse.portal.*", true);
         allPortals.getChildren().put("multiverse.portal.access.*", true);
         allPortals.getChildren().put("multiverse.portal.exempt.*", true);
+        allPortals.getChildren().put("multiverse.portal.fill.*", true);
         allPortalAccess.getChildren().put(this.permission.getName(), true);
         allPortalExempt.getChildren().put(this.exempt.getName(), true);
+        allPortalFill.getChildren().put(this.fillPermission.getName(), true);
 
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalExempt);
+        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalFill);
         for(Player player : this.plugin.getServer().getOnlinePlayers()){
             player.recalculatePermissions();
         }
@@ -295,6 +310,10 @@ public class MVPortal {
         return (this.plugin.getCore().getMVPerms().hasPermission(player, this.permission.getName(), true));
     }
 
+    public boolean playerCanFillPortal(Player player) {
+        return (this.plugin.getCore().getMVPerms().hasPermission(player, this.fillPermission.getName(), true));
+    }
+
     public MVDestination getDestination() {
         return this.destination;
     }
@@ -354,6 +373,10 @@ public class MVPortal {
         return this.permission;
     }
 
+    public Permission getFillPermission() {
+        return this.fillPermission;
+    }
+
     public void removePermission() {
         this.removeFromUpperLists(this.permission);
         this.plugin.getServer().getPluginManager().removePermission(permission);
@@ -363,6 +386,8 @@ public class MVPortal {
         Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
         Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
         Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
+        Permission allPortalExempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
+        Permission allPortalFill = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill.*");
         if (all != null) {
             all.getChildren().remove(this.permission.getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
@@ -376,6 +401,14 @@ public class MVPortal {
         if (allPortalAccess != null) {
             allPortalAccess.getChildren().remove(this.permission.getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
+        }
+        if (allPortalExempt != null) {
+            allPortalExempt.getChildren().remove(this.exempt.getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalExempt);
+        }
+        if (allPortalFill != null) {
+            allPortalFill.getChildren().remove(this.fillPermission.getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalFill);
         }
     }
 
@@ -517,6 +550,8 @@ public class MVPortal {
     public Permission getExempt() {
         return this.exempt;
     }
+
+
 
     private MultiverseRegion expandedRegion(MultiverseRegion r, int x, int y, int z) {
         Vector min = new Vector().copy(r.getMinimumPoint());

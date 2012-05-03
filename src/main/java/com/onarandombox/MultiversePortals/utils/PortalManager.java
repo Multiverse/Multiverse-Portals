@@ -152,6 +152,7 @@ public class PortalManager {
         removed.removePermission();
         Permission portalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
         Permission exemptAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
+        Permission portalFill = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill.*");
         if (exemptAccess != null) {
             exemptAccess.getChildren().remove(removed.getExempt().getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(exemptAccess);
@@ -159,6 +160,10 @@ public class PortalManager {
         if (portalAccess != null) {
             portalAccess.getChildren().remove(removed.getPermission().getName());
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(portalAccess);
+        }
+        if (portalFill != null) {
+            portalFill.getChildren().remove(removed.getFillPermission().getName());
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(portalFill);
         }
         if (MultiversePortals.ClearOnRemove) {
             // Replace portal blocks in the portal with air. This keeps us from
@@ -170,6 +175,7 @@ public class PortalManager {
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
+        this.plugin.getServer().getPluginManager().removePermission(removed.getFillPermission());
         return removed;
     }
 

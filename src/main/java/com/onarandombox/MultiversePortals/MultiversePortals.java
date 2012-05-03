@@ -167,9 +167,19 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             Permission perm = new Permission("multiverse.portal.access.*");
             this.getServer().getPluginManager().addPermission(perm);
         }
+        if (this.getServer().getPluginManager().getPermission("multiverse.portal.fill.*") == null) {
+            Permission perm = new Permission("multiverse.portal.fill.*");
+            this.getServer().getPluginManager().addPermission(perm);
+        }
+        if (this.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*") == null) {
+            Permission perm = new Permission("multiverse.portal.exempt.*");
+            this.getServer().getPluginManager().addPermission(perm);
+        }
         // Now add these to our parent one.
         Permission allPortals = this.getServer().getPluginManager().getPermission("multiverse.portal.*");
         allPortals.getChildren().put("multiverse.portal.access.*", true);
+        allPortals.getChildren().put("multiverse.portal.exempt.*", true);
+        allPortals.getChildren().put("multiverse.portal.fill.*", true);
         this.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
 
         Permission all = this.getServer().getPluginManager().getPermission("multiverse.*");
