@@ -256,9 +256,12 @@ public class PortalPlayerSession {
 
     private void showPortalPriceInfo(MVPortal portal) {
         getPlayerFromName().sendMessage("More details for you: " + ChatColor.GREEN + portal.getDestination());
-        if (portal.getPrice() > 0) {
+        if (portal.getPrice() > 0D) {
             GenericBank bank = this.plugin.getCore().getBank();
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(getPlayerFromName(), portal.getPrice(), portal.getCurrency()));
+        } else if (portal.getPrice() < 0D) {
+            GenericBank bank = this.plugin.getCore().getBank();
+            getPlayerFromName().sendMessage("Prize: " + ChatColor.GREEN + bank.getFormattedAmount(getPlayerFromName(), Math.abs(portal.getPrice()), portal.getCurrency()));
         } else {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + "FREE!");
         }
