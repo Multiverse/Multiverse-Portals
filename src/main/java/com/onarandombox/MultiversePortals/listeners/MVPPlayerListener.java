@@ -228,6 +228,10 @@ public class MVPPlayerListener implements Listener {
             if (world == null) {
                 return;
             }
+            if (!portal.isFrameValid(loc)) {
+                //event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
+                return;
+            }
             if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
                 try {
                     if (scriptPortal(event.getPlayer(), d, portal, ps)) {
@@ -246,11 +250,6 @@ public class MVPPlayerListener implements Listener {
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
             if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
                 this.stateFailure(p.getDisplayName(), portal.getName());
-                return;
-            }
-
-            if (!portal.isFrameValid(loc)) {
-                //event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
                 return;
             }
 
