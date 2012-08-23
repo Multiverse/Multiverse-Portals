@@ -7,9 +7,11 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.io.File;
 import java.util.Date;
 import java.util.logging.Level;
 
+import buscript.multiverse.Buscript;
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -27,6 +29,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.fernferret.allpay.multiverse.GenericBank;
@@ -225,6 +228,17 @@ public class MVPPlayerListener implements Listener {
             if (world == null) {
                 return;
             }
+            if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
+                try {
+                    if (scriptPortal(event.getPlayer(), d, portal, ps)) {
+                        // Portal handled by script
+                        performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                    }
+                    return;
+                } catch (IllegalStateException ignore) {
+                    // Portal not handled by script
+                }
+            }
             if (!ps.allowTeleportViaCooldown(new Date())) {
                 p.sendMessage(ps.getFriendlyRemainingTimeMessage());
                 return;
@@ -249,7 +263,7 @@ public class MVPPlayerListener implements Listener {
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
                         bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                        performTeleport(event, ps, d);
+                        performTeleport(event.getPlayer(), event.getTo(), ps, d);
                     }
                 }
             } else {
@@ -258,7 +272,7 @@ public class MVPPlayerListener implements Listener {
                 MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (!portalEvent.isCancelled()) {
-                    performTeleport(event, ps, d);
+                    performTeleport(event.getPlayer(), event.getTo(), ps, d);
                 }
             }
         }
@@ -276,16 +290,54 @@ public class MVPPlayerListener implements Listener {
                                         playerName, portalName));
     }
 
-    private void performTeleport(PlayerMoveEvent event, PortalPlayerSession ps, MVDestination d) {
+    private void performTeleport(Player player, Location to, PortalPlayerSession ps, MVDestination d) {
         SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
-        TeleportResult result = playerTeleporter.safelyTeleport(event.getPlayer(), event.getPlayer(), d);
+        TeleportResult result = playerTeleporter.safelyTeleport(player, player, d);
         if (result == TeleportResult.SUCCESS) {
-            ps.playerDidTeleport(event.getTo());
+            ps.playerDidTeleport(to);
             ps.setTeleportTime(new Date());
-            this.stateSuccess(event.getPlayer().getDisplayName(), d.getName());
+            this.stateSuccess(player.getDisplayName(), d.getName());
         } else {
-            this.stateFailure(event.getPlayer().getDisplayName(), d.getName());
+            this.stateFailure(player.getDisplayName(), d.getName());
         }
+    }
+
+    private boolean scriptPortal(Player player, MVDestination d, MVPortal portal, PortalPlayerSession ps) {
+        Buscript buscript = plugin.getCore().getScriptAPI();
+        File handlerScript = new File(buscript.getScriptFolder(), portal.getHandlerScript());
+        if (handlerScript.exists()) {
+            TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, player);
+            buscript.getGlobalScope().put("portal", buscript.getGlobalScope(), portal);
+            buscript.getGlobalScope().put("player", buscript.getGlobalScope(), player);
+            buscript.getGlobalScope().put("travelAgent", buscript.getGlobalScope(), agent);
+            buscript.getGlobalScope().put("allowPortal", buscript.getGlobalScope(), true);
+            buscript.getGlobalScope().put("portalSession", buscript.getGlobalScope(), ps);
+            buscript.executeScript(handlerScript, player.getName());
+            buscript.getGlobalScope().put("portal", buscript.getGlobalScope(), null);
+            buscript.getGlobalScope().put("player", buscript.getGlobalScope(), null);
+            buscript.getGlobalScope().put("travelAgent", buscript.getGlobalScope(), null);
+            buscript.getGlobalScope().put("portalSession", buscript.getGlobalScope(), null);
+            Object allowObject = buscript.getGlobalScope().get("allowPortal", buscript.getGlobalScope());
+            buscript.getGlobalScope().put("allowPortal", buscript.getGlobalScope(), null);
+            if (allowObject instanceof Boolean) {
+                if (((Boolean) allowObject)) {
+                    MVPortalEvent portalEvent = new MVPortalEvent(d, player, agent, portal);
+                    this.plugin.getServer().getPluginManager().callEvent(portalEvent);
+                    if (!portalEvent.isCancelled()) {
+                        return true;
+                    }
+                    plugin.log(Level.FINE, "A plugin cancelled the portal after script handling.");
+                    return false;
+                } else {
+                    plugin.log(Level.FINE, "Portal denied by script!");
+                    return false;
+                }
+            } else {
+                plugin.log(Level.FINE, "Portal denied by script because allowPortal not a boolean!");
+                return false;
+            }
+        }
+        throw new IllegalStateException();
     }
 
     @EventHandler
@@ -319,6 +371,18 @@ public class MVPPlayerListener implements Listener {
                     return;
                 }
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
+                if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
+                    try {
+                        if (scriptPortal(event.getPlayer(), portalDest, portal, ps)) {
+                            // Portal handled by script
+                        } else {
+                            event.setCancelled(true);
+                        }
+                        return;
+                    } catch (IllegalStateException ignore) {
+                        // Portal not handled by script
+                    }
+                }
                 if (!ps.allowTeleportViaCooldown(new Date())) {
                     event.getPlayer().sendMessage(ps.getFriendlyRemainingTimeMessage());
                     event.setCancelled(true);

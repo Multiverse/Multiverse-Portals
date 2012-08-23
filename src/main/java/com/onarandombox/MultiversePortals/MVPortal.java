@@ -48,6 +48,7 @@ public class MVPortal {
     private boolean teleportNonPlayers;
     private FileConfiguration config;
     private boolean allowSave;
+    private String handlerScript;
 
     private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
         Material.PORTAL, Material.LONG_GRASS, Material.VINE,
@@ -80,6 +81,7 @@ public class MVPortal {
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
         this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
+        this.setHandlerScript(this.config.getString(this.portalConfigString + ".handlerscript", ""));
         this.permission = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.name);
         if (this.permission == null) {
             this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
@@ -358,6 +360,10 @@ public class MVPortal {
             } catch (Exception e) {
             }
         }
+        if (property.equalsIgnoreCase("handlerscript")) {
+            this.setHandlerScript(value);
+            return true;
+        }
         return false;
     }
 
@@ -367,6 +373,16 @@ public class MVPortal {
             return null;
         }
         return mvWorld.getCBWorld();
+    }
+
+    public String getHandlerScript() {
+        return handlerScript;
+    }
+
+    public void setHandlerScript(String handlerScript) {
+        this.handlerScript = handlerScript;
+        this.config.set(this.portalConfigString + ".handlerscript", this.handlerScript);
+        saveConfig();
     }
 
     public Permission getPermission() {
