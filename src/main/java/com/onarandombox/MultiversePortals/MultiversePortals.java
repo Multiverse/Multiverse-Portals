@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
@@ -379,14 +380,27 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadConfig();
     }
 
+    /**
+     * Logs a message to Multiverse-Portals's Logger.  If the Message is of fine-finest level, it will be logged to the
+     * debug log if enabled.
+     * @param level
+     * @param msg
+     * @deprecated
+     */
+    @Deprecated
     public static void staticLog(Level level, String msg) {
-        log.log(level, logPrefix + " " + msg);
-        debugLog.log(level, logPrefix + " " + msg);
+        Logging.log(level, msg);
     }
 
+    /**
+     *
+     * @param level
+     * @param msg
+     * @deprecated
+     */
+    @Deprecated
     public static void staticDebugLog(Level level, String msg) {
-        log.log(level, "[MVPortals-Debug] " + msg);
-        debugLog.log(level, "[MVPortals-Debug] " + msg);
+        Logging.log(level, msg);
     }
 
     public void setWorldEditAPI(WorldEditAPI api) {
@@ -395,15 +409,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     @Override
     public void log(Level level, String msg) {
-        if (level == Level.FINE && MultiverseCore.getStaticConfig().getGlobalDebug() >= 1) {
-            staticDebugLog(Level.INFO, msg);
-        } else if (level == Level.FINER && MultiverseCore.getStaticConfig().getGlobalDebug() >= 2) {
-            staticDebugLog(Level.INFO, msg);
-        } else if (level == Level.FINEST && MultiverseCore.getStaticConfig().getGlobalDebug() >= 3) {
-            staticDebugLog(Level.INFO, msg);
-        } else if (level != Level.FINE && level != Level.FINER && level != Level.FINEST) {
-            staticLog(level, msg);
-        }
+        Logging.log(level, msg);
     }
 
     @Override

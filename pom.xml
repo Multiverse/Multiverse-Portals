@@ -112,6 +112,37 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.dumptruckman.minecraft:Logging</include>
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.dumptruckman.minecraft.util.Logging</pattern>
+                                    <shadedPattern>com.onarandombox.MultiversePortals.util.MVPLogging
+                                    </shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.dumptruckman.minecraft.util.DebugLog</pattern>
+                                    <shadedPattern>com.onarandombox.MultiverseCore.utils.DebugFileLogger</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -141,6 +172,16 @@
             </exclusions>
         </dependency>
         <!-- End of WorldEdit Dependency -->
+
+        <!-- Start of Logging Dependency -->
+        <dependency>
+            <groupId>com.dumptruckman.minecraft</groupId>
+            <artifactId>Logging</artifactId>
+            <version>1.0.6</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <!-- End of Logging Dependency -->
 
     </dependencies>
     <distributionManagement>
