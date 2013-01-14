@@ -51,9 +51,11 @@ public class MVPPlayerListener implements Listener {
     private MultiversePortals plugin;
     private PortalFiller filler;
     private PortalManager portalManager;
+    private PlayerListenerHelper helper;
 
-    public MVPPlayerListener(MultiversePortals plugin) {
+    public MVPPlayerListener(MultiversePortals plugin, PlayerListenerHelper helper) {
         this.plugin = plugin;
+        this.helper = helper;
         this.filler = new PortalFiller(plugin.getCore());
     }
 
@@ -191,154 +193,6 @@ public class MVPPlayerListener implements Listener {
         return newLoc;
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void playerMove(PlayerMoveEvent event) {
-        if (event.isCancelled() || !MultiversePortals.UseOnMove) {
-            return;
-        }
-        Player p = event.getPlayer(); // Grab Player
-        Location loc = p.getLocation(); // Grab Location
-        /**
-         * Check the Player has actually moved a block to prevent unneeded calculations... This is to prevent huge performance drops on high player count servers.
-         */
-        PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
-        ps.setStaleLocation(loc, MoveType.PLAYER_MOVE);
-
-        // If the location is stale, ie: the player isn't actually moving xyz coords, they're looking around
-        if (ps.isStaleLocation()) {
-            return;
-        }
-        MVPortal portal = ps.getStandingInPortal();
-        // If the portal is not null
-        // AND if we did not show debug info, do the stuff
-        // The debug is meant to toggle.
-        if (portal != null && ps.doTeleportPlayer(MoveType.PLAYER_MOVE) && !ps.showDebugInfo()) {
-            MVDestination d = portal.getDestination();
-            if (d == null) {
-                return;
-            }
-            p.setFallDistance(0);
-
-            if (d instanceof InvalidDestination) {
-                this.plugin.log(Level.FINE, "Invalid Destination!");
-                return;
-            }
-
-            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(d.getLocation(p).getWorld().getName());
-            if (world == null) {
-                return;
-            }
-            if (!portal.isFrameValid(loc)) {
-                //event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
-                return;
-            }
-            if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
-                try {
-                    if (scriptPortal(event.getPlayer(), d, portal, ps)) {
-                        // Portal handled by script
-                        performTeleport(event.getPlayer(), event.getTo(), ps, d);
-                    }
-                    return;
-                } catch (IllegalStateException ignore) {
-                    // Portal not handled by script
-                }
-            }
-            if (!ps.allowTeleportViaCooldown(new Date())) {
-                p.sendMessage(ps.getFriendlyRemainingTimeMessage());
-                return;
-            }
-            // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
-            if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
-                this.stateFailure(p.getDisplayName(), portal.getName());
-                return;
-            }
-
-            if (portal.getPrice() != 0D) {
-                GenericBank bank = plugin.getCore().getBank();
-                if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
-                    // call event for other plugins
-                    TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                    MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
-                    this.plugin.getServer().getPluginManager().callEvent(portalEvent);
-                    if (!portalEvent.isCancelled()) {
-                        bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                        performTeleport(event.getPlayer(), event.getTo(), ps, d);
-                    }
-                }
-            } else {
-                // call event for other plugins
-                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
-                this.plugin.getServer().getPluginManager().callEvent(portalEvent);
-                if (!portalEvent.isCancelled()) {
-                    performTeleport(event.getPlayer(), event.getTo(), ps, d);
-                }
-            }
-        }
-    }
-
-    private void stateSuccess(String playerName, String worldName) {
-        this.plugin.log(Level.FINE, String.format(
-                                        "MV-Portals is allowing Player '%s' to use the portal '%s'.",
-                                        playerName, worldName));
-    }
-
-    private void stateFailure(String playerName, String portalName) {
-        this.plugin.log(Level.FINE, String.format(
-                                        "MV-Portals is DENYING Player '%s' access to use the portal '%s'.",
-                                        playerName, portalName));
-    }
-
-    private void performTeleport(Player player, Location to, PortalPlayerSession ps, MVDestination d) {
-        SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
-        TeleportResult result = playerTeleporter.safelyTeleport(player, player, d);
-        if (result == TeleportResult.SUCCESS) {
-            ps.playerDidTeleport(to);
-            ps.setTeleportTime(new Date());
-            this.stateSuccess(player.getDisplayName(), d.getName());
-        } else {
-            this.stateFailure(player.getDisplayName(), d.getName());
-        }
-    }
-
-    private boolean scriptPortal(Player player, MVDestination d, MVPortal portal, PortalPlayerSession ps) {
-        Buscript buscript = plugin.getCore().getScriptAPI();
-        File handlerScript = new File(buscript.getScriptFolder(), portal.getHandlerScript());
-        if (handlerScript.exists()) {
-            TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, player);
-            buscript.getGlobalScope().put("portal", buscript.getGlobalScope(), portal);
-            buscript.getGlobalScope().put("player", buscript.getGlobalScope(), player);
-            buscript.getGlobalScope().put("travelAgent", buscript.getGlobalScope(), agent);
-            buscript.getGlobalScope().put("allowPortal", buscript.getGlobalScope(), true);
-            buscript.getGlobalScope().put("portalSession", buscript.getGlobalScope(), ps);
-            buscript.executeScript(handlerScript, player.getName());
-            buscript.getGlobalScope().put("portal", buscript.getGlobalScope(), null);
-            buscript.getGlobalScope().put("player", buscript.getGlobalScope(), null);
-            buscript.getGlobalScope().put("travelAgent", buscript.getGlobalScope(), null);
-            buscript.getGlobalScope().put("portalSession", buscript.getGlobalScope(), null);
-            Object allowObject = buscript.getGlobalScope().get("allowPortal", buscript.getGlobalScope());
-            buscript.getGlobalScope().put("allowPortal", buscript.getGlobalScope(), null);
-            if (allowObject instanceof Boolean) {
-                if (((Boolean) allowObject)) {
-                    MVPortalEvent portalEvent = new MVPortalEvent(d, player, agent, portal);
-                    this.plugin.getServer().getPluginManager().callEvent(portalEvent);
-                    if (!portalEvent.isCancelled()) {
-                        return true;
-                    }
-                    plugin.log(Level.FINE, "A plugin cancelled the portal after script handling.");
-                    return false;
-                } else {
-                    plugin.log(Level.FINE, "Portal denied by script!");
-                    return false;
-                }
-            } else {
-                plugin.log(Level.FINE, "Portal denied by script because allowPortal not a boolean!");
-                return false;
-            }
-        }
-        throw new IllegalStateException();
-    }
-
     @EventHandler
     public void playerPortal(PlayerPortalEvent event) {
         if (event.isCancelled()) {
@@ -372,7 +226,7 @@ public class MVPPlayerListener implements Listener {
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
                 if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
                     try {
-                        if (scriptPortal(event.getPlayer(), portalDest, portal, ps)) {
+                        if (helper.scriptPortal(event.getPlayer(), portalDest, portal, ps)) {
                             // Portal handled by script
                         } else {
                             event.setCancelled(true);

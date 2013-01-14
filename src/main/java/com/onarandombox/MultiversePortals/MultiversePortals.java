@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.dumptruckman.minecraft.util.Logging;
+import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
+import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
@@ -132,7 +134,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private void registerEvents() {
         // Initialize our listeners
         MVPPluginListener pluginListener = new MVPPluginListener(this);
-        MVPPlayerListener playerListener = new MVPPlayerListener(this);
+        PlayerListenerHelper playerListenerHelper = new PlayerListenerHelper(this);
+        MVPPlayerListener playerListener = new MVPPlayerListener(this, playerListenerHelper);
+        if (MultiversePortals.UseOnMove) {
+            MVPPlayerMoveListener moveListener = new MVPPlayerMoveListener(this, playerListenerHelper);
+        }
         MVPBlockListener blockListener = new MVPBlockListener(this);
         MVPVehicleListener vehicleListener = new MVPVehicleListener(this);
         MVPCoreListener coreListener = new MVPCoreListener(this);
