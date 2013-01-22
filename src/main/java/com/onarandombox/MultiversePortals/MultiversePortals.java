@@ -70,7 +70,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     protected WorldEditAPI worldEditAPI = null;
 
     private PortalManager portalManager;
-    private Map<Player, PortalPlayerSession> portalSessions;
+    private Map<String, PortalPlayerSession> portalSessions;
 
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
@@ -119,7 +119,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.createDefaultPerms();
 
         this.portalManager = new PortalManager(this);
-        this.portalSessions = new HashMap<Player, PortalPlayerSession>();
+        this.portalSessions = new HashMap<String, PortalPlayerSession>();
         this.getCore().getDestFactory().registerDestinationType(PortalDestination.class, "p");
 
         this.loadPortals();
@@ -136,9 +136,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         MVPPluginListener pluginListener = new MVPPluginListener(this);
         PlayerListenerHelper playerListenerHelper = new PlayerListenerHelper(this);
         MVPPlayerListener playerListener = new MVPPlayerListener(this, playerListenerHelper);
-        if (MultiversePortals.UseOnMove) {
-            MVPPlayerMoveListener moveListener = new MVPPlayerMoveListener(this, playerListenerHelper);
-        }
         MVPBlockListener blockListener = new MVPBlockListener(this);
         MVPVehicleListener vehicleListener = new MVPVehicleListener(this);
         MVPCoreListener coreListener = new MVPCoreListener(this);
@@ -150,6 +147,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         pm.registerEvents(blockListener, this);
         if (MultiversePortals.TeleportVehicles) {
             pm.registerEvents(vehicleListener, this);
+        }
+        if (MultiversePortals.UseOnMove) {
+            pm.registerEvents(new MVPPlayerMoveListener(this, playerListenerHelper), this);
         }
         pm.registerEvents(coreListener, this);
     }
@@ -195,11 +195,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public PortalPlayerSession getPortalSession(Player p) {
-        if (this.portalSessions.containsKey(p)) {
-            return this.portalSessions.get(p);
+        if (this.portalSessions.containsKey(p.getName())) {
+            return this.portalSessions.get(p.getName());
         }
         PortalPlayerSession session = new PortalPlayerSession(this, p);
-        this.portalSessions.put(p, session);
+        this.portalSessions.put(p.getName(), session);
         return session;
     }
 
