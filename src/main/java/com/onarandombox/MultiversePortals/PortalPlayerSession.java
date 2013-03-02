@@ -17,7 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.fernferret.allpay.multiverse.GenericBank;
+import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;

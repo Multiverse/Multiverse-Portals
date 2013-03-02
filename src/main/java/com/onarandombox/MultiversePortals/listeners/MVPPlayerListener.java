@@ -32,7 +32,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import com.fernferret.allpay.multiverse.GenericBank;
+import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;

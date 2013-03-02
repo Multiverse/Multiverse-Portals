@@ -8,7 +8,7 @@
 package com.onarandombox.MultiversePortals.listeners;
 
 import buscript.multiverse.Buscript;
-import com.fernferret.allpay.multiverse.GenericBank;
+import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
