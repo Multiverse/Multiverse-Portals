@@ -7,40 +7,25 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import buscript.multiverse.Buscript;
 import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
-import com.onarandombox.MultiverseCore.enums.TeleportResult;
 import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
-import com.onarandombox.MultiversePortals.utils.PortalFiller;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
-import org.bukkit.ChatColor;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.TravelAgent;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerBucketFillEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.io.File;
 import java.util.Date;
 import java.util.logging.Level;
 
@@ -117,16 +102,23 @@ public class MVPPlayerMoveListener implements Listener {
             }
 
             if (portal.getPrice() != 0D) {
-                GenericBank bank = plugin.getCore().getBank();
-                if (bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal.")) {
+                final Economy vaultEco = (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) ? plugin.getCore().getVaultHandler().getEconomy() : null;
+                final GenericBank bank = vaultEco == null ? plugin.getCore().getBank() : null;
+                if ((vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
                     // call event for other plugins
                     TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
                     MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
-                        bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                        if (vaultEco != null) {
+                            vaultEco.withdrawPlayer(event.getPlayer().getName(), portal.getPrice());
+                        } else {
+                            bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                        }
                         helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
                     }
+                } else if (vaultEco != null) {
+                    p.sendMessage("You need " + vaultEco.format(portal.getPrice()) + " to enter the " + portal.getName() + " portal.");
                 }
             } else {
                 // call event for other plugins

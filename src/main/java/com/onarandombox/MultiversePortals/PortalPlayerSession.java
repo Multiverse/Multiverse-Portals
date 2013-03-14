@@ -17,7 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
@@ -257,11 +256,21 @@ public class PortalPlayerSession {
     private void showPortalPriceInfo(MVPortal portal) {
         getPlayerFromName().sendMessage("More details for you: " + ChatColor.GREEN + portal.getDestination());
         if (portal.getPrice() > 0D) {
-            GenericBank bank = this.plugin.getCore().getBank();
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + bank.getFormattedAmount(getPlayerFromName(), portal.getPrice(), portal.getCurrency()));
+            final String formattedAmount;
+            if (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) {
+                formattedAmount = plugin.getCore().getVaultHandler().getEconomy().format(portal.getPrice());
+            } else {
+                formattedAmount = this.plugin.getCore().getBank().getFormattedAmount(getPlayerFromName(), portal.getPrice(), portal.getCurrency());
+            }
+            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + formattedAmount);
         } else if (portal.getPrice() < 0D) {
-            GenericBank bank = this.plugin.getCore().getBank();
-            getPlayerFromName().sendMessage("Prize: " + ChatColor.GREEN + bank.getFormattedAmount(getPlayerFromName(), Math.abs(portal.getPrice()), portal.getCurrency()));
+            final String formattedAmount;
+            if (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) {
+                formattedAmount = plugin.getCore().getVaultHandler().getEconomy().format(Math.abs(portal.getPrice()));
+            } else {
+                formattedAmount = this.plugin.getCore().getBank().getFormattedAmount(getPlayerFromName(), Math.abs(portal.getPrice()), portal.getCurrency());
+            }
+            getPlayerFromName().sendMessage("Prize: " + ChatColor.GREEN + formattedAmount);
         } else {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + "FREE!");
         }
