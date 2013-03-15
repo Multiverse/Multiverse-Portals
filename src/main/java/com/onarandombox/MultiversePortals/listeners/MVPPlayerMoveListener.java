@@ -7,6 +7,7 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -104,16 +105,26 @@ public class MVPPlayerMoveListener implements Listener {
             if (portal.getPrice() != 0D) {
                 final Economy vaultEco = (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) ? plugin.getCore().getVaultHandler().getEconomy() : null;
                 final GenericBank bank = vaultEco == null ? plugin.getCore().getBank() : null;
-                if ((vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
+                if (portal.getPrice() < 0D || (vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
                     // call event for other plugins
                     TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
                     MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
                         if (vaultEco != null) {
-                            vaultEco.withdrawPlayer(event.getPlayer().getName(), portal.getPrice());
+                            if (portal.getPrice() < 0D) {
+                                p.sendMessage(String.format("You have earned %s for using %s.", vaultEco.format(-portal.getPrice()), portal.getName()));
+                                vaultEco.depositPlayer(event.getPlayer().getName(), -portal.getPrice());
+                            } else {
+                                p.sendMessage(String.format("You have been charged %s for using %s.", vaultEco.format(portal.getPrice()), portal.getName()));
+                                vaultEco.withdrawPlayer(event.getPlayer().getName(), portal.getPrice());
+                            }
                         } else {
-                            bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                            if (portal.getPrice() < 0D) {
+                                bank.give(event.getPlayer(), -portal.getPrice(), portal.getCurrency());
+                            } else {
+                                bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                            }
                         }
                         helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
                     }

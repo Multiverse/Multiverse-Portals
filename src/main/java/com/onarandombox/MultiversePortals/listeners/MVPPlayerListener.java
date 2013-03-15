@@ -10,12 +10,15 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.fernferret.allpay.multiverse.commons.GenericBank;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -196,6 +199,7 @@ public class MVPPlayerListener implements Listener {
         Location playerPortalLoc = event.getPlayer().getLocation();
         // Determine if we're in a portal
         MVPortal portal = pm.getPortal(event.getPlayer(), playerPortalLoc);
+        Player p = event.getPlayer();
         // Even if the location was null, we still have to see if
         // someone wasn't exactly on (because they can do this).
         if (portal == null) {
@@ -239,16 +243,55 @@ public class MVPPlayerListener implements Listener {
                     SafeTTeleporter teleporter = this.plugin.getCore().getSafeTTeleporter();
                     event.setTo(teleporter.getSafeLocation(event.getPlayer(), portalDest));
                 }
-                event.setPortalTravelAgent(agent);
-                event.useTravelAgent(true);
-                MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent, portal);
-                this.plugin.getServer().getPluginManager().callEvent(portalEvent);
-                if (portalEvent.isCancelled()) {
-                    event.setCancelled(true);
-                    this.plugin.log(Level.FINE, "Someone cancelled the MVPlayerPortal Event!");
-                    return;
+                final Economy vaultEco = (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) ? plugin.getCore().getVaultHandler().getEconomy() : null;
+                final GenericBank bank = vaultEco == null ? plugin.getCore().getBank() : null;
+                boolean canAfford = false;
+                boolean shouldPay = false;
+                if (portal.getPrice() != 0D) {
+                    shouldPay = true;
+                    if (portal.getPrice() < 0D || (vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
+                        canAfford = true;
+                    } else if (vaultEco != null) {
+                        p.sendMessage("You need " + vaultEco.format(portal.getPrice()) + " to enter the " + portal.getName() + " portal.");
+                        event.setCancelled(true);
+                        return;
+                    } else if (bank != null) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                } else {
+                    canAfford = true;
                 }
-                this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
+                if (canAfford) {
+                    event.setPortalTravelAgent(agent);
+                    event.useTravelAgent(true);
+                    MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent, portal);
+                    this.plugin.getServer().getPluginManager().callEvent(portalEvent);
+                    if (portalEvent.isCancelled()) {
+                        event.setCancelled(true);
+                        this.plugin.log(Level.FINE, "Someone cancelled the MVPlayerPortal Event!");
+                        return;
+                    } else {
+                        if (shouldPay) {
+                            if (vaultEco != null) {
+                                if (portal.getPrice() < 0D) {
+                                    p.sendMessage(String.format("You have earned %s for using %s.", vaultEco.format(-portal.getPrice()), portal.getName()));
+                                    vaultEco.depositPlayer(event.getPlayer().getName(), -portal.getPrice());
+                                } else {
+                                    p.sendMessage(String.format("You have been charged %s for using %s.", vaultEco.format(portal.getPrice()), portal.getName()));
+                                    vaultEco.withdrawPlayer(event.getPlayer().getName(), portal.getPrice());
+                                }
+                            } else {
+                                if (portal.getPrice() < 0D) {
+                                    bank.give(event.getPlayer(), -portal.getPrice(), portal.getCurrency());
+                                } else {
+                                    bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
+                                }
+                            }
+                        }
+                    }
+                    this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
+                }
             } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
                 event.getPlayer().sendMessage(String.format(
