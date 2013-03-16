@@ -247,7 +247,7 @@ public class MVPPlayerListener implements Listener {
                 final GenericBank bank = vaultEco == null ? plugin.getCore().getBank() : null;
                 boolean canAfford = false;
                 boolean shouldPay = false;
-                if (portal.getPrice() != 0D) {
+                if (portal.getPrice() != 0D && !p.hasPermission(portal.getExempt())) {
                     shouldPay = true;
                     if (portal.getPrice() < 0D || (vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
                         canAfford = true;

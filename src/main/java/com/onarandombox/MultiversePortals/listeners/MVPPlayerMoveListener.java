@@ -102,7 +102,7 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
 
-            if (portal.getPrice() != 0D) {
+            if (portal.getPrice() != 0D && !p.hasPermission(portal.getExempt())) {
                 final Economy vaultEco = (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) ? plugin.getCore().getVaultHandler().getEconomy() : null;
                 final GenericBank bank = vaultEco == null ? plugin.getCore().getBank() : null;
                 if (portal.getPrice() < 0D || (vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
