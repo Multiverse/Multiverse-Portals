@@ -38,15 +38,18 @@ public class PlayerListenerHelper {
     }
 
     void performTeleport(Player player, Location to, PortalPlayerSession ps, MVDestination d) {
-        SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
-        TeleportResult result = playerTeleporter.safelyTeleport(player, player, d);
-        if (result == TeleportResult.SUCCESS) {
-            ps.playerDidTeleport(to);
-            ps.setTeleportTime(new Date());
-            this.stateSuccess(player.getDisplayName(), d.getName());
-        } else {
-            this.stateFailure(player.getDisplayName(), d.getName());
+        if ((d.getRequiredPermission() == null) || (d.getRequiredPermission().length() == 0)
+                || player.hasPermission(d.getRequiredPermission())) {
+            SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
+            TeleportResult result = playerTeleporter.safelyTeleport(player, player, d);
+            if (result == TeleportResult.SUCCESS) {
+                ps.playerDidTeleport(to);
+                ps.setTeleportTime(new Date());
+                this.stateSuccess(player.getDisplayName(), d.getName());
+                return;
+            }
         }
+        this.stateFailure(player.getDisplayName(), d.getName());
     }
 
     boolean scriptPortal(Player player, MVDestination d, MVPortal portal, PortalPlayerSession ps) {
