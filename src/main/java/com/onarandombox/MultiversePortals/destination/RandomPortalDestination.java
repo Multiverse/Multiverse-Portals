@@ -57,7 +57,8 @@ public class RandomPortalDestination implements MVDestination {
         // iterate over splits, split[0] = getIdentifier()
         MVPortal portal;
         for (int i = 1; i < split.length; i++)
-            if ((portal = portalPlugin.getPortalManager().getPortal(split[i])) != null)
+            if (((portal = portalPlugin.getPortalManager().getPortal(split[i])) != null)
+                    && (portal.getDestination() != null))
                 this.portals.add(portal);
     }
 
