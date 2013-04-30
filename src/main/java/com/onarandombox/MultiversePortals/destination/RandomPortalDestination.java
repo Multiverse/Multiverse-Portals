@@ -7,6 +7,7 @@
 
 package com.onarandombox.MultiversePortals.destination;
 
+import com.onarandombox.MultiverseCore.api.Core;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.utils.BlockSafety;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
@@ -26,6 +27,7 @@ import java.util.Random;
 public class RandomPortalDestination implements MVDestination {
     private static final Random RANDOM = new Random();
     private List<MVPortal> portals;
+    private Core core;
 
     @Override
     public String getIdentifier() {
@@ -34,13 +36,33 @@ public class RandomPortalDestination implements MVDestination {
 
     @Override
     public boolean isThisType(JavaPlugin plugin, String dest) {
+        this.core = (Core) plugin.getServer().getPluginManager().getPlugin("Multiverse-Core");
         // If this class exists, then this plugin MUST exist!
         return dest.startsWith("rp:");
     }
 
     @Override
     public Location getLocation(Entity e) {
-        return portals.get(RANDOM.nextInt(portals.size())).getDestination().getLocation(e);
+        MVPortal portal = portals.get(RANDOM.nextInt(portals.size()));
+        PortalLocation pl = portal.getLocation();
+        double portalWidth = Math.abs((pl.getMaximum().getBlockX()) - pl.getMinimum().getBlockX()) + 1;
+        double portalDepth = Math.abs((pl.getMaximum().getBlockZ()) - pl.getMinimum().getBlockZ()) + 1;
+
+        double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
+        double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
+        double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(),
+                pl.getMaximum().getBlockY(), portal.getWorld());
+        return new Location(portal.getWorld(), finalX, finalY, finalZ);
+    }
+
+    // copied from PortalDestination...
+    private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
+        for (int i = y; i < yMax; i++) {
+            if (core.getBlockSafety().playerCanSpawnHereSafely(w, finalX, i, finalZ)) {
+                return i;
+            }
+        }
+        return y;
     }
 
     @Override
