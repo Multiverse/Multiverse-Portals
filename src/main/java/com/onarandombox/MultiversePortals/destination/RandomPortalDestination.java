@@ -40,8 +40,7 @@ public class RandomPortalDestination implements MVDestination {
 
     @Override
     public Location getLocation(Entity e) {
-        MVDestination dest = portals.get(RANDOM.nextInt(portals.size())).getDestination();
-        return (dest != null) ? dest.getLocation(e) : null;
+        return portals.get(RANDOM.nextInt(portals.size())).getDestination().getLocation(e);
     }
 
     @Override
