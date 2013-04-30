@@ -45,6 +45,7 @@ import com.onarandombox.MultiversePortals.commands.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands.SelectCommand;
 import com.onarandombox.MultiversePortals.commands.WandCommand;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.MultiversePortals.destination.RandomPortalDestination;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
@@ -121,6 +122,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.portalManager = new PortalManager(this);
         this.portalSessions = new HashMap<String, PortalPlayerSession>();
         this.getCore().getDestFactory().registerDestinationType(PortalDestination.class, "p");
+        this.getCore().getDestFactory().registerDestinationType(RandomPortalDestination.class, "rp");
 
         this.loadPortals();
         this.loadConfig();
