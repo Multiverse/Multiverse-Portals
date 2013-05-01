@@ -241,6 +241,7 @@ public class MVPPlayerListener implements Listener {
                 // No longer checking exemption status
                 if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true)) {
                     this.helper.stateFailure(p.getDisplayName(), portal.getName());
+                    event.setCancelled(true);
                     return;
                 }
                 TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
