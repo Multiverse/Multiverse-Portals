@@ -238,7 +238,8 @@ public class MVPPlayerListener implements Listener {
                     return;
                 }
                 // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
-                if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true) && !portal.isExempt(event.getPlayer())) {
+                // No longer checking exemption status
+                if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true)) {
                     this.helper.stateFailure(p.getDisplayName(), portal.getName());
                     return;
                 }

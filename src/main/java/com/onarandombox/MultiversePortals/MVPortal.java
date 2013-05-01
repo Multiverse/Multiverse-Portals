@@ -559,6 +559,7 @@ public class MVPortal {
         return MultiversePortals.FrameMaterials.contains(commonMaterialId);
     }
 
+    @Deprecated
     public boolean isExempt(Player player) {
         return false;
     }
