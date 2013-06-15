@@ -38,8 +38,8 @@ public class PlayerListenerHelper {
     }
 
     void performTeleport(Player player, Location to, PortalPlayerSession ps, MVDestination d) {
-        if ((d.getRequiredPermission() == null) || (d.getRequiredPermission().length() == 0)
-                || player.hasPermission(d.getRequiredPermission())) {
+        if (!plugin.getCore().getMVConfig().getEnforceAccess() || (d.getRequiredPermission() == null)
+                || (d.getRequiredPermission().length() == 0) || player.hasPermission(d.getRequiredPermission())) {
             SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
             TeleportResult result = playerTeleporter.safelyTeleport(player, player, d);
             if (result == TeleportResult.SUCCESS) {
