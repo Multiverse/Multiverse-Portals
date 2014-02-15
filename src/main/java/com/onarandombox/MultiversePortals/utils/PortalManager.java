@@ -136,6 +136,10 @@ public class PortalManager {
     }
 
     public MVPortal removePortal(String portalName, boolean removeFromConfigs) {
+        return removePortal(portalName, removeFromConfigs, false);
+    }
+
+    private MVPortal removePortal(String portalName, boolean removeFromConfigs, boolean delayRecalculation) {
         if (!isPortal(portalName)) {
             return null;
         }
@@ -155,16 +159,18 @@ public class PortalManager {
         Permission portalFill = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill.*");
         if (exemptAccess != null) {
             exemptAccess.getChildren().remove(removed.getExempt().getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(exemptAccess);
         }
         if (portalAccess != null) {
             portalAccess.getChildren().remove(removed.getPermission().getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(portalAccess);
         }
         if (portalFill != null) {
             portalFill.getChildren().remove(removed.getFillPermission().getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(portalFill);
         }
+
+        if (!delayRecalculation) {
+            recalculatePermissions();
+        }
+
         if (MultiversePortals.ClearOnRemove) {
             // Replace portal blocks in the portal with air. This keeps us from
             // leaving behind portal blocks (which would take an unsuspecting
@@ -177,6 +183,14 @@ public class PortalManager {
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
         this.plugin.getServer().getPluginManager().removePermission(removed.getFillPermission());
         return removed;
+    }
+
+    private void recalculatePermissions() {
+        String[] permissionsNames = new String[] { "multiverse.portal.access.*", "multiverse.portal.exempt.*", "multiverse.portal.fill.*" };
+        for (String permissionName : permissionsNames) {
+            Permission permission = this.plugin.getServer().getPluginManager().getPermission(permissionName);
+            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(permission);
+        }
     }
 
     public List<MVPortal> getAllPortals() {
@@ -259,8 +273,9 @@ public class PortalManager {
     public void removeAll(boolean removeFromConfigs) {
         List<String> iterList = new ArrayList<String>(this.portals.keySet());
         for (String s : iterList) {
-            this.removePortal(s, removeFromConfigs);
+            this.removePortal(s, removeFromConfigs, true);
         }
+        recalculatePermissions();
     }
     
     private void replaceInRegion(World world, MultiverseRegion removedRegion, Material oldMaterial, Material newMaterial) {
