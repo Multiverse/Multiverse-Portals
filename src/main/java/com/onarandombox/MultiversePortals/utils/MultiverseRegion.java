@@ -23,6 +23,17 @@ public class MultiverseRegion {
     private Vector max;
     private MultiverseWorld world;
 
+    public MultiverseRegion(Vector pos1, Vector pos2, MultiverseWorld w) {
+        this.min = Vector.getMinimum(pos1, pos2);
+        this.max = Vector.getMaximum(pos1, pos2);
+        this.world = w;
+    }
+
+    public MultiverseRegion(Location pos1, Location pos2, MultiverseWorld w) {
+        this(pos1.toVector(), pos2.toVector(), w);
+    }
+
+    @Deprecated
     public MultiverseRegion(Object pos1, Object pos2, MultiverseWorld w) {
         // Creating soft dependencies on WE
         if (pos1 instanceof com.sk89q.worldedit.Vector && pos2 instanceof com.sk89q.worldedit.Vector) {
@@ -34,12 +45,6 @@ public class MultiverseRegion {
             this.max = Vector.getMaximum(tmp1, tmp2);
             this.world = w;
         }
-    }
-
-    public MultiverseRegion(Vector pos1, Vector pos2, MultiverseWorld w) {
-        this.min = Vector.getMinimum(pos1, pos2);
-        this.max = Vector.getMaximum(pos1, pos2);
-        this.world = w;
     }
 
     public Vector getMinimumPoint() {

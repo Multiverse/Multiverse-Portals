@@ -10,7 +10,6 @@ package com.onarandombox.MultiversePortals;
 import java.util.Date;
 import java.util.logging.Level;
 
-import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -18,8 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
+import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public class PortalPlayerSession {
     private MultiversePortals plugin;
@@ -128,7 +129,7 @@ public class PortalPlayerSession {
     }
 
     public boolean setLeftClickSelection(Vector v, MultiverseWorld world) {
-        if(!this.plugin.isWandEnabled()) {
+        if (!this.plugin.isWandEnabled()) {
             return false;
         }
         this.leftClick = v;
@@ -143,7 +144,7 @@ public class PortalPlayerSession {
     }
 
     public boolean setRightClickSelection(Vector v, MultiverseWorld world) {
-        if(!this.plugin.isWandEnabled()) {
+        if (!this.plugin.isWandEnabled()) {
             return false;
         }
         this.rightClick = v;
@@ -159,36 +160,49 @@ public class PortalPlayerSession {
     }
 
     public MultiverseRegion getSelectedRegion() {
-        // Did not find WE
-        MultiverseRegion r = null;
-        if (this.plugin.getWEAPI() != null) {
-            System.out.println("WEAPI");
+        Player player = getPlayerFromName();
+        if (plugin.isWorldEditEnabled()) {
             try {
-                // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
-                r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMinimumPoint(),
-                        this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMaximumPoint(),
-                        this.plugin.getCore().getMVWorldManager().getMVWorld(this.getPlayerFromName().getWorld().getName()));
-            } catch (Exception e) {
-                this.getPlayerFromName().sendMessage("You haven't finished your selection.");
+                Selection selection = plugin.getWorldEdit().getSelection(player);
+                if (selection == null) {
+                    player.sendMessage(ChatColor.RED + "You must have a WorldEdit selection to do this!");
+                    return null;
+                }
+
+                Location minimumPoint = selection.getMinimumPoint();
+                Location maximumPoint = selection.getMaximumPoint();
+                if (minimumPoint == null || maximumPoint == null) {
+                    player.sendMessage(ChatColor.RED + "You must finish your selection first!");
+                    return null;
+                }
+
+                MultiverseWorld mvWorld = plugin.getCore().getMVWorldManager().getMVWorld(player.getWorld().getName());
+                return new MultiverseRegion(selection.getMinimumPoint(), selection.getMaximumPoint(), mvWorld);
+            } catch (Throwable ex) {
+                player.sendMessage(ChatColor.RED + "Encountered an exception, check console!");
+                plugin.getLogger().log(Level.SEVERE, "Failed to get WorldEdit selection for portal creation", ex);
                 return null;
             }
-            return r;
         }
+
         // They're using our crappy selection:
         if (this.leftClick == null) {
-            this.getPlayerFromName().sendMessage("You need to LEFT click on a block with your wand!");
+            player.sendMessage("You need to LEFT click on a block with your wand!");
             return null;
         }
+
         if (this.rightClick == null) {
-            this.getPlayerFromName().sendMessage("You need to RIGHT click on a block with your wand!");
+            player.sendMessage("You need to RIGHT click on a block with your wand!");
             return null;
         }
+
         if (!this.leftClickWorld.equals(this.rightClickWorld)) {
-            this.getPlayerFromName().sendMessage("You need to select both coords in the same world!");
-            this.getPlayerFromName().sendMessage("Left Click Position was in:" + this.leftClickWorld.getColoredWorldString());
-            this.getPlayerFromName().sendMessage("Right Click Position was in:" + this.rightClickWorld.getColoredWorldString());
+            player.sendMessage("You need to select both coords in the same world!");
+            player.sendMessage("Left Click Position was in:" + this.leftClickWorld.getColoredWorldString());
+            player.sendMessage("Right Click Position was in:" + this.rightClickWorld.getColoredWorldString());
             return null;
         }
+
         return new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
     }
 
@@ -296,8 +310,8 @@ public class PortalPlayerSession {
     }
 
     public String getFriendlyRemainingTimeMessage() {
-        String remaining = "There is a portal " + ChatColor.AQUA + "cooldown" + ChatColor.WHITE + " in effect. Please try again in " + ChatColor.GOLD
-        + Integer.toString((int) this.getRemainingCooldown() / 1000) + "s.";
+        String remaining = "There is a portal " + ChatColor.AQUA + "cooldown" + ChatColor.WHITE + " in effect. Please try again in "
+                + ChatColor.GOLD + Integer.toString((int) this.getRemainingCooldown() / 1000) + "s.";
         int time = (int) this.getRemainingCooldown() / 1000;
         // Account for the fact that 0 seconds means 1
         time++;
@@ -310,7 +324,7 @@ public class PortalPlayerSession {
     }
 
     public long getRemainingCooldown() {
-        //Calculate the remaining cooldown period
+        // Calculate the remaining cooldown period
         long remainingcooldown = (this.plugin.getCooldownTime() - ((new Date()).getTime() - this.lastTeleportTime.getTime()));
         if (remainingcooldown < 0) {
             remainingcooldown = 0;
