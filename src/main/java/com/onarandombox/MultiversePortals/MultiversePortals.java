@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -28,7 +27,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.commands.HelpCommand;
@@ -58,7 +56,6 @@ import com.pneumaticraft.commandhandler.multiverse.CommandHandler;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
-    private static final Logger log = Logger.getLogger("Minecraft");
     private static final String logPrefix = "[Multiverse-Portals] ";
     protected static DebugLog debugLog;
     private MultiverseCore core;
@@ -97,21 +94,21 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         // Test if the Core was found, if not we'll disable this plugin.
         if (this.core == null) {
-            log.info(logPrefix + "Multiverse-Core not found, will keep looking.");
+            getLogger().info(logPrefix + "Multiverse-Core not found, will keep looking.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         if (this.core.getProtocolVersion() < requiresProtocol) {
-            log.severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
-            log.severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
-            log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
-            log.severe(logPrefix + "Grab an updated copy at: ");
-            log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
+            getLogger().severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
+            getLogger().severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
+            getLogger().severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
+            getLogger().severe(logPrefix + "Grab an updated copy at: ");
+            getLogger().severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         // Turn on Logging and register ourselves with Core
-        log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
+        getLogger().info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
         this.core.incrementPluginCount();
 
