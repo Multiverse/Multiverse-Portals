@@ -10,8 +10,8 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
-import com.fernferret.allpay.multiverse.commons.GenericBank;
 import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
@@ -166,7 +167,7 @@ public class MVPPlayerListener implements Listener {
         // If we Found WorldEdit, return, we're not needed here.
         // If the item is not the Wand we've stetup we're not needed either
         // If the player doesn't have the perms, return also.
-        if (this.plugin.getWEAPI() != null || event.getPlayer().getItemInHand().getTypeId() != itemType || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+        if (plugin.isWorldEditEnabled() || event.getPlayer().getItemInHand().getTypeId() != itemType || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;
         }
 

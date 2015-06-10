@@ -16,11 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import com.dumptruckman.minecraft.util.Logging;
-import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
-import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
@@ -47,19 +43,19 @@ import com.onarandombox.MultiversePortals.commands.WandCommand;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import com.onarandombox.MultiversePortals.destination.RandomPortalDestination;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
+import com.onarandombox.MultiversePortals.integration.WorldEditHandler;
 import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
 import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
+import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.pneumaticraft.commandhandler.multiverse.CommandHandler;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
-    private static final Logger log = Logger.getLogger("Minecraft");
     private static final String logPrefix = "[Multiverse-Portals] ";
     protected static DebugLog debugLog;
     private MultiverseCore core;
@@ -68,7 +64,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private FileConfiguration MVPConfig;
 
     private CommandHandler commandHandler;
-    protected WorldEditAPI worldEditAPI = null;
+
+    protected WorldEditHandler worldEdit = null;
 
     private PortalManager portalManager;
     private Map<String, PortalPlayerSession> portalSessions;
@@ -86,30 +83,32 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     // An empty or null list means all materials are okay.
     public static List<Integer> FrameMaterials = null;
 
+    @Override
     public void onLoad() {
         getDataFolder().mkdirs();
     }
 
+    @Override
     public void onEnable() {
         this.core = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         // Test if the Core was found, if not we'll disable this plugin.
         if (this.core == null) {
-            log.info(logPrefix + "Multiverse-Core not found, will keep looking.");
+            getLogger().info(logPrefix + "Multiverse-Core not found, will keep looking.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         if (this.core.getProtocolVersion() < requiresProtocol) {
-            log.severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
-            log.severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
-            log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
-            log.severe(logPrefix + "Grab an updated copy at: ");
-            log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
+            getLogger().severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
+            getLogger().severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
+            getLogger().severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
+            getLogger().severe(logPrefix + "Grab an updated copy at: ");
+            getLogger().severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         // Turn on Logging and register ourselves with Core
-        log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
+        getLogger().info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
         debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
         this.core.incrementPluginCount();
 
@@ -160,10 +159,19 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
      * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make
      * sure
      */
-    private void checkForWorldEdit() {
-        if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-            this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
+    public void checkForWorldEdit() {
+        try {
+            worldEdit = new WorldEditHandler(this);
+        } catch (Throwable ex) {
         }
+    }
+
+    public boolean isWorldEditEnabled() {
+        return worldEdit != null && worldEdit.isEnabled();
+    }
+
+    public WorldEditHandler getWorldEdit() {
+        return worldEdit;
     }
 
     /** Create the higher level permissions so we can add finer ones to them. */
@@ -302,6 +310,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         }
     }
 
+    @Override
     public void onDisable() {
 
     }
@@ -353,10 +362,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return authors.substring(2);
     }
 
-    public WorldEditAPI getWEAPI() {
-        return this.worldEditAPI;
-    }
-
+    @Override
     public MultiverseCore getCore() {
         return this.core;
     }
@@ -369,6 +375,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return this.MVPPortalConfig;
     }
 
+    @Override
     public void setCore(MultiverseCore multiverseCore) {
         this.core = multiverseCore;
     }
@@ -389,8 +396,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     /**
-     * Logs a message to Multiverse-Portals's Logger.  If the Message is of fine-finest level, it will be logged to the
+     * Logs a message to Multiverse-Portals's Logger. If the Message is of fine-finest level, it will be logged to the
      * debug log if enabled.
+     *
      * @param level
      * @param msg
      * @deprecated
@@ -409,10 +417,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     @Deprecated
     public static void staticDebugLog(Level level, String msg) {
         Logging.log(level, msg);
-    }
-
-    public void setWorldEditAPI(WorldEditAPI api) {
-        this.worldEditAPI = api;
     }
 
     @Override

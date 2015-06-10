@@ -16,8 +16,6 @@ import org.bukkit.event.server.PluginEnableEvent;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class MVPPluginListener implements Listener {
 
@@ -33,8 +31,7 @@ public class MVPPluginListener implements Listener {
             this.plugin.setCore(((MultiverseCore) this.plugin.getServer().getPluginManager().getPlugin("Multiverse-Core")));
             this.plugin.getServer().getPluginManager().enablePlugin(this.plugin);
         } else if (event.getPlugin().getDescription().getName().equals("WorldEdit")) {
-            this.plugin.setWorldEditAPI(new WorldEditAPI((WorldEditPlugin) this.plugin.getServer().getPluginManager().getPlugin("WorldEdit")));
-            MultiversePortals.staticLog(Level.INFO, "Found WorldEdit. Using it for selections.");
+            this.plugin.checkForWorldEdit();
         } else if (event.getPlugin().getDescription().getName().equals("MultiVerse")) {
             if (event.getPlugin().isEnabled()) {
                 this.plugin.getServer().getPluginManager().disablePlugin(event.getPlugin());
