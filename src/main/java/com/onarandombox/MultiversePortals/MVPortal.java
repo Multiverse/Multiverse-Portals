@@ -167,10 +167,6 @@ public class MVPortal {
         allPortalFill.getChildren().put(this.fillPermission.getName(), true);
 
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
-        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
-        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
-        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalExempt);
-        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalFill);
         for(Player player : this.plugin.getServer().getOnlinePlayers()){
             player.recalculatePermissions();
         }
