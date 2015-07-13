@@ -55,7 +55,6 @@ import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.pneumaticraft.commandhandler.multiverse.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
@@ -68,7 +67,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private FileConfiguration MVPConfig;
 
     private CommandHandler commandHandler;
-    protected WorldEditAPI worldEditAPI = null;
+    private WorldEditConnection worldEditConnection;
 
     private PortalManager portalManager;
     private Map<String, PortalPlayerSession> portalSessions;
@@ -161,9 +160,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
      * sure
      */
     private void checkForWorldEdit() {
-        if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-            this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
-        }
+        worldEditConnection = new WorldEditConnection(this);
+        getServer().getPluginManager().registerEvents(worldEditConnection, this);
+        worldEditConnection.connect();
     }
 
     /** Create the higher level permissions so we can add finer ones to them. */
@@ -353,8 +352,21 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return authors.substring(2);
     }
 
+    /**
+     * @deprecated use {@link #getWorldEditConnection()} as this method will be removed.
+     */
+    @Deprecated
     public WorldEditAPI getWEAPI() {
-        return this.worldEditAPI;
+        return getWorldEditConnection().worldEditAPI;
+    }
+
+    /**
+     * Returns the WorldEdit compatibility object. Use this to check for WorldEdit and get a player's WorldEdit selection.
+     *
+     * @return the WorldEdit compatibility ojbect.
+     */
+    public WorldEditConnection getWorldEditConnection() {
+        return worldEditConnection;
     }
 
     public MultiverseCore getCore() {
@@ -411,8 +423,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         Logging.log(level, msg);
     }
 
+    /**
+     * @deprecated why was this ever a public method??
+     */
+    @Deprecated
     public void setWorldEditAPI(WorldEditAPI api) {
-        this.worldEditAPI = api;
+        getWorldEditConnection().worldEditAPI = api;
     }
 
     @Override

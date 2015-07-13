@@ -17,9 +17,13 @@
             <url>http://repo.onarandombox.com/content/groups/public</url>
         </repository>
         <repository>
-            <id>Bukkit Official</id>
-            <url>http://repo.bukkit.org/content/repositories/public</url>
+            <id>bukkit</id>
+            <url>http://repo.bukkit.org/content/groups/public</url>
         </repository>
+        <repository>
+            <id>world-edit</id>
+            <url>http://maven.sk89q.com/repo/</url>
+         </repository>
     </repositories>
 
     <!-- Profiles are used to detect whether this is a local or Jenkins build
@@ -159,9 +163,9 @@
 
         <!-- Start of WorldEdit Dependency -->
         <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldedit</artifactId>
-            <version>4.7</version>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>6.0</version>
             <type>jar</type>
             <scope>compile</scope>
             <exclusions>

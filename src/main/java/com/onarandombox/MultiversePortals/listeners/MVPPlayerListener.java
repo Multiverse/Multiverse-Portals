@@ -166,7 +166,9 @@ public class MVPPlayerListener implements Listener {
         // If we Found WorldEdit, return, we're not needed here.
         // If the item is not the Wand we've stetup we're not needed either
         // If the player doesn't have the perms, return also.
-        if (this.plugin.getWEAPI() != null || event.getPlayer().getItemInHand().getTypeId() != itemType || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+        if (plugin.getWorldEditConnection().isConnected()
+                || event.getPlayer().getItemInHand().getTypeId() != itemType
+                || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;
         }
 

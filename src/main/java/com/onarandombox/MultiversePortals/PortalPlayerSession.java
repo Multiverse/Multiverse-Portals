@@ -159,34 +159,37 @@ public class PortalPlayerSession {
     }
 
     public MultiverseRegion getSelectedRegion() {
-        // Did not find WE
-        MultiverseRegion r = null;
-        if (this.plugin.getWEAPI() != null) {
-            System.out.println("WEAPI");
-            try {
-                // GAH this looks SO ugly keeping no imports :( see if I can find a workaround
-                r = new MultiverseRegion(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMinimumPoint(),
-                        this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelection(this.plugin.getWEAPI().getSession(this.getPlayerFromName()).getSelectionWorld()).getMaximumPoint(),
-                        this.plugin.getCore().getMVWorldManager().getMVWorld(this.getPlayerFromName().getWorld().getName()));
-            } catch (Exception e) {
-                this.getPlayerFromName().sendMessage("You haven't finished your selection.");
+        Player player = getPlayerFromName();
+        WorldEditConnection worldEdit = plugin.getWorldEditConnection();
+        if (worldEdit.isConnected()) {
+            if (worldEdit.isSelectionAvailable(player)) {
+                Location minPoint = worldEdit.getSelectionMinPoint(player);
+                Location maxPoint = worldEdit.getSelectionMaxPoint(player);
+                if (minPoint != null && maxPoint != null && minPoint.getWorld().equals(maxPoint.getWorld())) {
+                    return new MultiverseRegion(minPoint, maxPoint,
+                            plugin.getCore().getMVWorldManager().getMVWorld(minPoint.getWorld().getName()));
+                } else {
+                    player.sendMessage("You haven't finished your selection.");
+                return null;
+                }
+            } else {
+                player.sendMessage("You must have a WorldEdit selection to do this.");
                 return null;
             }
-            return r;
         }
         // They're using our crappy selection:
         if (this.leftClick == null) {
-            this.getPlayerFromName().sendMessage("You need to LEFT click on a block with your wand!");
+            player.sendMessage("You need to LEFT click on a block with your wand!");
             return null;
         }
         if (this.rightClick == null) {
-            this.getPlayerFromName().sendMessage("You need to RIGHT click on a block with your wand!");
+            player.sendMessage("You need to RIGHT click on a block with your wand!");
             return null;
         }
         if (!this.leftClickWorld.equals(this.rightClickWorld)) {
-            this.getPlayerFromName().sendMessage("You need to select both coords in the same world!");
-            this.getPlayerFromName().sendMessage("Left Click Position was in:" + this.leftClickWorld.getColoredWorldString());
-            this.getPlayerFromName().sendMessage("Right Click Position was in:" + this.rightClickWorld.getColoredWorldString());
+            player.sendMessage("You need to select both coords in the same world!");
+            player.sendMessage("Left Click Position was in:" + this.leftClickWorld.getColoredWorldString());
+            player.sendMessage("Right Click Position was in:" + this.rightClickWorld.getColoredWorldString());
             return null;
         }
         return new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);

@@ -50,7 +50,7 @@ public class WandCommand extends PortalCommand {
         // Do the normal wand thing
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            if (this.plugin.getWEAPI() != null) {
+            if (plugin.getWorldEditConnection().isConnected()) {
                 p.sendMessage(ChatColor.GREEN + "Cool!" + ChatColor.WHITE + " You're using" + ChatColor.AQUA + " WorldEdit! ");
                 p.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit wand " + ChatColor.WHITE + "to perform portal selections!");
                 return;

@@ -36,6 +36,10 @@ public class MultiverseRegion {
         }
     }
 
+    public MultiverseRegion(Location loc1, Location loc2, MultiverseWorld w) {
+        this(loc1.toVector(), loc2.toVector(), w);
+    }
+
     public MultiverseRegion(Vector pos1, Vector pos2, MultiverseWorld w) {
         this.min = Vector.getMinimum(pos1, pos2);
         this.max = Vector.getMaximum(pos1, pos2);
