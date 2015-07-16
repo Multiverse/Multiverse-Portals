@@ -27,7 +27,12 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -161,7 +166,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
      */
     private void checkForWorldEdit() {
         worldEditConnection = new WorldEditConnection(this);
-        getServer().getPluginManager().registerEvents(worldEditConnection, this);
+        getServer().getPluginManager().registerEvents(new WorldEditPluginListener(worldEditConnection), this);
         worldEditConnection.connect();
     }
 
@@ -482,5 +487,36 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public void setWandEnabled(boolean enabled) {
         WandEnabled = enabled;
+    }
+
+    private static class WorldEditPluginListener implements Listener {
+
+        private final WorldEditConnection worldEditConnection;
+
+        private WorldEditPluginListener(WorldEditConnection worldEditConnection) {
+            this.worldEditConnection = worldEditConnection;
+        }
+
+        private boolean isPluginWorldEdit(Plugin plugin) {
+            if (plugin == null) {
+                throw new RuntimeException("plugin must not be null.");
+            }
+
+            return plugin.getName().equals("WorldEdit");
+        }
+
+        @EventHandler
+        private void pluginEnabled(PluginEnableEvent event) {
+            if (isPluginWorldEdit(event.getPlugin())) {
+                worldEditConnection.connect();
+            }
+        }
+
+        @EventHandler
+        private void pluginDisableEvent(PluginDisableEvent event) {
+            if (isPluginWorldEdit(event.getPlugin())) {
+                worldEditConnection.disconnect();
+            }
+        }
     }
 }

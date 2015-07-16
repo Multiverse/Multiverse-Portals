@@ -1,18 +1,13 @@
 package com.onarandombox.MultiversePortals;
 
-import com.google.common.base.Verify;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 
-public class WorldEditConnection implements Listener {
+public class WorldEditConnection {
 
     private final Plugin connectingPlugin;
 
@@ -60,28 +55,6 @@ public class WorldEditConnection implements Listener {
     void disconnect() {
         worldEditPlugin = null;
         this.worldEditAPI = null;
-    }
-
-    private boolean isPluginWorldEdit(Plugin plugin) {
-        if (plugin == null) {
-            throw new RuntimeException("plugin must not be null.");
-        }
-
-        return plugin.getName().equals("WorldEdit");
-    }
-
-    @EventHandler
-    private void pluginEnabled(PluginEnableEvent event) {
-        if (isPluginWorldEdit(event.getPlugin())) {
-            connect();
-        }
-    }
-
-    @EventHandler
-    private void pluginDisableEvent(PluginDisableEvent event) {
-        if (isPluginWorldEdit(event.getPlugin())) {
-            disconnect();
-        }
     }
 
     /**
