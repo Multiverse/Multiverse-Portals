@@ -79,7 +79,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 9;
+    private final static int requiresProtocol = 19;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
@@ -108,7 +108,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             log.severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
             log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
             log.severe(logPrefix + "Grab an updated copy at: ");
-            log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
+            log.severe(logPrefix + "http://ci.onarandombox.com/view/Multiverse/job/Multiverse-Core/");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
