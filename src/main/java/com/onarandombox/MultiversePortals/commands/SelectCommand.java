@@ -39,7 +39,7 @@ public class SelectCommand extends PortalCommand {
         }
         Player p = (Player) sender;
         if (!this.plugin.getCore().getMVPerms().hasPermission(p, "multiverse.portal.create", true)) {
-            p.sendMessage("You need create permissions to do this!(multiverse.portal.create)");
+            p.sendMessage("You need create permissions to do this! (multiverse.portal.create)");
             return;
         }
         if (args.size() == 0) {
