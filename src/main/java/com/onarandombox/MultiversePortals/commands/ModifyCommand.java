@@ -44,8 +44,28 @@ public class ModifyCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Sorry, right now this command is player only :(");
+        String portalName = extractPortalName(args);
+        MVPortal selectedPortal = null;
+        if (portalName != null) {
+            selectedPortal = this.plugin.getPortalManager().getPortal(portalName);
+        }
+        if (!(sender instanceof Player) ) {
+        	if( 
+        			SetProperties.valueOf(args.get(0)) == SetProperties.dest
+        			&& !args.get(1).equalsIgnoreCase("here")
+        			&& !args.get(1).matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")
+        			&& selectedPortal != null
+        	) {
+        		if( this.setProperty(selectedPortal, args.get(0), args.get(1) ) ) {
+                    sender.sendMessage("Property " + args.get(0) + " of Portal " + selectedPortal.getName() +  " was set to " + args.get(1));
+        		} else {
+        			sender.sendMessage("Sorry, right now this command is player only :( ( With the very small exeption of 'mvp modify dest [newdest] -p [portalname]' )");
+        		}
+        	} else {
+        			sender.sendMessage("Sorry, right now this command is player only :( ( With the very small exeption of 'mvp modify dest [newdest] -p [portalname]' )");	
+        	}
+        	
+            
             return;
         }
 
@@ -61,8 +81,7 @@ public class ModifyCommand extends PortalCommand {
             sender.sendMessage("Please try again, or see our Wiki for help!");
             return;
         }
-        String portalName = extractPortalName(args);
-        MVPortal selectedPortal = null;
+        
         // If they provided -p PORTALNAME, try to retrieve it
         if (portalName != null) {
             selectedPortal = this.plugin.getPortalManager().getPortal(portalName);
@@ -71,11 +90,11 @@ public class ModifyCommand extends PortalCommand {
                 return;
             }
         }
+        
         // If they didn't provide -p, then try to use their selected portal
         if (selectedPortal == null) {
             selectedPortal = this.getUserSelectedPortal(player);
         }
-
         if (selectedPortal == null) {
             sender.sendMessage("You need to select a portal using " + ChatColor.AQUA + "/mvp select {NAME}");
             sender.sendMessage("or append " + ChatColor.DARK_AQUA + "-p {PORTAL}" + ChatColor.WHITE + " to this command.");
@@ -92,7 +111,7 @@ public class ModifyCommand extends PortalCommand {
             }
 
             if (SetProperties.valueOf(args.get(0)) == SetProperties.dest || SetProperties.valueOf(args.get(0)) == SetProperties.destination) {
-                if (args.get(1).equalsIgnoreCase("here")) {
+            	if (args.get(1).equalsIgnoreCase("here")) {
                     PortalPlayerSession ps = this.plugin.getPortalSession(player);
                     MVPortal standingIn = ps.getUncachedStandingInPortal();
                     Location l = player.getLocation();
@@ -114,7 +133,7 @@ public class ModifyCommand extends PortalCommand {
                 }
             }
 
-            if (this.setProperty(selectedPortal, args.get(0), args.get(1))) {
+            if ( this.setProperty(selectedPortal, args.get(0), args.get(1) ) ) {
                 sender.sendMessage("Property " + args.get(0) + " of Portal " + ChatColor.YELLOW + selectedPortal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + args.get(1));
             } else {
                 sender.sendMessage("Property " + args.get(0) + " of Portal " + ChatColor.YELLOW + selectedPortal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + args.get(1));
