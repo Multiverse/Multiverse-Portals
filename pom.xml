@@ -16,10 +16,11 @@
             <id>OnARandomBox</id>
             <url>http://repo.onarandombox.com/content/groups/public</url>
         </repository>
-        <repository>
-            <id>bukkit</id>
-            <url>http://repo.bukkit.org/content/groups/public</url>
-        </repository>
+      <!-- Spigot -->
+    <repository>
+        <id>spigot-repo</id>
+        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
         <repository>
             <id>world-edit</id>
             <url>http://maven.sk89q.com/repo/</url>
@@ -49,7 +50,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -176,7 +177,14 @@
             </exclusions>
         </dependency>
         <!-- End of WorldEdit Dependency -->
-
+            <!--Spigot API-->
+    <dependency>
+           <groupId>org.spigotmc</groupId>
+           <artifactId>spigot-api</artifactId>
+           <version>1.8.8-R0.1-SNAPSHOT</version>
+           <scope>provided</scope>
+    </dependency>
+        <!--Spigot API-->
         <!-- Start of Logging Dependency -->
         <dependency>
             <groupId>com.dumptruckman.minecraft</groupId>
