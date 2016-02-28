@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.entity.minecart.StorageMinecart; 
+import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
@@ -87,7 +88,7 @@ public class MVPVehicleListener implements Listener {
                 Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());
 		
 		// Gets inventory from old Cart
-		if (event.getVehicle() instanceof StorageMinecart) {
+		if (event.getVehicle() instanceof StorageMinecart || event.getVehicle() instanceof HopperMinecart) {
 		ItemStack[] inv = ((InventoryHolder) event.getVehicle()).getInventory().getContents();
 		
 		// Fills Inventory to new Cart
