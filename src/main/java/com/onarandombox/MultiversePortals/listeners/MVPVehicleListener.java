@@ -83,19 +83,14 @@ public class MVPVehicleListener implements Listener {
                 Entity formerPassenger = event.getVehicle().getPassenger();
                 event.getVehicle().eject();
 		
-		
-		
-			
 		// Spawns new Minecart at Location
                 Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());
 		
-
 		// Gets inventory from old Cart
 		if (event.getVehicle() instanceof StorageMinecart) {
 		ItemStack[] inv = ((InventoryHolder) event.getVehicle()).getInventory().getContents();
 		
 		// Fills Inventory to new Cart
-		
 	        InventoryHolder smc = (InventoryHolder) newVehicle; 
 	        smc.getInventory().setContents(inv); 		
 		}
@@ -107,8 +102,7 @@ public class MVPVehicleListener implements Listener {
 
                 this.setVehicleVelocity(vehicleVec, dest, newVehicle);
 
-                // remove the old one
-		
+                // remove the old minecart
                 event.getVehicle().remove();
             }
         }
