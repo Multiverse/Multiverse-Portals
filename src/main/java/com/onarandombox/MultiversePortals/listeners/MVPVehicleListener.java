@@ -12,12 +12,16 @@ import java.util.Date;
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;  
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.minecart.StorageMinecart; 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
+import org.bukkit.inventory.InventoryHolder; 
+import org.bukkit.inventory.ItemStack; 
 
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
@@ -78,8 +82,23 @@ public class MVPVehicleListener implements Listener {
 
                 Entity formerPassenger = event.getVehicle().getPassenger();
                 event.getVehicle().eject();
-
+		
+		
+		
+			
+		// Spawns new Minecart at Location
                 Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());
+		
+
+		// Gets inventory from old Cart
+		if (event.getVehicle() instanceof StorageMinecart) {
+		ItemStack[] inv = ((InventoryHolder) event.getVehicle()).getInventory().getContents();
+		
+		// Fills Inventory to new Cart
+		
+	        InventoryHolder smc = (InventoryHolder) newVehicle; 
+	        smc.getInventory().setContents(inv); 		
+		}
 
                 if (formerPassenger != null) {
                     formerPassenger.teleport(target);
@@ -89,6 +108,7 @@ public class MVPVehicleListener implements Listener {
                 this.setVehicleVelocity(vehicleVec, dest, newVehicle);
 
                 // remove the old one
+		
                 event.getVehicle().remove();
             }
         }
