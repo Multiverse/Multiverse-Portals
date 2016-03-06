@@ -57,7 +57,7 @@ public class ModifyCommand extends PortalCommand {
 
         if (!validCommand(args, operator)) {
             sender.sendMessage("Looks like you forgot or added an extra parameter.");
-            sender.sendMessage("Please try again, or see our Wiki for help!");
+            sender.sendMessage("Please try again or see our Wiki for help!");
             return;
         }
         String portalName = extractPortalName(args);
