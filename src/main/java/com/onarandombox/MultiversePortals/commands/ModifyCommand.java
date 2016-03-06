@@ -26,8 +26,6 @@ import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 /**
  * Allows modification of portal location, destination and owner. NOT name at this time.
- *
- * @author fernferret
  */
 public class ModifyCommand extends PortalCommand {
 
