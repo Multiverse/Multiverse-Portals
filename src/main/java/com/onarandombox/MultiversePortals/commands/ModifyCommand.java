@@ -44,19 +44,20 @@ public class ModifyCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Sorry, right now this command is player only :(");
-            return;
+        Player player = null;
+        if ((sender instanceof Player)) {
+            player = (Player) sender;
         }
 
-        Player player = (Player) sender;
         if (!validateAction(args.get(0))) {
             sender.sendMessage("Sorry, you cannot " + ChatColor.AQUA + "SET" + ChatColor.WHITE + " the property " +
                     ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ".");
             return;
         }
 
-        if (!validCommand(args, SetProperties.valueOf(args.get(0)))) {
+        final SetProperties operator = SetProperties.valueOf(args.get(0));
+
+        if (!validCommand(args, operator)) {
             sender.sendMessage("Looks like you forgot or added an extra parameter.");
             sender.sendMessage("Please try again, or see our Wiki for help!");
             return;
@@ -70,6 +71,12 @@ public class ModifyCommand extends PortalCommand {
                 sender.sendMessage("Sorry, the portal " + ChatColor.RED + portalName + ChatColor.WHITE + " did not exist!");
                 return;
             }
+        } else if (player == null) {
+            // If the player is null (so it's not a player sending the command and we don't have a portalName, we
+            // have to return here. portalName cannot be derived if we have no player.
+            sender.sendMessage("You NEED to enter -p PORTALNAME if you're using this from a command block or console!" +
+                               " Not running modify command.");
+            return;
         }
         // If they didn't provide -p, then try to use their selected portal
         if (selectedPortal == null) {
@@ -86,13 +93,14 @@ public class ModifyCommand extends PortalCommand {
 
         if (portalName != null) {
             // Simply chop off the rest, if they have loc, that's good enough!
-            if (SetProperties.valueOf(args.get(0)) == SetProperties.loc || SetProperties.valueOf(args.get(0)) == SetProperties.location) {
+            if (operator == SetProperties.loc || operator == SetProperties.location) {
                 this.setLocation(selectedPortal, player);
                 return;
             }
 
-            if (SetProperties.valueOf(args.get(0)) == SetProperties.dest || SetProperties.valueOf(args.get(0)) == SetProperties.destination) {
-                if (args.get(1).equalsIgnoreCase("here")) {
+            if (operator == SetProperties.dest ||
+                operator == SetProperties.destination) {
+                if (args.get(1).equalsIgnoreCase("here") && player != null) {
                     PortalPlayerSession ps = this.plugin.getPortalSession(player);
                     MVPortal standingIn = ps.getUncachedStandingInPortal();
                     Location l = player.getLocation();
@@ -102,7 +110,7 @@ public class ModifyCommand extends PortalCommand {
                     } else {
                         args.set(1, "e:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw());
                     }
-                } else if (args.get(1).matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
+                } else if (args.get(1).matches("(i?)cannon-[\\d]+(\\.[\\d]+)?") && player != null) {
                     // We found a Cannon Destination!
                     Location l = player.getLocation();
                     try {
