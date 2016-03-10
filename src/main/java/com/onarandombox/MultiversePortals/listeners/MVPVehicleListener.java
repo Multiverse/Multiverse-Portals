@@ -88,7 +88,7 @@ public class MVPVehicleListener implements Listener {
                 Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());
 		
 		// Gets inventory from old Cart
-		if (event.getVehicle() instanceof StorageMinecart || event.getVehicle() instanceof HopperMinecart) {
+		if (event.getVehicle() instanceof InventoryHolder) {
 		ItemStack[] inv = ((InventoryHolder) event.getVehicle()).getInventory().getContents();
 		
 		// Fills Inventory to new Cart
