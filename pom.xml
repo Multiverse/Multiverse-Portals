@@ -3,13 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.onarandombox.multiverseportals</groupId>
     <artifactId>Multiverse-Portals</artifactId>
-    <version>2.5.1-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <name>Multiverse-Portals</name>
     <description>Multiverse Portals module</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.number>UNKNOWN</project.build.number>
-        <bukkit.build.location>lib</bukkit.build.location>
     </properties>
 
     <repositories>
@@ -18,9 +17,13 @@
             <url>http://repo.onarandombox.com/content/groups/public</url>
         </repository>
         <repository>
-            <id>Bukkit Official</id>
-            <url>http://repo.bukkit.org/content/repositories/public</url>
+            <id>bukkit</id>
+            <url>http://repo.bukkit.org/content/groups/public</url>
         </repository>
+        <repository>
+            <id>world-edit</id>
+            <url>http://maven.sk89q.com/repo/</url>
+         </repository>
     </repositories>
 
     <!-- Profiles are used to detect whether this is a local or Jenkins build
@@ -48,8 +51,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -152,7 +155,7 @@
         <dependency>
             <groupId>com.onarandombox.multiversecore</groupId>
             <artifactId>Multiverse-Core</artifactId>
-            <version>2.5.1-SNAPSHOT</version>
+            <version>2.5.0-SNAPSHOT</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -160,9 +163,9 @@
 
         <!-- Start of WorldEdit Dependency -->
         <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldedit</artifactId>
-            <version>6.0.0-SNAPSHOT</version>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>6.0</version>
             <type>jar</type>
             <scope>compile</scope>
             <exclusions>
@@ -178,42 +181,21 @@
         <dependency>
             <groupId>com.dumptruckman.minecraft</groupId>
             <artifactId>Logging</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.9</version>
             <type>jar</type>
             <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bukkit</groupId>
-                    <artifactId>bukkit</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- End of Logging Dependency -->
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
-            <!-- If you want the lates, use this -->
-            <!-- <version>LATEST</version> -->
-            <type>jar</type>
-            <scope>system</scope>
-            <systemPath>${env.SPIGOT_BASE}/Bukkit/target/Bukkit-1.8-R0.1-SNAPSHOT.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
-            <!-- If you want the lates, use this -->
-            <!-- <version>LATEST</version> -->
-            <type>jar</type>
-            <scope>system</scope>
-            <systemPath>${env.SPIGOT_BASE}/CraftBukkit/target/CraftBukkit-1.8-R0.1-SNAPSHOT.jar</systemPath>
-        </dependency>
+
     </dependencies>
     <distributionManagement>
         <repository>
             <id>OnARandomBox</id>
             <url>http://repo.onarandombox.com/content/repositories/multiverse</url>
         </repository>
+        <snapshotRepository>
+            <id>OnARandomBox</id>
+            <url>http://repo.onarandombox.com/content/repositories/multiverse-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>

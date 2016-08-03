@@ -7,11 +7,6 @@
 
 package com.onarandombox.MultiversePortals.enums;
 
-/**
- * Multiverse 2
- *
- * @author fernferret
- */
 public enum SetProperties {
     destination, dest, owner, loc, location, price, currency, curr, safe, telenonplayers, handlerscript
 }

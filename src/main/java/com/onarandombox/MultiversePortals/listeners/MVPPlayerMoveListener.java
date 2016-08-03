@@ -7,11 +7,10 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import com.dumptruckman.minecraft.util.Logging;
-import com.fernferret.allpay.multiverse.commons.GenericBank;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
+import com.onarandombox.MultiverseCore.utils.MVEconomist;
 import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -103,34 +102,31 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
 
-            if (portal.getPrice() != 0D && !p.hasPermission(portal.getExempt())) {
-                final Economy vaultEco = (portal.getCurrency() <= 0 && plugin.getCore().getVaultHandler().getEconomy() != null) ? plugin.getCore().getVaultHandler().getEconomy() : null;
-                final GenericBank bank = vaultEco == null ? plugin.getCore().getBank() : null;
-                if (portal.getPrice() < 0D || (vaultEco != null && vaultEco.has(p.getName(), portal.getPrice())) || (bank != null && bank.hasEnough(event.getPlayer(), portal.getPrice(), portal.getCurrency(), "You need " + bank.getFormattedAmount(event.getPlayer(), portal.getPrice(), portal.getCurrency()) + " to enter the " + portal.getName() + " portal."))) {
+            MVEconomist economist = plugin.getCore().getEconomist();
+            double price = portal.getPrice();
+            int currency = portal.getCurrency();
+
+            if (price != 0D && !p.hasPermission(portal.getExempt())) {
+                if (price < 0D || economist.isPlayerWealthyEnough(p, price, currency)) {
                     // call event for other plugins
                     TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
                     MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
-                        if (vaultEco != null) {
-                            if (portal.getPrice() < 0D) {
-                                p.sendMessage(String.format("You have earned %s for using %s.", vaultEco.format(-portal.getPrice()), portal.getName()));
-                                vaultEco.depositPlayer(event.getPlayer().getName(), -portal.getPrice());
-                            } else {
-                                p.sendMessage(String.format("You have been charged %s for using %s.", vaultEco.format(portal.getPrice()), portal.getName()));
-                                vaultEco.withdrawPlayer(event.getPlayer().getName(), portal.getPrice());
-                            }
+                        if (price < 0D) {
+                            economist.deposit(p, -price, currency);
                         } else {
-                            if (portal.getPrice() < 0D) {
-                                bank.give(event.getPlayer(), -portal.getPrice(), portal.getCurrency());
-                            } else {
-                                bank.take(event.getPlayer(), portal.getPrice(), portal.getCurrency());
-                            }
+                            economist.withdraw(p, price, currency);
                         }
+                        p.sendMessage(String.format("You have %s %s for using %s.",
+                                price > 0D ? "been charged" : "earned",
+                                economist.formatPrice(price, currency),
+                                portal.getName()));
                         helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
                     }
-                } else if (vaultEco != null) {
-                    p.sendMessage("You need " + vaultEco.format(portal.getPrice()) + " to enter the " + portal.getName() + " portal.");
+                } else {
+                    p.sendMessage(economist.getNSFMessage(currency,
+                                "You need " + economist.formatPrice(price, currency) + " to enter the " + portal.getName() + " portal."));
                 }
             } else {
                 // call event for other plugins

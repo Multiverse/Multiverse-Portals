@@ -27,7 +27,12 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,7 +60,6 @@ import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import com.pneumaticraft.commandhandler.multiverse.CommandHandler;
 import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
@@ -68,14 +72,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private FileConfiguration MVPConfig;
 
     private CommandHandler commandHandler;
-    protected WorldEditAPI worldEditAPI = null;
+    private WorldEditConnection worldEditConnection;
 
     private PortalManager portalManager;
     private Map<String, PortalPlayerSession> portalSessions;
 
     public static final int DEFAULT_WAND = 271;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 9;
+    private final static int requiresProtocol = 19;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
@@ -104,7 +108,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             log.severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
             log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
             log.severe(logPrefix + "Grab an updated copy at: ");
-            log.severe(logPrefix + "http://bukkit.onarandombox.com/?dir=multiverse-core");
+            log.severe(logPrefix + "http://ci.onarandombox.com/view/Multiverse/job/Multiverse-Core/");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -161,9 +165,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
      * sure
      */
     private void checkForWorldEdit() {
-        if (this.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
-            this.worldEditAPI = new WorldEditAPI((WorldEditPlugin) this.getServer().getPluginManager().getPlugin("WorldEdit"));
-        }
+        worldEditConnection = new WorldEditConnection(this);
+        getServer().getPluginManager().registerEvents(new WorldEditPluginListener(worldEditConnection), this);
+        worldEditConnection.connect();
     }
 
     /** Create the higher level permissions so we can add finer ones to them. */
@@ -353,8 +357,21 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return authors.substring(2);
     }
 
+    /**
+     * @deprecated use {@link #getWorldEditConnection()} as this method will be removed.
+     */
+    @Deprecated
     public WorldEditAPI getWEAPI() {
-        return this.worldEditAPI;
+        return getWorldEditConnection().worldEditAPI;
+    }
+
+    /**
+     * Returns the WorldEdit compatibility object. Use this to check for WorldEdit and get a player's WorldEdit selection.
+     *
+     * @return the WorldEdit compatibility ojbect.
+     */
+    public WorldEditConnection getWorldEditConnection() {
+        return worldEditConnection;
     }
 
     public MultiverseCore getCore() {
@@ -411,8 +428,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         Logging.log(level, msg);
     }
 
+    /**
+     * @deprecated why was this ever a public method??
+     */
+    @Deprecated
     public void setWorldEditAPI(WorldEditAPI api) {
-        this.worldEditAPI = api;
+        getWorldEditConnection().worldEditAPI = api;
     }
 
     @Override
@@ -466,5 +487,36 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public void setWandEnabled(boolean enabled) {
         WandEnabled = enabled;
+    }
+
+    private static class WorldEditPluginListener implements Listener {
+
+        private final WorldEditConnection worldEditConnection;
+
+        private WorldEditPluginListener(WorldEditConnection worldEditConnection) {
+            this.worldEditConnection = worldEditConnection;
+        }
+
+        private boolean isPluginWorldEdit(Plugin plugin) {
+            if (plugin == null) {
+                throw new RuntimeException("plugin must not be null.");
+            }
+
+            return plugin.getName().equals("WorldEdit");
+        }
+
+        @EventHandler
+        private void pluginEnabled(PluginEnableEvent event) {
+            if (isPluginWorldEdit(event.getPlugin())) {
+                worldEditConnection.connect();
+            }
+        }
+
+        @EventHandler
+        private void pluginDisableEvent(PluginDisableEvent event) {
+            if (isPluginWorldEdit(event.getPlugin())) {
+                worldEditConnection.disconnect();
+            }
+        }
     }
 }

@@ -32,9 +32,6 @@ public class MVPPluginListener implements Listener {
         if (event.getPlugin().getDescription().getName().equals("Multiverse-Core")) {
             this.plugin.setCore(((MultiverseCore) this.plugin.getServer().getPluginManager().getPlugin("Multiverse-Core")));
             this.plugin.getServer().getPluginManager().enablePlugin(this.plugin);
-        } else if (event.getPlugin().getDescription().getName().equals("WorldEdit")) {
-            this.plugin.setWorldEditAPI(new WorldEditAPI((WorldEditPlugin) this.plugin.getServer().getPluginManager().getPlugin("WorldEdit")));
-            MultiversePortals.staticLog(Level.INFO, "Found WorldEdit. Using it for selections.");
         } else if (event.getPlugin().getDescription().getName().equals("MultiVerse")) {
             if (event.getPlugin().isEnabled()) {
                 this.plugin.getServer().getPluginManager().disablePlugin(event.getPlugin());
