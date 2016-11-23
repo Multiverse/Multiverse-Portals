@@ -63,7 +63,7 @@ public class MVPPlayerListener implements Listener {
         ps.playerDidTeleport(event.getTo());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void playerBucketFill(PlayerBucketFillEvent event) {
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         this.plugin.log(Level.FINER, "Fill: ");
@@ -84,7 +84,7 @@ public class MVPPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void playerBucketEmpty(PlayerBucketEmptyEvent event) {
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         this.plugin.log(Level.FINER, "Fill: ");
