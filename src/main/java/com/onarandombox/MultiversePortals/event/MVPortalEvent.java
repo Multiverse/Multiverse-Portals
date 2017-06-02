@@ -32,8 +32,7 @@ public class MVPortalEvent extends Event implements Cancellable {
     /**
      * Old constructor did not provide enough intel
      *
-     * @deprecated use {@link MVPortalEvent(MVDestination destination, Player
-     *             teleportee, TravelAgent travelAgent, MVPortal sendingPortal)}
+     * @deprecated use {@link MVPortalEvent(MVDestination, Player, TravelAgent, MVPortal)}
      *             instead.
      */
     @Deprecated
@@ -101,7 +100,7 @@ public class MVPortalEvent extends Event implements Cancellable {
 
     /**
      * Returns the type of portal that was used.
-     * <p/>
+     *
      * This will be Legacy for MV1 style portals and Normal for Portals that use the swirly purple goo.
      *
      * @return A {@link PortalType}
