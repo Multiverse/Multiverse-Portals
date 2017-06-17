@@ -170,7 +170,7 @@
             <artifactId>worldedit-bukkit</artifactId>
             <version>6.0</version>
             <type>jar</type>
-            <scope>compile</scope>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.bukkit</groupId>
