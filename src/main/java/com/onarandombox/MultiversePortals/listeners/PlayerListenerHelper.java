@@ -57,18 +57,18 @@ public class PlayerListenerHelper {
         File handlerScript = new File(buscript.getScriptFolder(), portal.getHandlerScript());
         if (handlerScript.exists()) {
             TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, player);
-            buscript.getGlobalScope().put("portal", buscript.getGlobalScope(), portal);
-            buscript.getGlobalScope().put("player", buscript.getGlobalScope(), player);
-            buscript.getGlobalScope().put("travelAgent", buscript.getGlobalScope(), agent);
-            buscript.getGlobalScope().put("allowPortal", buscript.getGlobalScope(), true);
-            buscript.getGlobalScope().put("portalSession", buscript.getGlobalScope(), ps);
+            buscript.setScriptVariable("portal", portal);
+            buscript.setScriptVariable("player", player);
+            buscript.setScriptVariable("travelAgent", agent);
+            buscript.setScriptVariable("allowPortal", true);
+            buscript.setScriptVariable("portalSession", ps);
             buscript.executeScript(handlerScript, player.getName());
-            buscript.getGlobalScope().put("portal", buscript.getGlobalScope(), null);
-            buscript.getGlobalScope().put("player", buscript.getGlobalScope(), null);
-            buscript.getGlobalScope().put("travelAgent", buscript.getGlobalScope(), null);
-            buscript.getGlobalScope().put("portalSession", buscript.getGlobalScope(), null);
-            Object allowObject = buscript.getGlobalScope().get("allowPortal", buscript.getGlobalScope());
-            buscript.getGlobalScope().put("allowPortal", buscript.getGlobalScope(), null);
+            buscript.setScriptVariable("portal", null);
+            buscript.setScriptVariable("player", null);
+            buscript.setScriptVariable("travelAgent", null);
+            buscript.setScriptVariable("portalSession", null);
+            Object allowObject = buscript.getScriptVariable("allowPortal");
+            buscript.setScriptVariable("allowPortal", null);
             if (allowObject instanceof Boolean) {
                 if (((Boolean) allowObject)) {
                     MVPortalEvent portalEvent = new MVPortalEvent(d, player, agent, portal);

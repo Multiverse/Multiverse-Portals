@@ -7,8 +7,12 @@
 
 package com.onarandombox.MultiversePortals;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -242,8 +246,20 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public void loadConfig() {
 
         this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
-        Configuration portalsDefaults = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/defaults/config.yml"));
-        this.MVPConfig.setDefaults(portalsDefaults);
+        InputStream resourceURL = this.getClass().getResourceAsStream("/defaults/config.yml");
+
+        // Read in our default config with UTF-8 now
+        Configuration portalsDefaults = null;
+        try {
+            portalsDefaults = YamlConfiguration.loadConfiguration(new BufferedReader(new InputStreamReader(resourceURL, "UTF-8")));
+            this.MVPConfig.setDefaults(portalsDefaults);
+        } catch (UnsupportedEncodingException e) {
+            Logging.severe("Couldn't load default config with UTF-8 encoding. Details follow:");
+            e.printStackTrace();
+            Logging.severe("Default configs NOT loaded.");
+        }
+
+
         this.MVPConfig.options().copyDefaults(true);
         this.saveMainConfig();
         this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
@@ -281,7 +297,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig.set("use_onmove", null);
         this.MVPConfig.set("portal_cooldown", null);
         // Update the version
-        this.MVPConfig.set("version", portalsDefaults.get("version"));
+        if (portalsDefaults != null) {
+            this.MVPConfig.set("version", portalsDefaults.get("version"));
+        }
 
         this.saveMainConfig();
     }
