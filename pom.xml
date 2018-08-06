@@ -28,6 +28,10 @@
             <id>world-edit</id>
             <url>http://maven.sk89q.com/repo/</url>
          </repository>
+        <repository>
+            <id>rlf-mvn-repo</id>
+            <url>https://raw.github.com/rlf/mvn-repo/master/</url>
+        </repository>
     </repositories>
 
     <!-- Profiles are used to detect whether this is a local or Jenkins build
@@ -168,7 +172,7 @@
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
-            <version>6.0</version>
+            <version>7.0.0-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
             <exclusions>
