@@ -7,17 +7,14 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import java.util.logging.Level;
-
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiversePortals.MultiversePortals;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import java.util.logging.Level;
 
 public class MVPPluginListener implements Listener {
 

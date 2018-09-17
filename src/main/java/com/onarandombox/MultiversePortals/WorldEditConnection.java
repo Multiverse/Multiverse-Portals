@@ -1,8 +1,12 @@
 package com.onarandombox.MultiversePortals;
 
-import com.sk89q.worldedit.bukkit.WorldEditAPI;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -12,7 +16,7 @@ public class WorldEditConnection {
     private final Plugin connectingPlugin;
 
     private WorldEditPlugin worldEditPlugin;
-    WorldEditAPI worldEditAPI;
+    WorldEdit worldEdit;
 
     WorldEditConnection(Plugin plugin) {
         if (plugin == null) {
@@ -44,7 +48,7 @@ public class WorldEditConnection {
         if (!isConnected()) {
             worldEditPlugin = retrieveWorldEditPluginFromServer();
             if (worldEditPlugin != null) {
-                this.worldEditAPI = new WorldEditAPI(worldEditPlugin);
+                this.worldEdit = worldEditPlugin.getWorldEdit();
                 connectingPlugin.getLogger().info("Found WorldEdit. Using it for selections.");
                 return true;
             }
@@ -54,7 +58,7 @@ public class WorldEditConnection {
 
     void disconnect() {
         worldEditPlugin = null;
-        this.worldEditAPI = null;
+        this.worldEdit = null;
     }
 
     /**
@@ -66,12 +70,15 @@ public class WorldEditConnection {
         return worldEditPlugin != null;
     }
 
-    private Selection getSelection(Player player) {
+    private Region getSelection(Player player) {
         if (!isConnected()) {
             throw new RuntimeException("WorldEdit connection is unavailable.");
         }
-
-        return worldEditPlugin.getSelection(player);
+        try {
+            return worldEdit.getSessionManager().get(new BukkitPlayer(worldEditPlugin, player)).getSelection(new BukkitWorld(player.getWorld()));
+        } catch (IncompleteRegionException e) {
+            return null;
+        }
     }
 
     /**
@@ -86,8 +93,12 @@ public class WorldEditConnection {
             throw new RuntimeException("WorldEdit connection is unavailable.");
         }
 
-        Selection selection = getSelection(player);
-        return selection != null ? selection.getMaximumPoint() : null;
+        Region selection = getSelection(player);
+        if (selection != null) {
+            Vector point = selection.getMaximumPoint();
+            return new Location(player.getWorld(), point.getBlockX(), point.getBlockY(), point.getBlockZ());
+        }
+        return null;
     }
 
     /**
@@ -102,8 +113,12 @@ public class WorldEditConnection {
             throw new RuntimeException("WorldEdit connection is unavailable.");
         }
 
-        Selection selection = getSelection(player);
-        return selection != null ? selection.getMinimumPoint() : null;
+        Region selection = getSelection(player);
+        if (selection != null) {
+            Vector point = selection.getMinimumPoint();
+            return new Location(player.getWorld(), point.getBlockX(), point.getBlockY(), point.getBlockZ());
+        }
+        return null;
     }
 
     /**
