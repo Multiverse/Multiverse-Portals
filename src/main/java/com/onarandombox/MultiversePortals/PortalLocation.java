@@ -36,7 +36,7 @@ public class PortalLocation {
      * @param minPt
      * @param maxPt
      */
-    public PortalLocation(com.sk89q.worldedit.Vector minPt, com.sk89q.worldedit.Vector maxPt, MultiverseWorld world) {
+    public PortalLocation(com.sk89q.worldedit.math.BlockVector3 minPt, com.sk89q.worldedit.math.BlockVector3 maxPt, MultiverseWorld world) {
         this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
     }
 
