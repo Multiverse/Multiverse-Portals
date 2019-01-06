@@ -2,7 +2,7 @@
 
 To build this project, the Bukkit/CraftBukkit dependencies must be obtained else-where.
 
-See http://www.spigotmc.org/threads/bukkit-craftbukkit-spigot-1-8.36598/ for details.
+See https://www.spigotmc.org/threads/bukkit-craftbukkit-spigot-bungeecord-1-13-2.344189/ for details.
 
 Once you successfully have compiled Bukkit and CraftBukkit, define the environment variable SPIGOT_BASE to the location of the BuildTools.jar, and compile Multiverse-Portals.
 
