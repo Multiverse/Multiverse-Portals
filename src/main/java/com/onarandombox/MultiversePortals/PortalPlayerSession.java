@@ -217,7 +217,7 @@ public class PortalPlayerSession {
     /**
      * This method should be called every time a player teleports to a portal.
      *
-     * @param location
+     * @param location Loc
      */
     public void playerDidTeleport(Location location) {
         PortalManager pm = this.plugin.getPortalManager();
@@ -251,7 +251,7 @@ public class PortalPlayerSession {
             showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
             showPortalPriceInfo(portal);
         } else {
-            this.plugin.log(Level.INFO, "Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
+            this.plugin.log.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
         }
         return true;
     }

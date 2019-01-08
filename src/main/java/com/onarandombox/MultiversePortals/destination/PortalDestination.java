@@ -4,9 +4,9 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.destination;
 
+import com.onarandombox.MultiverseCore.api.BlockSafety;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -14,13 +14,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.utils.BlockSafety;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiverseCore.utils.SimpleBlockSafety;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 
 public class PortalDestination implements MVDestination {
+
     private MVPortal portal;
     private boolean isValid;
     private String orientationString;
@@ -56,7 +56,7 @@ public class PortalDestination implements MVDestination {
         // double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
         double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), this.portal.getWorld());
-        return new Location(this.portal.getWorld(), finalX, finalY, finalZ, LocationManipulation.getYaw(this.orientationString), 0);
+        return new Location(this.portal.getWorld(), finalX, finalY, finalZ, portal.getPlugin().getCore().getLocationManipulation().getYaw(this.orientationString), 0);
     }
 
     /**
@@ -71,7 +71,7 @@ public class PortalDestination implements MVDestination {
      * @return
      */
     private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
-        BlockSafety bs = new BlockSafety();
+        BlockSafety bs = portal.getPlugin().getCore().getBlockSafety();
         for (int i = y; i < yMax; i++) {
             if (bs.playerCanSpawnHereSafely(w, finalX, i, finalZ)) {
                 return i;

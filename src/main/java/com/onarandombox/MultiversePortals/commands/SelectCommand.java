@@ -46,8 +46,8 @@ public class SelectCommand extends PortalCommand {
             MVPortal selected = this.plugin.getPortalSession(p).getSelectedPortal();
             if (this.plugin.getPortalSession(p).getSelectedPortal() == null) {
                 p.sendMessage("You have not selected a portal yet!");
-                ItemStack wand = new ItemStack(this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND));
-                p.sendMessage("Use a " + ChatColor.GREEN + wand.getType() + ChatColor.WHITE + " to do so!");
+                //ItemStack wand = new ItemStack(Material.valueOf(String.valueOf(this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND))));
+                //p.sendMessage("Use a " + ChatColor.GREEN + wand.getType() + ChatColor.WHITE + " to do so!");
                 return;
             }
             p.sendMessage("You have selected: " + ChatColor.DARK_AQUA + selected.getName());

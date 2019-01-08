@@ -7,6 +7,7 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -32,9 +33,7 @@ public class WorldEditConnection {
         } else if (plugin instanceof WorldEditPlugin) {
             return (WorldEditPlugin) plugin;
         } else {
-            connectingPlugin.getLogger().warning("WorldEdit v" + plugin.getDescription().getVersion()
-                    + " is incompatible with " + connectingPlugin.getDescription().getName() + " v"
-                    + connectingPlugin.getDescription().getVersion());
+            connectingPlugin.getLogger().log(Level.WARNING, "WorldEdit v{0} is incompatible with {1} v{2}", new Object[]{plugin.getDescription().getVersion(), connectingPlugin.getDescription().getName(), connectingPlugin.getDescription().getVersion()});
             return null;
         }
     }
@@ -82,6 +81,7 @@ public class WorldEditConnection {
     }
 
     /**
+     * @param player player
      * @return the maximum point of the player's WorldEdit selection or null if the player has no selection.
      */
     public Location getSelectionMaxPoint(Player player) {
@@ -102,6 +102,7 @@ public class WorldEditConnection {
     }
 
     /**
+     * @param player player
      * @return the minimum point of the player's WorldEdit selection or null if the player has no selection.
      */
     public Location getSelectionMinPoint(Player player) {
@@ -122,6 +123,7 @@ public class WorldEditConnection {
     }
 
     /**
+     * @param player player
      * @return true if the player has currently has a WorldEdit selection.
      */
     public boolean isSelectionAvailable(Player player) {

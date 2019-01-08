@@ -53,7 +53,7 @@ public class MVPCoreListener implements Listener {
      */
     @EventHandler
     public void portalTouchEvent(MVPlayerTouchedPortalEvent event) {
-        this.plugin.log(Level.FINER, "Found The TouchedPortal event.");
+        this.plugin.log.info("Found The TouchedPortal event.");
         Location l = event.getBlockTouched();
         if (event.canUseThisPortal() && (this.plugin.getPortalManager().isPortal(l))) {
             if (this.plugin.getPortalSession(event.getPlayer()).isDebugModeOn()) {
@@ -64,11 +64,11 @@ public class MVPCoreListener implements Listener {
             MVPortal p = this.plugin.getPortalManager().getPortal(event.getPlayer(), l);
             if (p == null) {
                 // The player can't see this portal, and can't use it.
-                this.plugin.log(Level.FINER, String.format("'%s' was DENIED access to this portal event.", event.getPlayer().getName()));
+                this.plugin.log.info(String.format("'%s' was DENIED access to this portal event.", event.getPlayer().getName()));
                 event.setCanUseThisPortal(false);
             } else if (p.getDestination() == null || !p.getDestination().isValid()) {
                 if (this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
-                    this.plugin.log(Level.FINE, "Allowing MVPortal to act as nether portal.");
+                    this.plugin.log.info("Allowing MVPortal to act as nether portal.");
                     return;
                 }
                 // They can see it, is it val

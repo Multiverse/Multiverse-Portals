@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.listeners;
 
 import java.util.Date;
@@ -30,6 +29,7 @@ import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 
 public class MVPVehicleListener implements Listener {
+
     private MultiversePortals plugin;
     private LocationManipulation locationManipulation;
     private SafeTTeleporter safeTTeleporter;
@@ -58,8 +58,9 @@ public class MVPVehicleListener implements Listener {
             MVPortal portal = this.plugin.getPortalManager().getPortal(event.getFrom());
             if ((portal != null) && (portal.getTeleportNonPlayers())) {
                 MVDestination dest = portal.getDestination();
-                if (dest == null || dest instanceof InvalidDestination)
+                if (dest == null || dest instanceof InvalidDestination) {
                     return;
+                }
 
                 // Check the portal's frame.
                 if (!portal.isFrameValid(event.getVehicle().getLocation())) {
@@ -76,7 +77,7 @@ public class MVPVehicleListener implements Listener {
 
                 this.setVehicleVelocity(vehicleVec, dest, event.getVehicle());
 
-                Entity formerPassenger = event.getVehicle().getPassenger();
+                Entity formerPassenger = event.getVehicle().getPassengers().get(0);
                 event.getVehicle().eject();
 
                 Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());

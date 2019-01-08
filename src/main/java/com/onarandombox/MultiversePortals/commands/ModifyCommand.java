@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
+import com.onarandombox.MultiverseCore.utils.SimpleLocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
@@ -103,7 +103,7 @@ public class ModifyCommand extends PortalCommand {
                     MVPortal standingIn = ps.getUncachedStandingInPortal();
                     Location l = player.getLocation();
                     if (standingIn != null) {
-                        String cardinal = LocationManipulation.getDirection(l);
+                        String cardinal = plugin.getCore().getLocationManipulation().getDirection(l);
                         args.set(1, "p:" + standingIn.getName() + ":" + cardinal);
                     } else {
                         args.set(1, "e:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw());

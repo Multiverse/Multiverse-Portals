@@ -1,8 +1,9 @@
 name: Multiverse-Portals
 main: com.onarandombox.MultiversePortals.MultiversePortals
-authors: ['Rigby', 'fernferret']
+authors: ['Rigby', 'fernferret', 'Optic_Fusion1']
 version: maven-version-number
 depend: ['Multiverse-Core']
+api-version: 1.13
 commands:
   mvp:
     description: Generic Multiverse-Portals Command

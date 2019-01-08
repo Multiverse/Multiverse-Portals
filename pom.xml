@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.onarandombox.multiverseportals</groupId>
     <artifactId>Multiverse-Portals</artifactId>
-    <version>2.5.2-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <name>Multiverse-Portals</name>
     <description>Multiverse Portals module</description>
     <properties>
@@ -21,13 +21,9 @@
             <url>http://repo.onarandombox.com/content/groups/public</url>
         </repository>
         <repository>
-            <id>spigot</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
-        <repository>
             <id>world-edit</id>
             <url>http://maven.sk89q.com/repo/</url>
-         </repository>
+        </repository>
         <repository>
             <id>rlf-mvn-repo</id>
             <url>https://raw.github.com/rlf/mvn-repo/master/</url>
@@ -35,7 +31,7 @@
     </repositories>
 
     <!-- Profiles are used to detect whether this is a local or Jenkins build
-         and adjust the build number accordingly -->
+    and adjust the build number accordingly -->
     <profiles>
         <profile>
             <id>jenkins</id>
@@ -59,8 +55,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -137,7 +133,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>com.dumptruckman.minecraft:Logging</include>
+                                    <include>org.slf4j:slf4j-api</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -162,7 +158,7 @@
         <dependency>
             <groupId>com.onarandombox.multiversecore</groupId>
             <artifactId>Multiverse-Core</artifactId>
-            <version>2.5.1-SNAPSHOT</version>
+            <version>2.7.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -184,31 +180,17 @@
         </dependency>
         <!-- End of WorldEdit Dependency -->
 
-        <!-- Start of Logging Dependency -->
-        <dependency>
-            <groupId>com.dumptruckman.minecraft</groupId>
-            <artifactId>Logging</artifactId>
-            <version>1.0.9</version>
-            <type>jar</type>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bukkit</groupId>
-                    <artifactId>craftbukkit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!-- Start of Logging Dependency -->       
         <!-- End of Logging Dependency -->
-
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
     </dependencies>
-    <distributionManagement>
-        <repository>
-            <id>OnARandomBox</id>
-            <url>http://repo.onarandombox.com/content/repositories/multiverse</url>
-        </repository>
-        <snapshotRepository>
-            <id>OnARandomBox</id>
-            <url>http://repo.onarandombox.com/content/repositories/multiverse-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>

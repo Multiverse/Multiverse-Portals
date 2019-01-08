@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
@@ -16,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import org.bukkit.Material;
 
 public class WandCommand extends PortalCommand {
 
@@ -55,11 +55,12 @@ public class WandCommand extends PortalCommand {
                 p.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit wand " + ChatColor.WHITE + "to perform portal selections!");
                 return;
             }
-            int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
-            ItemStack wand = new ItemStack(itemType, 1);
+            String wandString = plugin.getMainConfig().getString("wand");
+            Material wandMat = stringIsValidMaterial(wandString) ? getMaterialFromString(wandString) : MultiversePortals.DEFAULT_WAND;
+            ItemStack wand = new ItemStack(wandMat);
 
-            if (p.getItemInHand().getAmount() == 0) {
-                p.setItemInHand(wand);
+            if (p.getInventory().getItemInMainHand().getAmount() == 0) {
+                p.getInventory().setItemInMainHand(wand);
                 p.sendMessage("You have been given a " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")!");
             } else {
                 if (p.getInventory().addItem(wand).isEmpty()) {
@@ -69,6 +70,20 @@ public class WandCommand extends PortalCommand {
                     p.getWorld().dropItemNaturally(p.getLocation(), wand);
                 }
             }
+
+        }
+    }
+
+    public Material getMaterialFromString(String string) {
+        return Material.valueOf(string.toUpperCase());
+    }
+
+    public boolean stringIsValidMaterial(String string) {
+        try {
+            Material mat = Material.valueOf(string.toUpperCase());
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

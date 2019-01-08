@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals;
 
 import java.util.Arrays;
@@ -32,6 +31,7 @@ import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 
 public class MVPortal {
+
     private String name;
     private PortalLocation location;
     private MVDestination destination;
@@ -41,7 +41,7 @@ public class MVPortal {
     private Permission permission;
     private Permission fillPermission;
     private Permission exempt;
-    private int currency = -1;
+    private String currency = "Gold Ingot";
     private double price = 0.0;
     private MVWorldManager worldManager;
     private boolean safeTeleporter;
@@ -51,9 +51,8 @@ public class MVPortal {
     private String handlerScript;
 
     private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
-        Material.PORTAL, Material.LONG_GRASS, Material.VINE,
-        Material.SNOW, Material.AIR, Material.WATER,
-        Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA });
+        Material.NETHER_PORTAL, Material.TALL_GRASS, Material.VINE,
+        Material.SNOW, Material.AIR, Material.WATER, Material.LAVA});
 
     public static boolean isPortalInterior(Material material) {
         return INTERIOR_MATERIALS.contains(material);
@@ -77,7 +76,7 @@ public class MVPortal {
         this.config = this.plugin.getPortalsConfig();
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.setCurrency(this.config.getInt(this.portalConfigString + ".entryfee.currency", -1));
+        this.setCurrency(this.config.getString(this.portalConfigString + ".entryfee.currency", Material.GOLD_INGOT.name()));
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
         this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
@@ -167,7 +166,7 @@ public class MVPortal {
         allPortalFill.getChildren().put(this.fillPermission.getName(), true);
 
         this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
-        for(Player player : this.plugin.getServer().getOnlinePlayers()){
+        for (Player player : this.plugin.getServer().getOnlinePlayers()) {
             player.recalculatePermissions();
         }
     }
@@ -178,13 +177,12 @@ public class MVPortal {
 
         // Don't load portals from configs, as we have a linked list issue
         // Have to load all portals first, then resolve their destinations.
-
         String portalLocString = portal.config.getString(portal.portalConfigString + ".location", "");
         String worldString = portal.config.getString(portal.portalConfigString + ".world", "");
         portal.setPortalLocation(portalLocString, worldString);
 
         portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
-        portal.setCurrency(portal.config.getInt(portal.portalConfigString + ".entryfee.currency", -1));
+        portal.setCurrency(portal.config.getString(portal.portalConfigString + ".entryfee.currency", Material.GOLD_INGOT.name()));
         portal.setPrice(portal.config.getDouble(portal.portalConfigString + ".entryfee.amount", 0.0));
 
         // We've finished reading the portal from the config file. Any further
@@ -194,7 +192,7 @@ public class MVPortal {
         return portal;
     }
 
-    public int getCurrency() {
+    public String getCurrency() {
         return this.currency;
     }
 
@@ -202,7 +200,7 @@ public class MVPortal {
         return this.price;
     }
 
-    private boolean setCurrency(int currency) {
+    private boolean setCurrency(String currency) {
         this.currency = currency;
         config.set(this.portalConfigString + ".entryfee.currency", currency);
         saveConfig();
@@ -249,7 +247,7 @@ public class MVPortal {
     public boolean setPortalLocation(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
-            this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid LOCATION!");
+            plugin.log.warn("Portal " + name + " has an invalid LOCATION!");
             return false;
         }
         this.config.set(this.portalConfigString + ".location", this.location.toString());
@@ -258,7 +256,7 @@ public class MVPortal {
 
             this.config.set(this.portalConfigString + ".world", world.getName());
         } else {
-            this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
+            plugin.log.warn("Portal " + name + " has an invalid WORLD");
             return false;
         }
         saveConfig();
@@ -321,13 +319,8 @@ public class MVPortal {
             return this.setDestination(value);
         }
 
-
         if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
-            try {
-                return this.setCurrency(Integer.parseInt(value));
-            } catch (NumberFormatException e) {
-                return false;
-            }
+            return setCurrency(value.toUpperCase());
         }
 
         if (property.equalsIgnoreCase("price")) {
@@ -431,27 +424,25 @@ public class MVPortal {
      * @return true if the frame around the location is valid; false otherwise
      */
     public boolean isFrameValid(Location l) {
-        List<Integer> validMaterialIds = MultiversePortals.FrameMaterials;
+        List<Material> validMaterialIds = MultiversePortals.FrameMaterials;
         if (validMaterialIds == null || validMaterialIds.isEmpty()) {
             // All frame materials are valid.
             return true;
         }
 
-        MultiversePortals.staticLog(Level.FINER, String.format("checking portal frame at %d,%d,%d",
-                l.getBlockX(), l.getBlockY(), l.getBlockZ()));
+        plugin.log.info("Checking portal frame at %d, %d, %d", l.getBlockX(), l.getBlockY(), l.getBlockZ());
 
         // Limit the search to the portal's region, extended by 1 block.
         boolean frameValid = false;
         {
             MultiverseRegion r = getLocation().getRegion();
-            int useX = (r.getWidth()  == 1) ? 0 : 1;
+            int useX = (r.getWidth() == 1) ? 0 : 1;
             int useY = (r.getHeight() == 1) ? 0 : 1;
-            int useZ = (r.getDepth()  == 1) ? 0 : 1;
+            int useZ = (r.getDepth() == 1) ? 0 : 1;
 
             // Search for a frame in each of the portal's "flat" (size 1)
             // dimensions. If a portal's size is greater than 1 in all three
             // dimensions, an invalid frame will be reported.
-
             // Try a frame that's flat in the X dimension.
             if (!frameValid && useX == 0) {
                 frameValid = isFrameValid(l, expandedRegion(r, 0, 1, 1));
@@ -471,18 +462,17 @@ public class MVPortal {
     }
 
     /**
-     * Examines a frame around a location, bounded by a search region which has
-     * one dimension of size 1 and two dimensions which of size greater than
-     * one.
+     * Examines a frame around a location, bounded by a search region which has one dimension of size 1 and two dimensions which of size greater than one.
+     *
      * @param location
      * @param searchRegion
      * @return
      */
     private boolean isFrameValid(Location location, MultiverseRegion searchRegion) {
 
-        int useX = (searchRegion.getWidth()  == 1) ? 0 : 1;
+        int useX = (searchRegion.getWidth() == 1) ? 0 : 1;
         int useY = (searchRegion.getHeight() == 1) ? 0 : 1;
-        int useZ = (searchRegion.getDepth()  == 1) ? 0 : 1;
+        int useZ = (searchRegion.getDepth() == 1) ? 0 : 1;
 
         // Make sure the search region is flat in exactly one dimension.
         if (useX + useY + useZ != 2) {
@@ -491,10 +481,9 @@ public class MVPortal {
 
         Level debugLevel = Level.FINER;
 
-        MultiversePortals.staticLog(debugLevel, String.format("checking portal around %d,%d,%d",
-                location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        plugin.log.debug("Checking portal around %d,%d,%d", location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-        int commonMaterialId = -1;
+        Material commonMaterial = Material.AIR;
 
         World world = location.getWorld();
 
@@ -506,8 +495,8 @@ public class MVPortal {
             Location toCheck = frontier.pop();
             visited.add(toCheck);
 
-            MultiversePortals.staticLog(debugLevel, String.format("          ... block at %d,%d,%d",
-                    toCheck.getBlockX(), toCheck.getBlockY(), toCheck.getBlockZ()));
+            plugin.log.debug("          ... block at %d,%d,%d",
+                    toCheck.getBlockX(), toCheck.getBlockY(), toCheck.getBlockZ());
 
             if (isPortalInterior(toCheck.getBlock().getType())) {
                 // This is an empty block in the portal. Check each of the four
@@ -535,43 +524,38 @@ public class MVPortal {
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 // This is a frame block. Check its material.
-                int materialId = toCheck.getBlock().getTypeId();
-                if (commonMaterialId == -1) {
+                Material material = toCheck.getBlock().getType();
+                if (commonMaterial == Material.AIR) {
                     // This is the first frame block we've found.
-                    commonMaterialId = materialId;
-                }
-                else if (commonMaterialId != materialId) {
+                    commonMaterial = material;
+                } else if (commonMaterial != material) {
                     // This frame block doesn't match other frame blocks.
-                    MultiversePortals.staticLog(debugLevel, "frame has multiple materials");
+                    plugin.log.debug("Frame has multiple materials");
                     return false;
                 }
             }
         }
-        MultiversePortals.staticLog(debugLevel, String.format("frame has common material %d", commonMaterialId));
+        plugin.log.debug("Frame has common material %d", commonMaterial);
 
-        return MultiversePortals.FrameMaterials.contains(commonMaterialId);
-    }
-
-    @Deprecated
-    public boolean isExempt(Player player) {
-        return false;
+        return MultiversePortals.FrameMaterials.contains(commonMaterial);
     }
 
     public Permission getExempt() {
         return this.exempt;
     }
 
-
-
     private MultiverseRegion expandedRegion(MultiverseRegion r, int x, int y, int z) {
         Vector min = new Vector().copy(r.getMinimumPoint());
         Vector max = new Vector().copy(r.getMaximumPoint());
         min.add(new Vector(-x, -y, -z));
-        max.add(new Vector( x,  y,  z));
+        max.add(new Vector(x, y, z));
         return new MultiverseRegion(min, max, r.getWorld());
+    }
+    
+    public MultiversePortals getPlugin(){
+        return plugin;
     }
 
 }

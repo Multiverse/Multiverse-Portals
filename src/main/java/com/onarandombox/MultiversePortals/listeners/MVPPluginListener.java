@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.listeners;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
@@ -32,7 +31,7 @@ public class MVPPluginListener implements Listener {
         } else if (event.getPlugin().getDescription().getName().equals("MultiVerse")) {
             if (event.getPlugin().isEnabled()) {
                 this.plugin.getServer().getPluginManager().disablePlugin(event.getPlugin());
-                MultiversePortals.staticLog(Level.WARNING, "I just disabled the old version of Multiverse for you. You should remove the JAR now, your configs have been migrated.");
+                plugin.log.warn("I just disabled the old version of Multiverse for you. You should remove the JAR now, your configs have been migrated.");
             }
         }
     }

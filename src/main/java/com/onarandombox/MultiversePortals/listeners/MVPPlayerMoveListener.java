@@ -68,7 +68,7 @@ public class MVPPlayerMoveListener implements Listener {
             p.setFallDistance(0);
 
             if (d instanceof InvalidDestination) {
-                this.plugin.log(Level.FINE, "Invalid Destination!");
+                this.plugin.log.info("Invalid Destination!");
                 return;
             }
 
@@ -104,7 +104,7 @@ public class MVPPlayerMoveListener implements Listener {
 
             MVEconomist economist = plugin.getCore().getEconomist();
             double price = portal.getPrice();
-            int currency = portal.getCurrency();
+            String currency = portal.getCurrency();
 
             if (price != 0D && !p.hasPermission(portal.getExempt())) {
                 if (price < 0D || economist.isPlayerWealthyEnough(p, price, currency)) {

@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.utils;
 
 import java.util.ArrayList;
@@ -28,13 +27,13 @@ import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
 
-
 /**
  * Manages all portals for all worlds.
  *
  * @author fernferret
  */
 public class PortalManager {
+
     private MultiversePortals plugin;
     private Map<String, MVPortal> portals;
 
@@ -50,8 +49,10 @@ public class PortalManager {
         this.portals = new HashMap<String, MVPortal>();
         this.worldChunkPortals = new HashMap<MultiverseWorld, Map<Integer, Collection<MVPortal>>>();
     }
+
     /**
      * Method that checks to see if a player is inside a portal AND if they have perms to use it.
+     *
      * @param sender The sender to check.
      * @param l The location they're standing.
      * @return A MVPortal if it's valid, null if not.
@@ -75,14 +76,6 @@ public class PortalManager {
 
         return null;
     }
-    /**
-     * Deprecated, use getPortal instead.
-     * @deprecated
-     */
-    @Deprecated
-    public MVPortal isPortal(Player sender, Location l) {
-        return this.getPortal(sender, l);
-    }
 
     /**
      * Simplified method for seeing if someone is in a portal. We'll check perms later.
@@ -96,8 +89,8 @@ public class PortalManager {
     }
 
     /**
-     * Return a portal at a location.
-     * NOTE: If there are more than one portal, order is effectively indeterminate.
+     * Return a portal at a location. NOTE: If there are more than one portal, order is effectively indeterminate.
+     *
      * @param l The location to check at
      * @return Null if no portal found, otherwise the MVPortal at that location.
      */
@@ -128,7 +121,7 @@ public class PortalManager {
         }
         return false;
     }
-    
+
     // Add a portal whose name is already known to be unique.
     private void addUniquePortal(MultiverseWorld world, String name, MVPortal portal) {
         this.portals.put(name, portal);
@@ -177,7 +170,7 @@ public class PortalManager {
             // player to the nether instead of their expected destination).
 
             MultiverseRegion region = removed.getLocation().getRegion();
-            replaceInRegion(removed.getWorld(), region, Material.PORTAL, Material.AIR);
+            replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR);
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
@@ -186,7 +179,7 @@ public class PortalManager {
     }
 
     private void recalculatePermissions() {
-        String[] permissionsNames = new String[] { "multiverse.portal.access.*", "multiverse.portal.exempt.*", "multiverse.portal.fill.*" };
+        String[] permissionsNames = new String[]{"multiverse.portal.access.*", "multiverse.portal.exempt.*", "multiverse.portal.fill.*"};
         for (String permissionName : permissionsNames) {
             Permission permission = this.plugin.getServer().getPluginManager().getPermission(permissionName);
             this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(permission);
@@ -235,8 +228,8 @@ public class PortalManager {
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         if (MultiversePortals.EnforcePortalAccess) {
             for (MVPortal p : all) {
-                if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
-                        p.playerCanEnterPortal((Player) sender)) {
+                if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world)
+                        && p.playerCanEnterPortal((Player) sender)) {
                     validItems.add(p);
                 }
             }
@@ -254,10 +247,10 @@ public class PortalManager {
     /**
      * Gets a portal with a commandsender and a name. Used as a convenience for portal listing methods
      *
-     * @param portalName
-     * @param sender
+     * @param portalName The portal name
+     * @param sender sender
      *
-     * @return
+     * @return MVPortal
      */
     public MVPortal getPortal(String portalName, CommandSender sender) {
         if (!this.plugin.getCore().getMVPerms().hasPermission(sender, "multiverse.portal.access." + portalName, true)) {
@@ -277,12 +270,9 @@ public class PortalManager {
         }
         recalculatePermissions();
     }
-    
+
     private void replaceInRegion(World world, MultiverseRegion removedRegion, Material oldMaterial, Material newMaterial) {
 
-        int oldMaterialId = oldMaterial.getId();
-        int newMaterialId = newMaterial.getId();
-        
         // Determine the bounds of the region.
         Vector min = removedRegion.getMinimumPoint();
         Vector max = removedRegion.getMaximumPoint();
@@ -293,14 +283,14 @@ public class PortalManager {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Block b = world.getBlockAt(x, y, z);
-                    if (b.getTypeId() == oldMaterialId) {
-                        b.setTypeId(newMaterialId, false);
+                    if (b.getType() == oldMaterial) {
+                        b.setType(newMaterial, false);
                     }
                 }
             }
         }
     }
-    
+
     private int blockToChunk(int b) {
         // A block at -5 should be in chunk -1 instead of chunk 0.
         if (b < 0) {
@@ -308,11 +298,11 @@ public class PortalManager {
         }
         return b / 16;
     }
-    
+
     private int hashChunk(int cx, int cz) {
         return (cx << 16) | (cz & 0xFFFF);
     }
-    
+
     private void addToWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
 
         Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
@@ -343,7 +333,7 @@ public class PortalManager {
             }
         }
     }
-    
+
     private void removeFromWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
         Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
 

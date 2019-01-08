@@ -16,7 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 
 public class PortalFiller {
@@ -59,7 +58,7 @@ public class PortalFiller {
      */
     private void doFill(Block newLoc, int useX, int useZ, MultiverseRegion r, Material type) {
         if (isValidPortalRegion(newLoc.getLocation(), type)) {
-            newLoc.setTypeId(type.getId(), false);
+            newLoc.setType(type, false);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 1, 0, useZ * 1).getLocation(), type)) {
             Block tmpLoc = newLoc.getRelative(useX * 1, 0, useZ * 1);

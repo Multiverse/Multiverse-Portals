@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.listeners;
 
 import org.bukkit.Material;
@@ -19,6 +18,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MVPBlockListener implements Listener {
+
     private MultiversePortals plugin;
 
     public MVPBlockListener(MultiversePortals plugin) {
@@ -28,7 +28,7 @@ public class MVPBlockListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void blockFromTo(BlockFromToEvent event) {
         // Always check if the event has been canceled by someone else.
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
         }
         // If UseOnMove is false, every usable portal will be lit. Since water
@@ -39,8 +39,9 @@ public class MVPBlockListener implements Listener {
         }
 
         // The to block should never be null, but apparently it is sometimes...
-        if (event.getBlock() == null || event.getToBlock() == null)
+        if (event.getBlock() == null || event.getToBlock() == null) {
             return;
+        }
 
         // If lava/something else is trying to flow in...
         if (plugin.getPortalManager().isPortal(event.getToBlock().getLocation())) {
@@ -58,9 +59,9 @@ public class MVPBlockListener implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        if (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL) {
-            PortalManager pm = this.plugin.getPortalManager();
-            if (pm.isPortal(event.getBlock().getLocation())) {
+        if (event.getChangedType() == Material.NETHER_PORTAL || event.getBlock().getType() == Material.NETHER_PORTAL) {
+            PortalManager portalManager = plugin.getPortalManager();
+            if (portalManager.isPortal(event.getBlock().getLocation())) {
                 event.setCancelled(true);
             }
         }

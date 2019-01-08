@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalLocation;
@@ -78,7 +77,7 @@ public class CreateCommand extends PortalCommand {
                 MVPortal standingIn = ps.getUncachedStandingInPortal();
                 if (standingIn != null) {
                     // If they're standing in a portal. treat it differently, niftily you might say...
-                    String cardinal = LocationManipulation.getDirection(p.getLocation());
+                    String cardinal = plugin.getCore().getLocationManipulation().getDirection(p.getLocation());
                     portal.setDestination("p:" + standingIn.getName() + ":" + cardinal);
                 } else {
                     portal.setExactDestination(p.getLocation());

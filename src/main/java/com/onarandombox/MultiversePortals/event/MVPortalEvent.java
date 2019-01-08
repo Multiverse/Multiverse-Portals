@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals.event;
 
 import org.bukkit.Location;
@@ -23,24 +22,12 @@ import com.onarandombox.MultiversePortals.enums.PortalType;
  * @author fernferret
  */
 public class MVPortalEvent extends Event implements Cancellable {
+
     private Player teleportee;
     private MVPortal sendingPortal;
     private MVDestination destination;
     private TravelAgent travelAgent;
     private boolean isCancelled;
-
-    /**
-     * Old constructor did not provide enough intel
-     *
-     * @deprecated use {@link MVPortalEvent(MVDestination, Player, TravelAgent, MVPortal)}
-     *             instead.
-     */
-    @Deprecated
-    public MVPortalEvent(MVDestination destination, Player teleportee, TravelAgent travelAgent) {
-        this.teleportee = teleportee;
-        this.destination = destination;
-        this.travelAgent = travelAgent;
-    }
 
     public MVPortalEvent(MVDestination destination, Player teleportee, TravelAgent travelAgent, MVPortal sendingPortal) {
         this.teleportee = teleportee;
@@ -65,6 +52,7 @@ public class MVPortalEvent extends Event implements Cancellable {
 
     /**
      * Gets the handler list. This is required by the event system.
+     *
      * @return A list of HANDLERS.
      */
     public static HandlerList getHandlerList() {

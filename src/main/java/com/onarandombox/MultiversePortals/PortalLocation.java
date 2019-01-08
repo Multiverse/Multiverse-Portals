@@ -4,7 +4,6 @@
  * For more information please check the README.md file included
  * with this project
  */
-
 package com.onarandombox.MultiversePortals;
 
 import java.util.Arrays;
@@ -24,7 +23,6 @@ public class PortalLocation {
 
     public PortalLocation(Vector pos1, Vector pos2, MultiverseWorld world) {
         this.validLocation = this.setLocation(pos1, pos2, world);
-        ;
     }
 
     public PortalLocation() {
@@ -33,8 +31,9 @@ public class PortalLocation {
     /**
      * This constructor takes the Vectors from WorldEdit and converts them to Bukkit vectors.
      *
-     * @param minPt
-     * @param maxPt
+     * @param minPt Min point
+     * @param maxPt Max point
+     * @param world World
      */
     public PortalLocation(com.sk89q.worldedit.math.BlockVector3 minPt, com.sk89q.worldedit.math.BlockVector3 maxPt, MultiverseWorld world) {
         this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
@@ -43,11 +42,11 @@ public class PortalLocation {
     public static PortalLocation parseLocation(String locationString, MultiverseWorld world, String portalName) {
         String[] split = locationString.split(":");
         if (split.length != 2) {
-            MultiversePortals.staticLog(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
+            MultiversePortals.log.warn("Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
             return getInvalidPortalLocation();
         }
         if (world == null) {
-            MultiversePortals.staticLog(Level.WARNING, "Failed Parsing World for: " + portalName + " (World Error, World did not exist or was not imported into Multiverse-Core!)");
+            MultiversePortals.log.warn("Failed Parsing World for: " + portalName + " (World Error, World did not exist or was not imported into Multiverse-Core!)");
             return getInvalidPortalLocation();
         }
 
@@ -55,7 +54,7 @@ public class PortalLocation {
         Vector pos2 = parseVector(split[1]);
 
         if (pos1 == null || pos2 == null) {
-            MultiversePortals.staticLog(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Vector Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
+            MultiversePortals.log.warn("Failed Parsing Location for: " + portalName + " (Vector Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
             return getInvalidPortalLocation();
         }
         return new PortalLocation(pos1, pos2, world);
