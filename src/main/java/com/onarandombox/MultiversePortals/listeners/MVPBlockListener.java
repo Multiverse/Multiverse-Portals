@@ -58,7 +58,7 @@ public class MVPBlockListener implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        if (event.getChangedType() == Material.PORTAL || event.getBlock().getType() == Material.PORTAL) {
+        if (event.getChangedType() == Material.NETHER_PORTAL || event.getBlock().getType() == Material.NETHER_PORTAL) {
             PortalManager pm = this.plugin.getPortalManager();
             if (pm.isPortal(event.getBlock().getLocation())) {
                 event.setCancelled(true);

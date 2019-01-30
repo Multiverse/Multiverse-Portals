@@ -151,8 +151,8 @@ public class MVPPlayerListener implements Listener {
                     ps.showDebugInfo(portal);
                     event.setCancelled(true);
                 } else {
-                    Material fillMaterial = Material.PORTAL;
-                    if (translatedLocation.getWorld().getBlockAt(translatedLocation).getType() == Material.PORTAL) {
+                    Material fillMaterial = Material.NETHER_PORTAL;
+                    if (translatedLocation.getWorld().getBlockAt(translatedLocation).getType() == Material.NETHER_PORTAL) {
                         fillMaterial = Material.AIR;
                     }
                     this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
@@ -162,12 +162,12 @@ public class MVPPlayerListener implements Listener {
             return;
         }
 
-        int itemType = this.plugin.getMainConfig().getInt("wand", MultiversePortals.DEFAULT_WAND);
+        Material itemType = plugin.getWandMaterial();
         // If we Found WorldEdit, return, we're not needed here.
         // If the item is not the Wand we've stetup we're not needed either
         // If the player doesn't have the perms, return also.
         if (plugin.getWorldEditConnection().isConnected()
-                || event.getPlayer().getItemInHand().getTypeId() != itemType
+                || event.getPlayer().getItemInHand().getType() != itemType
                 || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;
         }
@@ -255,7 +255,7 @@ public class MVPPlayerListener implements Listener {
 
                 boolean shouldPay = false;
                 double price = portal.getPrice();
-                int currency = portal.getCurrency();
+                Material currency = portal.getCurrency();
                 MVEconomist economist = plugin.getCore().getEconomist();
 
                 // Stop the player if the portal costs and they can't pay

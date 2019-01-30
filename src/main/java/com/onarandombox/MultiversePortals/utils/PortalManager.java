@@ -177,7 +177,7 @@ public class PortalManager {
             // player to the nether instead of their expected destination).
 
             MultiverseRegion region = removed.getLocation().getRegion();
-            replaceInRegion(removed.getWorld(), region, Material.PORTAL, Material.AIR);
+            replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR);
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
@@ -279,10 +279,6 @@ public class PortalManager {
     }
     
     private void replaceInRegion(World world, MultiverseRegion removedRegion, Material oldMaterial, Material newMaterial) {
-
-        int oldMaterialId = oldMaterial.getId();
-        int newMaterialId = newMaterial.getId();
-        
         // Determine the bounds of the region.
         Vector min = removedRegion.getMinimumPoint();
         Vector max = removedRegion.getMaximumPoint();
@@ -293,8 +289,8 @@ public class PortalManager {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     Block b = world.getBlockAt(x, y, z);
-                    if (b.getTypeId() == oldMaterialId) {
-                        b.setTypeId(newMaterialId, false);
+                    if (b.getType() == oldMaterial) {
+                        b.setType(newMaterial, false);
                     }
                 }
             }

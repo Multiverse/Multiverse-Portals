@@ -15,20 +15,26 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
+import com.onarandombox.MultiverseCore.utils.MaterialConverter;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
 import com.sk89q.worldedit.WorldEdit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -81,9 +87,9 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private PortalManager portalManager;
     private Map<String, PortalPlayerSession> portalSessions;
 
-    public static final int DEFAULT_WAND = 271;
+    private static final Material DEFAULT_WAND = Material.WOODEN_AXE;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 19;
+    private final static int requiresProtocol = 22;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
@@ -92,7 +98,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     // Restricts the materials that can be used for the frames of portals.
     // An empty or null list means all materials are okay.
-    public static List<Integer> FrameMaterials = null;
+    public static List<Material> FrameMaterials = null;
 
     public void onLoad() {
         getDataFolder().mkdirs();
@@ -269,7 +275,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
         MultiversePortals.TeleportVehicles = this.MVPConfig.getBoolean("teleportvehicles", true);
-        MultiversePortals.FrameMaterials = this.MVPConfig.getIntegerList("framematerials");
+        MultiversePortals.FrameMaterials = migrateFrameMaterials(this.MVPConfig);
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
             this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
@@ -302,6 +308,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         }
 
         this.saveMainConfig();
+    }
+
+    private List<Material> migrateFrameMaterials(ConfigurationSection config) {
+        return config.getList("framematerials", Collections.emptyList()).stream()
+                .map(Object::toString)
+                .map(MaterialConverter::convertTypeString)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public boolean saveMainConfig() {
@@ -497,6 +511,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public void setWandEnabled(boolean enabled) {
         WandEnabled = enabled;
+    }
+
+    public Material getWandMaterial() {
+        Material m = MaterialConverter.convertConfigType(getMainConfig(),"wand");
+        if (m == null) {
+            m = MultiversePortals.DEFAULT_WAND;
+        }
+        return m;
     }
 
     private static class WorldEditPluginListener implements Listener {

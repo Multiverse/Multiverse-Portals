@@ -19,6 +19,7 @@ import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -104,7 +105,7 @@ public class MVPPlayerMoveListener implements Listener {
 
             MVEconomist economist = plugin.getCore().getEconomist();
             double price = portal.getPrice();
-            int currency = portal.getCurrency();
+            Material currency = portal.getCurrency();
 
             if (price != 0D && !p.hasPermission(portal.getExempt())) {
                 if (price < 0D || economist.isPlayerWealthyEnough(p, price, currency)) {

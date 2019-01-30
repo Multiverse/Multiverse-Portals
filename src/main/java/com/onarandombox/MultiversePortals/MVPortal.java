@@ -15,9 +15,12 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 
+import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import de.themoep.idconverter.multiverse.IdMappings;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -41,7 +44,7 @@ public class MVPortal {
     private Permission permission;
     private Permission fillPermission;
     private Permission exempt;
-    private int currency = -1;
+    private Material currency = null;
     private double price = 0.0;
     private MVWorldManager worldManager;
     private boolean safeTeleporter;
@@ -50,10 +53,8 @@ public class MVPortal {
     private boolean allowSave;
     private String handlerScript;
 
-    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(new Material[]{
-        Material.PORTAL, Material.LONG_GRASS, Material.VINE,
-        Material.SNOW, Material.AIR, Material.WATER,
-        Material.STATIONARY_WATER, Material.LAVA, Material.STATIONARY_LAVA });
+    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
+            Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
 
     public static boolean isPortalInterior(Material material) {
         return INTERIOR_MATERIALS.contains(material);
@@ -77,7 +78,7 @@ public class MVPortal {
         this.config = this.plugin.getPortalsConfig();
         this.name = name;
         this.portalConfigString = "portals." + this.name;
-        this.setCurrency(this.config.getInt(this.portalConfigString + ".entryfee.currency", -1));
+        this.setCurrency(MaterialConverter.convertConfigType(this.config, this.portalConfigString + ".entryfee.currency"));
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
         this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
@@ -184,7 +185,7 @@ public class MVPortal {
         portal.setPortalLocation(portalLocString, worldString);
 
         portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
-        portal.setCurrency(portal.config.getInt(portal.portalConfigString + ".entryfee.currency", -1));
+        portal.setCurrency(MaterialConverter.convertConfigType(portal.config, portal.portalConfigString + ".entryfee.currency"));
         portal.setPrice(portal.config.getDouble(portal.portalConfigString + ".entryfee.amount", 0.0));
 
         // We've finished reading the portal from the config file. Any further
@@ -194,7 +195,7 @@ public class MVPortal {
         return portal;
     }
 
-    public int getCurrency() {
+    public Material getCurrency() {
         return this.currency;
     }
 
@@ -202,7 +203,7 @@ public class MVPortal {
         return this.price;
     }
 
-    private boolean setCurrency(int currency) {
+    private boolean setCurrency(Material currency) {
         this.currency = currency;
         config.set(this.portalConfigString + ".entryfee.currency", currency);
         saveConfig();
@@ -323,11 +324,7 @@ public class MVPortal {
 
 
         if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
-            try {
-                return this.setCurrency(Integer.parseInt(value));
-            } catch (NumberFormatException e) {
-                return false;
-            }
+            return this.setCurrency(Material.matchMaterial(value));
         }
 
         if (property.equalsIgnoreCase("price")) {
@@ -431,8 +428,8 @@ public class MVPortal {
      * @return true if the frame around the location is valid; false otherwise
      */
     public boolean isFrameValid(Location l) {
-        List<Integer> validMaterialIds = MultiversePortals.FrameMaterials;
-        if (validMaterialIds == null || validMaterialIds.isEmpty()) {
+        List<Material> validMaterials = MultiversePortals.FrameMaterials;
+        if (validMaterials == null || validMaterials.isEmpty()) {
             // All frame materials are valid.
             return true;
         }
@@ -494,7 +491,7 @@ public class MVPortal {
         MultiversePortals.staticLog(debugLevel, String.format("checking portal around %d,%d,%d",
                 location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-        int commonMaterialId = -1;
+        Material commonMaterial = null;
 
         World world = location.getWorld();
 
@@ -538,21 +535,21 @@ public class MVPortal {
             }
             else {
                 // This is a frame block. Check its material.
-                int materialId = toCheck.getBlock().getTypeId();
-                if (commonMaterialId == -1) {
+                Material material = toCheck.getBlock().getType();
+                if (commonMaterial == null) {
                     // This is the first frame block we've found.
-                    commonMaterialId = materialId;
+                    commonMaterial = material;
                 }
-                else if (commonMaterialId != materialId) {
+                else if (commonMaterial != material) {
                     // This frame block doesn't match other frame blocks.
                     MultiversePortals.staticLog(debugLevel, "frame has multiple materials");
                     return false;
                 }
             }
         }
-        MultiversePortals.staticLog(debugLevel, String.format("frame has common material %d", commonMaterialId));
+        MultiversePortals.staticLog(debugLevel, String.format("frame has common material %s", commonMaterial));
 
-        return MultiversePortals.FrameMaterials.contains(commonMaterialId);
+        return MultiversePortals.FrameMaterials.contains(commonMaterial);
     }
 
     @Deprecated

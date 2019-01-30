@@ -7,6 +7,9 @@
 
 package com.onarandombox.MultiversePortals.destination;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.BlockSafety;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -14,7 +17,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.utils.BlockSafety;
 import com.onarandombox.MultiverseCore.utils.LocationManipulation;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -71,7 +73,10 @@ public class PortalDestination implements MVDestination {
      * @return
      */
     private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
-        BlockSafety bs = new BlockSafety();
+        // If this class exists, then this Multiverse-Core MUST exist!
+        // TODO there really ought to be a better way!
+        MultiverseCore mvCore = (MultiverseCore) Bukkit.getPluginManager().getPlugin("Multiverse-Core");
+        BlockSafety bs = mvCore.getBlockSafety();
         for (int i = y; i < yMax; i++) {
             if (bs.playerCanSpawnHereSafely(w, finalX, i, finalZ)) {
                 return i;
