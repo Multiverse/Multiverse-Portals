@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.logging.Level;
 
 import com.onarandombox.MultiverseCore.utils.MVEconomist;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

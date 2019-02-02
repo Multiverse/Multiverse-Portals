@@ -29,6 +29,7 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
+import com.onarandombox.commandhandler.CommandHandler;
 import com.sk89q.worldedit.WorldEdit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -69,7 +70,6 @@ import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
 import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
-import com.pneumaticraft.commandhandler.multiverse.CommandHandler;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
@@ -354,7 +354,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.commandHandler.registerCommand(new SelectCommand(this));
         this.commandHandler.registerCommand(new WandCommand(this));
         this.commandHandler.registerCommand(new ConfigCommand(this));
-        for (com.pneumaticraft.commandhandler.multiverse.Command c : this.commandHandler.getAllCommands()) {
+        for (com.onarandombox.commandhandler.Command c : this.commandHandler.getAllCommands()) {
             if (c instanceof HelpCommand) {
                 c.addKey("mvp");
             }

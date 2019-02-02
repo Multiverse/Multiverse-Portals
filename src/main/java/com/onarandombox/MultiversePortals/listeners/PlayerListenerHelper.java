@@ -1,6 +1,5 @@
 package com.onarandombox.MultiversePortals.listeners;
 
-import buscript.multiverse.Buscript;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiverseCore.enums.TeleportResult;
@@ -9,6 +8,7 @@ import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
+import com.onarandombox.buscript.Buscript;
 import org.bukkit.Location;
 import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;

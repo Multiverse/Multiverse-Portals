@@ -9,10 +9,10 @@ package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
 
+import com.onarandombox.commandhandler.Command;
 import org.bukkit.command.CommandSender;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.pneumaticraft.commandhandler.multiverse.Command;
 /**
  * Convenience class so we don't have to cast each time.
  * @author fernferret

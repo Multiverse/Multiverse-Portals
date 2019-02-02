@@ -16,11 +16,9 @@ import java.util.Stack;
 import java.util.logging.Level;
 
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
-import de.themoep.idconverter.multiverse.IdMappings;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
