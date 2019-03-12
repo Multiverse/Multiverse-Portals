@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.logging.Level;
 
 import com.onarandombox.MultiverseCore.utils.MVEconomist;
+import com.onarandombox.MultiversePortals.WorldEditConnection;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -165,7 +166,8 @@ public class MVPPlayerListener implements Listener {
         // If we Found WorldEdit, return, we're not needed here.
         // If the item is not the Wand we've stetup we're not needed either
         // If the player doesn't have the perms, return also.
-        if (plugin.getWorldEditConnection().isConnected()
+        WorldEditConnection worldEdit = plugin.getWorldEditConnection();
+        if ((worldEdit != null && worldEdit.isConnected())
                 || event.getPlayer().getItemInHand().getType() != itemType
                 || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
             return;

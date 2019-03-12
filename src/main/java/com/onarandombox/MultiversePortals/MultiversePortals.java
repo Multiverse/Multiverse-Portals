@@ -30,7 +30,6 @@ import com.onarandombox.MultiverseCore.utils.MaterialConverter;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
 import com.onarandombox.commandhandler.CommandHandler;
-import com.sk89q.worldedit.WorldEdit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -144,7 +143,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Register our events AFTER the config.
         this.registerEvents();
 
-        this.checkForWorldEdit();
+        getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
     }
 
     private void registerEvents() {
@@ -168,16 +167,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             pm.registerEvents(new MVPPlayerMoveListener(this, playerListenerHelper), this);
         }
         pm.registerEvents(coreListener, this);
-    }
-
-    /**
-     * Currently, WorldEdit is required for portals, we're listening for new plugins coming online, but we need to make
-     * sure
-     */
-    private void checkForWorldEdit() {
-        worldEditConnection = new WorldEditConnection(this);
-        getServer().getPluginManager().registerEvents(new WorldEditPluginListener(worldEditConnection), this);
-        worldEditConnection.connect();
     }
 
     /** Create the higher level permissions so we can add finer ones to them. */
@@ -390,14 +379,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     /**
-     * @deprecated use {@link #getWorldEditConnection()} as this method will be removed.
-     */
-    @Deprecated
-    public WorldEdit getWEAPI() {
-        return getWorldEditConnection().worldEdit;
-    }
-
-    /**
      * Returns the WorldEdit compatibility object. Use this to check for WorldEdit and get a player's WorldEdit selection.
      *
      * @return the WorldEdit compatibility ojbect.
@@ -521,12 +502,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return m;
     }
 
-    private static class WorldEditPluginListener implements Listener {
+    private class WorldEditPluginListener implements Listener {
 
-        private final WorldEditConnection worldEditConnection;
-
-        private WorldEditPluginListener(WorldEditConnection worldEditConnection) {
-            this.worldEditConnection = worldEditConnection;
+        private WorldEditPluginListener() {
+            if (getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+                connectWorldEdit();
+            }
         }
 
         private boolean isPluginWorldEdit(Plugin plugin) {
@@ -537,10 +518,15 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             return plugin.getName().equals("WorldEdit");
         }
 
+        private void connectWorldEdit() {
+            worldEditConnection = new WorldEditConnection(MultiversePortals.this);
+            worldEditConnection.connect();
+        }
+
         @EventHandler
         private void pluginEnabled(PluginEnableEvent event) {
             if (isPluginWorldEdit(event.getPlugin())) {
-                worldEditConnection.connect();
+                connectWorldEdit();
             }
         }
 
@@ -548,6 +534,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         private void pluginDisableEvent(PluginDisableEvent event) {
             if (isPluginWorldEdit(event.getPlugin())) {
                 worldEditConnection.disconnect();
+                worldEditConnection = null;
             }
         }
     }

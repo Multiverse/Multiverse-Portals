@@ -9,6 +9,7 @@ package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
 
+import com.onarandombox.MultiversePortals.WorldEditConnection;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,7 +51,9 @@ public class WandCommand extends PortalCommand {
         // Do the normal wand thing
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            if (plugin.getWorldEditConnection().isConnected()) {
+
+            WorldEditConnection worldEdit = plugin.getWorldEditConnection();
+            if (worldEdit != null && worldEdit.isConnected()) {
                 p.sendMessage(ChatColor.GREEN + "Cool!" + ChatColor.WHITE + " You're using" + ChatColor.AQUA + " WorldEdit! ");
                 p.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit wand " + ChatColor.WHITE + "to perform portal selections!");
                 return;

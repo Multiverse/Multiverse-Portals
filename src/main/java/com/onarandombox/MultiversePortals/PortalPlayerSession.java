@@ -161,7 +161,7 @@ public class PortalPlayerSession {
     public MultiverseRegion getSelectedRegion() {
         Player player = getPlayerFromName();
         WorldEditConnection worldEdit = plugin.getWorldEditConnection();
-        if (worldEdit.isConnected()) {
+        if (worldEdit != null && worldEdit.isConnected()) {
             if (worldEdit.isSelectionAvailable(player)) {
                 Location minPoint = worldEdit.getSelectionMinPoint(player);
                 Location maxPoint = worldEdit.getSelectionMaxPoint(player);
