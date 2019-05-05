@@ -11,7 +11,6 @@ import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiverseCore.utils.MVEconomist;
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
@@ -19,7 +18,6 @@ import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -109,8 +107,7 @@ public class MVPPlayerMoveListener implements Listener {
             if (price != 0D && !p.hasPermission(portal.getExempt())) {
                 if (price < 0D || economist.isPlayerWealthyEnough(p, price, currency)) {
                     // call event for other plugins
-                    TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                    MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
+                    MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), portal);
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
                         if (price < 0D) {
@@ -130,8 +127,7 @@ public class MVPPlayerMoveListener implements Listener {
                 }
             } else {
                 // call event for other plugins
-                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
+                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (!portalEvent.isCancelled()) {
                     helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);

@@ -8,7 +8,6 @@
 package com.onarandombox.MultiversePortals.event;
 
 import org.bukkit.Location;
-import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -26,31 +25,16 @@ public class MVPortalEvent extends Event implements Cancellable {
     private Player teleportee;
     private MVPortal sendingPortal;
     private MVDestination destination;
-    private TravelAgent travelAgent;
     private boolean isCancelled;
 
-    /**
-     * Old constructor did not provide enough intel
-     *
-     * @deprecated use {@link MVPortalEvent(MVDestination, Player, TravelAgent, MVPortal)}
-     *             instead.
-     */
-    @Deprecated
-    public MVPortalEvent(MVDestination destination, Player teleportee, TravelAgent travelAgent) {
+    public MVPortalEvent(MVDestination destination, Player teleportee, MVPortal sendingPortal) {
         this.teleportee = teleportee;
         this.destination = destination;
-        this.travelAgent = travelAgent;
-    }
-
-    public MVPortalEvent(MVDestination destination, Player teleportee, TravelAgent travelAgent, MVPortal sendingPortal) {
-        this.teleportee = teleportee;
-        this.destination = destination;
-        this.travelAgent = travelAgent;
         this.sendingPortal = sendingPortal;
     }
 
     public MVPortalEvent(MVDestination destination, Player teleportee) {
-        this(destination, teleportee, null, null);
+        this(destination, teleportee, null);
     }
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -106,19 +90,7 @@ public class MVPortalEvent extends Event implements Cancellable {
      * @return A {@link PortalType}
      */
     public PortalType getPortalType() {
-        if (this.travelAgent == null) {
-            return PortalType.Legacy;
-        }
-        return PortalType.Legacy;
-    }
-
-    /**
-     * Returns the TravelAgent being used, or null if none.
-     *
-     * @return The {@link TravelAgent}.
-     */
-    public TravelAgent getTravelAgent() {
-        return this.travelAgent;
+        return PortalType.Normal;
     }
 
     /**
