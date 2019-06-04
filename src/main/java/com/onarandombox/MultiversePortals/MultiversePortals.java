@@ -88,7 +88,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private static final Material DEFAULT_WAND = Material.WOODEN_AXE;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 22;
+    private final static int requiresProtocol = 23;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
