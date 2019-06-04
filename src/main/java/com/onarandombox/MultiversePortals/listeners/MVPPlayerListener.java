@@ -10,12 +10,21 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
+import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiverseCore.utils.MVEconomist;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.WorldEditConnection;
+import com.onarandombox.MultiversePortals.event.MVPortalEvent;
+import com.onarandombox.MultiversePortals.utils.PortalFiller;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -28,18 +37,6 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-
-import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
-import com.onarandombox.MultiverseCore.destination.InvalidDestination;
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
-import com.onarandombox.MultiversePortals.event.MVPortalEvent;
-import com.onarandombox.MultiversePortals.utils.PortalFiller;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MVPPlayerListener implements Listener {
 
@@ -247,7 +244,7 @@ public class MVPPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
+                MVPTravelAgent agent = new MVPTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
                 event.setTo(portalDest.getLocation(event.getPlayer()));
                 if (portalDest.useSafeTeleporter()) {
                     SafeTTeleporter teleporter = this.plugin.getCore().getSafeTTeleporter();
@@ -270,8 +267,7 @@ public class MVPPlayerListener implements Listener {
                     }
                 }
 
-                event.setPortalTravelAgent(agent);
-                event.useTravelAgent(true);
+                agent.setPortalEventTravelAgent(event);
                 MVPortalEvent portalEvent = new MVPortalEvent(portalDest, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
 

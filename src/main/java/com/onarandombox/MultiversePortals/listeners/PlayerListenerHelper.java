@@ -1,5 +1,9 @@
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.io.File;
+import java.util.Date;
+import java.util.logging.Level;
+
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiverseCore.enums.TeleportResult;
@@ -10,12 +14,7 @@ import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import com.onarandombox.buscript.Buscript;
 import org.bukkit.Location;
-import org.bukkit.TravelAgent;
 import org.bukkit.entity.Player;
-
-import java.io.File;
-import java.util.Date;
-import java.util.logging.Level;
 
 public class PlayerListenerHelper {
 
@@ -56,7 +55,7 @@ public class PlayerListenerHelper {
         Buscript buscript = plugin.getCore().getScriptAPI();
         File handlerScript = new File(buscript.getScriptFolder(), portal.getHandlerScript());
         if (handlerScript.exists()) {
-            TravelAgent agent = new MVTravelAgent(this.plugin.getCore(), d, player);
+            MVPTravelAgent agent = new MVPTravelAgent(this.plugin.getCore(), d, player);
             buscript.setScriptVariable("portal", portal);
             buscript.setScriptVariable("player", player);
             buscript.setScriptVariable("travelAgent", agent);
