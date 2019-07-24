@@ -20,7 +20,7 @@ class MVPTravelAgent extends MVTravelAgent {
             Class.forName("org.bukkit.TravelAgent");
             new BukkitTravelAgent(this).setPortalEventTravelAgent(event);
         } catch (ClassNotFoundException ignore) {
-            core.log(Level.WARNING, "TravelAgent not available for PlayerPortalEvent for " + player.getName());
+            core.log(Level.FINE, "TravelAgent not available for PlayerPortalEvent for " + player.getName());
         }
     }
 }
