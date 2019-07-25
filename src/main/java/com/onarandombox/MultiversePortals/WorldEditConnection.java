@@ -28,6 +28,10 @@ public class WorldEditConnection {
     private WorldEditPlugin retrieveWorldEditPluginFromServer() {
         Plugin plugin = connectingPlugin.getServer().getPluginManager().getPlugin("WorldEdit");
         if (plugin == null) {
+            plugin = connectingPlugin.getServer().getPluginManager().getPlugin("FastAsyncWorldEdit");
+        }
+
+        if (plugin == null) {
             return null;
         } else if (plugin instanceof WorldEditPlugin) {
             return (WorldEditPlugin) plugin;
@@ -49,7 +53,7 @@ public class WorldEditConnection {
             worldEditPlugin = retrieveWorldEditPluginFromServer();
             if (worldEditPlugin != null) {
                 this.worldEdit = worldEditPlugin.getWorldEdit();
-                connectingPlugin.getLogger().info("Found WorldEdit. Using it for selections.");
+                connectingPlugin.getLogger().info(String.format("Found %s. Using it for selections.", worldEditPlugin.getName()));
                 return true;
             }
         }
