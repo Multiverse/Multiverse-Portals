@@ -9,6 +9,8 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
+import com.onarandombox.MultiverseCore.event.MVDebugModeEvent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -44,6 +46,11 @@ public class MVPCoreListener implements Listener {
         plugin.reloadConfigs();
         event.addConfig("Multiverse-Portals - portals.yml");
         event.addConfig("Multiverse-Portals - config.yml");
+    }
+
+    @EventHandler
+    public void debugModeChange(MVDebugModeEvent event) {
+        Logging.setDebugLevel(event.getLevel());
     }
 
     /**

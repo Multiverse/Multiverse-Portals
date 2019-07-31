@@ -72,8 +72,6 @@ import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
-    private static final Logger log = Logger.getLogger("Minecraft");
-    private static final String logPrefix = "[Multiverse-Portals] ";
     protected static DebugLog debugLog;
     private MultiverseCore core;
 
@@ -88,7 +86,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     private static final Material DEFAULT_WAND = Material.WOODEN_AXE;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 23;
+    private final static int requiresProtocol = 24;
     public static boolean UseOnMove = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
@@ -104,26 +102,28 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public void onEnable() {
+        Logging.init(this);
         this.core = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
 
         // Test if the Core was found, if not we'll disable this plugin.
         if (this.core == null) {
-            log.info(logPrefix + "Multiverse-Core not found, will keep looking.");
+            Logging.info("Multiverse-Core not found, will keep looking.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
         if (this.core.getProtocolVersion() < requiresProtocol) {
-            log.severe(logPrefix + "Your Multiverse-Core is OUT OF DATE");
-            log.severe(logPrefix + "This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
-            log.severe(logPrefix + "Your of Core Protocol Level is: " + this.core.getProtocolVersion());
-            log.severe(logPrefix + "Grab an updated copy at: ");
-            log.severe(logPrefix + "http://ci.onarandombox.com/view/Multiverse/job/Multiverse-Core/");
+            Logging.severe("Your Multiverse-Core is OUT OF DATE");
+            Logging.severe("This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
+            Logging.severe("Your of Core Protocol Level is: " + this.core.getProtocolVersion());
+            Logging.severe("Grab an updated copy at: ");
+            Logging.severe("http://ci.onarandombox.com/view/Multiverse/job/Multiverse-Core/");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        // Turn on Logging and register ourselves with Core
-        log.info(logPrefix + "- Version " + this.getDescription().getVersion() + " Enabled - By " + getAuthors());
-        debugLog = new DebugLog("Multiverse-Portals", getDataFolder() + File.separator + "debug.log");
+
+        Logging.setDebugLevel(core.getMVConfig().getGlobalDebug());
+
+        // Register ourselves with Core
         this.core.incrementPluginCount();
 
         // Register our commands
@@ -144,6 +144,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.registerEvents();
 
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
+
+        Logging.log(true, Level.INFO, " Enabled - By %s", getAuthors());
     }
 
     private void registerEvents() {
