@@ -203,7 +203,7 @@ public class MVPortal {
 
     private boolean setCurrency(Material currency) {
         this.currency = currency;
-        config.set(this.portalConfigString + ".entryfee.currency", currency.name());
+        config.set(this.portalConfigString + ".entryfee.currency", currency == null ? null : currency.name());
         saveConfig();
         return true;
     }
