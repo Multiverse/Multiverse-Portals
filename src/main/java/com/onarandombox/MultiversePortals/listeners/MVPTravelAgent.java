@@ -16,11 +16,22 @@ class MVPTravelAgent extends MVTravelAgent {
     }
 
     void setPortalEventTravelAgent(PlayerPortalEvent event) {
+        boolean error = false;
         try {
             Class.forName("org.bukkit.TravelAgent");
             new BukkitTravelAgent(this).setPortalEventTravelAgent(event);
         } catch (ClassNotFoundException ignore) {
-            core.log(Level.FINE, "TravelAgent not available for PlayerPortalEvent for " + player.getName());
+            error = true;
+        }
+        try {
+            event.setCanCreatePortal(false);
+            event.setCreationRadius(0);
+            event.setSearchRadius(0);
+        } catch (NoSuchMethodError ignore) {
+            error = true;
+        }
+        if (error) {
+            core.log(Level.FINE, "Neither TravelAgent nor portal creation/search methods available for PlayerPortalEvent for " + player.getName());
         }
     }
 }
