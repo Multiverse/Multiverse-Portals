@@ -8,6 +8,8 @@
 package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -58,33 +60,33 @@ public class ListCommand extends PortalCommand {
             titleString += ChatColor.GOLD + " [" + filter + "]";
         }
         sender.sendMessage(ChatColor.AQUA + "--- " + titleString + ChatColor.AQUA + " ---");
-        sender.sendMessage(getPortals(sender, world, filter));
 
+        boolean altColor = false;
+        for (String s : getFilteredPortals(sender, world, filter)) {
+            if (altColor) {
+                sender.sendMessage(ChatColor.YELLOW + s);
+                altColor = false;
+            } else {
+                sender.sendMessage(ChatColor.WHITE + s);
+                altColor = true;
+            }
+        }
     }
 
-    private String getPortals(CommandSender sender, MultiverseWorld world, String filter) {
-        String portals = "";
+    private List<String> getFilteredPortals(CommandSender sender, MultiverseWorld world, String filter) {
+        List<String> portals_filtered = new ArrayList<>();
+
         if (filter == null) {
             filter = "";
         }
-        boolean altColor = false;
+
         for (MVPortal p : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
             if (p.getName().matches("(i?).*" + filter + ".*")) {
-                if (altColor) {
-                    portals += ChatColor.YELLOW;
-                    altColor = false;
-                } else {
-                    portals += ChatColor.WHITE;
-                    altColor = true;
-                }
-
-                portals += p.getName() + " ";
+                portals_filtered.add(p.getName());
             }
+        }
 
-        }
-        if (portals.length() > 2) {
-            portals = portals.substring(0, portals.length() - 1);
-        }
-        return portals;
+        portals_filtered.sort(Comparator.comparing(String::toString));
+        return portals_filtered;
     }
 }
