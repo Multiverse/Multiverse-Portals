@@ -75,12 +75,19 @@ public class ListCommand extends PortalCommand {
 
     private List<String> getFilteredPortals(CommandSender sender, MultiverseWorld world, String filter) {
         List<String> portals_filtered = new ArrayList<>();
+        List<MVPortal> portals;
 
         if (filter == null) {
             filter = "";
         }
 
-        for (MVPortal p : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
+        if (world == null) {
+            portals = this.plugin.getPortalManager().getPortals(sender);
+        } else {
+            portals = this.plugin.getPortalManager().getPortals(sender, world);
+        }
+
+        for (MVPortal p : portals) {
             if (p.getName().matches("(i?).*" + filter + ".*")) {
                 portals_filtered.add(p.getName());
             }
