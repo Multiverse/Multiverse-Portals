@@ -88,8 +88,9 @@ public class ListCommand extends PortalCommand {
         }
 
         for (MVPortal p : portals) {
-            if (p.getName().matches("(i?).*" + filter + ".*")) {
-                portals_filtered.add(p.getName());
+            String name = p.getName();
+            if (name.matches("(i?).*" + filter + ".*")) {
+                portals_filtered.add(name);
             }
         }
 
