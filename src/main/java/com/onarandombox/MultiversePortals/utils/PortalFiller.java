@@ -9,10 +9,12 @@ package com.onarandombox.MultiversePortals.utils;
 
 import java.util.logging.Level;
 
+import org.bukkit.Axis;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
@@ -59,6 +61,11 @@ public class PortalFiller {
     private void doFill(Block newLoc, int useX, int useZ, MultiverseRegion r, Material type) {
         if (isValidPortalRegion(newLoc.getLocation(), type)) {
             newLoc.setType(type, false);
+            if (useX == 0 && newLoc.getBlockData() instanceof Orientable) {
+                Orientable b = (Orientable) newLoc.getBlockData();
+                b.setAxis(Axis.Z);
+                newLoc.setBlockData(b);
+            }
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 1, 0, useZ * 1).getLocation(), type)) {
             Block tmpLoc = newLoc.getRelative(useX * 1, 0, useZ * 1);
