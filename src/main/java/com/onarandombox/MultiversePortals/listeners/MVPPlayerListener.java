@@ -37,6 +37,7 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 public class MVPPlayerListener implements Listener {
 
@@ -161,12 +162,14 @@ public class MVPPlayerListener implements Listener {
 
         Material itemType = plugin.getWandMaterial();
         // If we Found WorldEdit, return, we're not needed here.
-        // If the item is not the Wand we've stetup we're not needed either
+        // If the item is not the Wand we've setup we're not needed either
         // If the player doesn't have the perms, return also.
+        // Also return if this isn't the player's main hand
         WorldEditConnection worldEdit = plugin.getWorldEditConnection();
         if ((worldEdit != null && worldEdit.isConnected())
                 || event.getPlayer().getItemInHand().getType() != itemType
-                || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)) {
+                || !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), "multiverse.portal.create", true)
+                || event.getHand() != EquipmentSlot.HAND) {
             return;
         }
 
