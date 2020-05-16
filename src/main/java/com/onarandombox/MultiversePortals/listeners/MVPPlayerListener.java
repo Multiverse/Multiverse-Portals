@@ -62,13 +62,13 @@ public class MVPPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerBucketFill(PlayerBucketFillEvent event) {
-        Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
-        this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
+        // PlayerBucketFillEvent.getBlockClicked() returns the block that filled the bucket, so no need to translate the location!
+        this.plugin.log(Level.FINER, "No need to translate this location!");
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
-        MVPortal portal = portalManager.getPortal(event.getPlayer(), translatedLocation);
+        MVPortal portal = portalManager.getPortal(event.getPlayer(), event.getBlockClicked().getLocation());
         if (portal != null) {
             if (ps.isDebugModeOn()) {
                 ps.showDebugInfo(portal);
@@ -76,7 +76,7 @@ public class MVPPlayerListener implements Listener {
             } else {
                 Material fillMaterial = Material.AIR;
                 this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
-                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
+                this.filler.fillRegion(portal.getLocation().getRegion(), event.getBlockClicked().getLocation(), fillMaterial, event.getPlayer());
             }
         }
     }
