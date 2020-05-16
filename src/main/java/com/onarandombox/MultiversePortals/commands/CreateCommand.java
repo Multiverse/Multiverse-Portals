@@ -60,13 +60,13 @@ public class CreateCommand extends PortalCommand {
         MVPortal portal = this.plugin.getPortalManager().getPortal(args.get(0));
         PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
         if (this.plugin.getPortalManager().addPortal(world, args.get(0), p.getName(), location)) {
-            sender.sendMessage("New portal(" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") created and selected!");
+            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") created and selected!");
             // If the portal did not exist, ie: we're creating it.
             // we have to re select it, because it would be null
             portal = this.plugin.getPortalManager().getPortal(args.get(0));
 
         } else {
-            sender.sendMessage("New portal(" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") was NOT created!");
+            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") was NOT created!");
             sender.sendMessage("It already existed and has been selected.");
         }
 
@@ -87,7 +87,7 @@ public class CreateCommand extends PortalCommand {
                 // We found a Cannon Destination!
                 Location l = p.getLocation();
                 try {
-                    Double speed = Double.parseDouble(args.get(1).split("-")[1]);
+                    double speed = Double.parseDouble(args.get(1).split("-")[1]);
                     portal.setDestination("ca:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw() + ":" + speed);
                 } catch (NumberFormatException e) {
                     portal.setDestination("i:invalid");
