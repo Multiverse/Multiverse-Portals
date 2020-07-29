@@ -79,14 +79,18 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
             if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
-                try {
-                    if (helper.scriptPortal(event.getPlayer(), d, portal, ps)) {
-                        // Portal handled by script
-                        helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                if (plugin.getCore().getScriptAPI() != null) {
+                    try {
+                        if (helper.scriptPortal(event.getPlayer(), d, portal, ps)) {
+                            // Portal handled by script
+                            helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                        }
+                        return;
+                    } catch (IllegalStateException ignore) {
+                        // Portal not handled by script
                     }
-                    return;
-                } catch (IllegalStateException ignore) {
-                    // Portal not handled by script
+                } else {
+                    plugin.log(Level.WARNING, "Buscript wasn't initialized, so we can't use scripts!");
                 }
             }
             if (!ps.allowTeleportViaCooldown(new Date())) {
