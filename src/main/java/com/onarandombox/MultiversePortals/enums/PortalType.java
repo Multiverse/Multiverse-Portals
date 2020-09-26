@@ -14,4 +14,7 @@ package com.onarandombox.MultiversePortals.enums;
  * If Normal, a Nether style portal (with purple goo) was used.
  *
  */
-public enum PortalType { Legacy, Normal }
+public enum PortalType {
+    LEGACY,
+    NORMAL
+}

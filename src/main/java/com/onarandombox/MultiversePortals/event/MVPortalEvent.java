@@ -92,11 +92,12 @@ public class MVPortalEvent extends Event implements Cancellable {
      *
      * @return A {@link PortalType}
      */
-    public PortalType getPortalType() {
-        if (this.travelAgent == null) {
-            return PortalType.Legacy;
+    public PortalType getPortalType() throws IllegalStateException {
+        if (this.sendingPortal != null && this.sendingPortal.isLegacyPortal()) {
+            return PortalType.LEGACY;
         }
-        return PortalType.Legacy;
+
+        return PortalType.NORMAL;
     }
 
     /**

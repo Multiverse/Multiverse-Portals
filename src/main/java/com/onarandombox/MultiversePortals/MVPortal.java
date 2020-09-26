@@ -303,6 +303,21 @@ public class MVPortal {
         return this.location;
     }
 
+    public Material getFillMaterial() throws IllegalStateException {
+        if (!this.location.isValidLocation()) {
+            throw new IllegalStateException();
+        }
+
+        Vector min = this.location.getMinimum();
+        Vector max = this.location.getMaximum();
+        Vector middle = new Vector((min.getX() + max.getX()) / 2, (min.getY() + max.getY()) / 2, (min.getZ() + max.getZ()) / 2);
+        return middle.toLocation(this.location.getMVWorld().getCBWorld()).getBlock().getType();
+    }
+
+    public boolean isLegacyPortal() throws IllegalStateException {
+        return this.getFillMaterial() != Material.NETHER_PORTAL;
+    }
+
     public boolean playerCanEnterPortal(Player player) {
         return (this.plugin.getCore().getMVPerms().hasPermission(player, this.permission.getName(), true));
     }
