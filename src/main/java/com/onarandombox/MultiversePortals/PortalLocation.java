@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
@@ -24,7 +23,6 @@ public class PortalLocation {
 
     public PortalLocation(Vector pos1, Vector pos2, MultiverseWorld world) {
         this.validLocation = this.setLocation(pos1, pos2, world);
-        ;
     }
 
     public PortalLocation() {

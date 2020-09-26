@@ -65,7 +65,7 @@ public class PortalManager {
         for (MVPortal portal : getNearbyPortals(world, l)) {
 
             // Ignore portals the player can't use.
-            if (!MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal((Player) sender)) {
+            if (!MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal(sender)) {
                 PortalLocation portalLoc = portal.getLocation();
                 if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
                     return portal;

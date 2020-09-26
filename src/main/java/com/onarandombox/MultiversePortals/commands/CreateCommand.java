@@ -38,12 +38,11 @@ public class CreateCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        Player p = null;
         if (!(sender instanceof Player)) {
             sender.sendMessage("This command must be run by a player");
             return;
         }
-        p = (Player) sender;
+        Player p = (Player) sender;
 
         if (!this.plugin.getCore().getMVWorldManager().isMVWorld(p.getWorld().getName())) {
             this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
