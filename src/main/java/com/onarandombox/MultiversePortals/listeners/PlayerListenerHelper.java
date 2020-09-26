@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
@@ -55,10 +54,8 @@ public class PlayerListenerHelper {
         Buscript buscript = plugin.getCore().getScriptAPI();
         File handlerScript = new File(buscript.getScriptFolder(), portal.getHandlerScript());
         if (handlerScript.exists()) {
-            MVPTravelAgent agent = new MVPTravelAgent(this.plugin.getCore(), d, player);
             buscript.setScriptVariable("portal", portal);
             buscript.setScriptVariable("player", player);
-            buscript.setScriptVariable("travelAgent", agent);
             buscript.setScriptVariable("allowPortal", true);
             buscript.setScriptVariable("portalSession", ps);
             buscript.executeScript(handlerScript, player.getName());
@@ -70,7 +67,7 @@ public class PlayerListenerHelper {
             buscript.setScriptVariable("allowPortal", null);
             if (allowObject instanceof Boolean) {
                 if (((Boolean) allowObject)) {
-                    MVPortalEvent portalEvent = new MVPortalEvent(d, player, agent, portal);
+                    MVPortalEvent portalEvent = new MVPortalEvent(d, player, portal);
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
                         return true;

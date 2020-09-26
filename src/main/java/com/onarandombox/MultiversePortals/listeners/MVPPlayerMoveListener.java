@@ -111,8 +111,7 @@ public class MVPPlayerMoveListener implements Listener {
             if (price != 0D && !p.hasPermission(portal.getExempt())) {
                 if (price < 0D || economist.isPlayerWealthyEnough(p, price, currency)) {
                     // call event for other plugins
-                    MVPTravelAgent agent = new MVPTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                    MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
+                    MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), portal);
                     this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                     if (!portalEvent.isCancelled()) {
                         if (price < 0D) {
@@ -132,8 +131,7 @@ public class MVPPlayerMoveListener implements Listener {
                 }
             } else {
                 // call event for other plugins
-                MVPTravelAgent agent = new MVPTravelAgent(this.plugin.getCore(), d, event.getPlayer());
-                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
+                MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (!portalEvent.isCancelled()) {
                     helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);

@@ -7,7 +7,6 @@
 
 package com.onarandombox.MultiversePortals.event;
 
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -26,18 +25,16 @@ public class MVPortalEvent extends Event implements Cancellable {
     private Player teleportee;
     private MVPortal sendingPortal;
     private MVDestination destination;
-    private MVTravelAgent travelAgent;
     private boolean isCancelled;
 
-    public MVPortalEvent(MVDestination destination, Player teleportee, MVTravelAgent travelAgent, MVPortal sendingPortal) {
+    public MVPortalEvent(MVDestination destination, Player teleportee, MVPortal sendingPortal) {
         this.teleportee = teleportee;
         this.destination = destination;
-        this.travelAgent = travelAgent;
         this.sendingPortal = sendingPortal;
     }
 
     public MVPortalEvent(MVDestination destination, Player teleportee) {
-        this(destination, teleportee, null, null);
+        this(destination, teleportee, null);
     }
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -98,15 +95,6 @@ public class MVPortalEvent extends Event implements Cancellable {
         }
 
         return PortalType.NORMAL;
-    }
-
-    /**
-     * Returns the MVTravelAgent being used, or null if none.
-     *
-     * @return The {@link MVTravelAgent}.
-     */
-    public MVTravelAgent getTravelAgent() {
-        return this.travelAgent;
     }
 
     /**
