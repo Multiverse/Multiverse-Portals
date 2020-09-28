@@ -308,10 +308,8 @@ public class MVPortal {
             throw new IllegalStateException();
         }
 
-        Vector min = this.location.getMinimum();
-        Vector max = this.location.getMaximum();
-        Vector middle = new Vector((min.getX() + max.getX()) / 2, (min.getY() + max.getY()) / 2, (min.getZ() + max.getZ()) / 2);
-        return middle.toLocation(this.location.getMVWorld().getCBWorld()).getBlock().getType();
+        return new Vector().copy(this.location.getMinimum()).add(this.location.getMaximum()).multiply(0.5)
+                .toLocation(this.location.getMVWorld().getCBWorld()).getBlock().getType();
     }
 
     public boolean isLegacyPortal() throws IllegalStateException {
