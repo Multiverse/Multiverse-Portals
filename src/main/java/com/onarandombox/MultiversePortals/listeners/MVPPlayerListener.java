@@ -64,7 +64,6 @@ public class MVPPlayerListener implements Listener {
     public void playerBucketFill(PlayerBucketFillEvent event) {
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
-        // PlayerBucketFillEvent.getBlockClicked() returns the block that filled the bucket, so no need to translate the location!
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         MVPortal portal = portalManager.getPortal(event.getPlayer(), event.getBlockClicked().getLocation());
