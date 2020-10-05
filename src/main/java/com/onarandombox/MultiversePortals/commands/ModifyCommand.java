@@ -166,11 +166,18 @@ public class ModifyCommand extends PortalCommand {
         if (!args.contains("-p")) {
             return null;
         }
+
         int index = args.indexOf("-p");
+
         // Now we remove the -p
         args.remove(index);
-        // Now we remove and return the portalname
-        return args.remove(index);
+
+        // Now we remove and return the portalname if present
+        if (index < args.size()) {
+            return args.remove(index);
+        }
+
+        return null;
     }
 
     protected static boolean validateAction(String property) {
