@@ -63,14 +63,17 @@ public class PortalFiller {
             // we need to check if the fill material is nether_portal so we can rotate it if necessary
             if (type == Material.NETHER_PORTAL) {
                 // for now we won't use physics because it causes errors
-                newLoc.setType(type, false);
+                boolean usePhysics = false;
+                newLoc.setType(type, usePhysics);
                 if (useX == 0) {
                     Orientable b = (Orientable) newLoc.getBlockData();
                     b.setAxis(Axis.Z);
                     // also don't use physics here
-                    newLoc.setBlockData(b, false);
+                    newLoc.setBlockData(b, usePhysics);
                 }
-            } else newLoc.setType(type);
+            } else {
+                newLoc.setType(type);
+            }
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 1, 0, useZ * 1).getLocation(), type)) {
             Block tmpLoc = newLoc.getRelative(useX * 1, 0, useZ * 1);

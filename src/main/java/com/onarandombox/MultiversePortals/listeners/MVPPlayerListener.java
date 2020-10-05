@@ -65,7 +65,6 @@ public class MVPPlayerListener implements Listener {
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
         // PlayerBucketFillEvent.getBlockClicked() returns the block that filled the bucket, so no need to translate the location!
-        this.plugin.log(Level.FINER, "No need to translate this location!");
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         MVPortal portal = portalManager.getPortal(event.getPlayer(), event.getBlockClicked().getLocation());
@@ -237,7 +236,7 @@ public class MVPPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
+                // If they're using Access and they don't have permission and they're NOT exempt, return, they're not allowed to tp.
                 // No longer checking exemption status
                 if (MultiversePortals.EnforcePortalAccess && !this.plugin.getCore().getMVPerms().hasPermission(event.getPlayer(), portal.getPermission().getName(), true)) {
                     this.helper.stateFailure(p.getDisplayName(), portal.getName());
