@@ -465,18 +465,17 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public String getVersionInfo() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("[Multiverse-Portals] Multiverse-Portals Version: ").append(this.getDescription().getVersion()).append('\n');
-        buffer.append("[Multiverse-Portals] Loaded Portals: ").append(this.getPortalManager().getAllPortals().size()).append('\n');
-        buffer.append("[Multiverse-Portals] Dumping Portal Values: (version ").append(this.getMainConfig().getDouble("version", -1)).append(')').append('\n');
-        buffer.append("[Multiverse-Portals]  wand: ").append(this.getMainConfig().get("wand", "NOT SET")).append('\n');
-        buffer.append("[Multiverse-Portals]  useonmove: ").append(this.getMainConfig().get("useonmove", "NOT SET")).append('\n');
-        buffer.append("[Multiverse-Portals]  enforceportalaccess: ").append(this.getMainConfig().get("enforceportalaccess", "NOT SET")).append('\n');
-        buffer.append("[Multiverse-Portals]  portalsdefaulttonether: ").append(this.getMainConfig().get("portalsdefaulttonether", "NOT SET")).append('\n');
-        buffer.append("[Multiverse-Portals]  portalcooldown: ").append(this.getMainConfig().get("portalcooldown", "NOT SET")).append('\n');
-        buffer.append("[Multiverse-Portals]  clearonremove: ").append(this.getMainConfig().get("clearonremove", "NOT SET")).append('\n');
-        buffer.append("[Multiverse-Portals] Special Code: FRN001").append('\n');
-        return buffer.toString();
+        return "[Multiverse-Portals] Multiverse-Portals Version: " + this.getDescription().getVersion() + System.lineSeparator()
+                + "[Multiverse-Portals] Loaded Portals: " + this.getPortalManager().getAllPortals().size() + System.lineSeparator()
+                + "[Multiverse-Portals] Dumping Portal Values: (version " + this.getMainConfig().getDouble("version", -1) + ')' + System.lineSeparator() 
+                + "[Multiverse-Portals]   wand: " + this.getMainConfig().get("wand", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals]   useonmove: " + this.getMainConfig().get("useonmove", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals]   portalsdefaulttonether: " + this.getMainConfig().get("portalsdefaulttonether", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals]   enforceportalaccess: " + this.getMainConfig().get("enforceportalaccess", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals]   portalcooldown: " + this.getMainConfig().get("portalcooldown", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals]   clearonremove: " + this.getMainConfig().get("clearonremove", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals]   framematerials: " + this.getMainConfig().get("framematerials", "NOT SET") + System.lineSeparator()
+                + "[Multiverse-Portals] Special Code: FRN001" + System.lineSeparator();
     }
 
     private String logAndAddToPasteBinBuffer(String string) {
