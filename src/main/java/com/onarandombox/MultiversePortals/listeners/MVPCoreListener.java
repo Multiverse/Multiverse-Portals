@@ -7,13 +7,13 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
+import java.io.File;
 import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.event.MVDebugModeEvent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -36,6 +36,10 @@ public class MVPCoreListener implements Listener {
     @EventHandler
     public void versionRequest(MVVersionEvent event) {
         event.appendVersionInfo(this.plugin.getVersionInfo());
+        File configFile = new File(this.plugin.getDataFolder(), "config.yml");
+        File portalsFile = new File(this.plugin.getDataFolder(), "portals.yml");
+        event.putDetailedVersionInfo("multiverse-portals/config.yml", configFile);
+        event.putDetailedVersionInfo("multiverse-portals/portals.yml", portalsFile);
     }
     /**
      * This method is called when Multiverse-Core wants to reload the configs.
