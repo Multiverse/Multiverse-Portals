@@ -2,7 +2,7 @@
 name: ❓ Help!
 about: Encountered a problem with Multiverse-Portals? Not sure how to fix it?
 title: ''
-labels: 'type: Assistance'
+labels: 'Assistance'
 assignees: ''
 
 ---
