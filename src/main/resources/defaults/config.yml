@@ -3,7 +3,7 @@
 # to add your values back via the "/mvp conf" command.
 # When in-game, simply type: "/mvp conf ?" for help.
 # A config with explanations can be found here:
-# https://github.com/Multiverse/Multiverse-Portals/wiki/config.yml
+# https://github.com/Multiverse/Multiverse-Core/wiki/config.yml-(Portals)
 
 wand: 271
 useonmove: true
