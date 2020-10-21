@@ -416,8 +416,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public void reloadConfigs() {
-        this.portalManager.removeAll(false);
-        this.loadPortals();
+        this.reloadConfigs(true);
+    }
+
+    public void reloadConfigs(boolean reloadPortals) {
+        if (reloadPortals) {
+            this.portalManager.removeAll(false);
+            this.loadPortals();
+        }
 
         PluginManager pm = this.getServer().getPluginManager();
         boolean previousTeleportVehicles = MultiversePortals.TeleportVehicles;
