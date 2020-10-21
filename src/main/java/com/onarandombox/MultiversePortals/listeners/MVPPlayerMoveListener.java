@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class MVPPlayerMoveListener implements Listener {
@@ -35,6 +36,34 @@ public class MVPPlayerMoveListener implements Listener {
     public MVPPlayerMoveListener(MultiversePortals plugin, PlayerListenerHelper helper) {
         this.plugin = plugin;
         this.helper = helper;
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void blockFromTo(BlockFromToEvent event) {
+        // Always check if the event has been canceled by someone else.
+        if(event.isCancelled()) {
+            return;
+        }
+        // If UseOnMove is false, every usable portal will be lit. Since water
+        // and lava don't flow into portal blocks, no special action is
+        // required -- we can simply skip the rest of this function.
+        if (!MultiversePortals.UseOnMove) {
+            return;
+        }
+
+        // The to block should never be null, but apparently it is sometimes...
+        if (event.getBlock() == null || event.getToBlock() == null)
+            return;
+
+        // If lava/something else is trying to flow in...
+        if (plugin.getPortalManager().isPortal(event.getToBlock().getLocation())) {
+            event.setCancelled(true);
+            return;
+        }
+        // If something is trying to flow out, stop that too.
+        if (plugin.getPortalManager().isPortal(event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
