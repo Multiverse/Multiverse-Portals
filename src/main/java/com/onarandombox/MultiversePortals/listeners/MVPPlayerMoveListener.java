@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class MVPPlayerMoveListener implements Listener {
@@ -38,15 +39,37 @@ public class MVPPlayerMoveListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW)
+    public void blockFromTo(BlockFromToEvent event) {
+        // Always check if the event has been canceled by someone else.
+        if(event.isCancelled()) {
+            return;
+        }
+
+        // The to block should never be null, but apparently it is sometimes...
+        if (event.getBlock() == null || event.getToBlock() == null) {
+            return;
+        }
+
+        // If lava/something else is trying to flow in...
+        if (plugin.getPortalManager().isPortal(event.getToBlock().getLocation())) {
+            event.setCancelled(true);
+            return;
+        }
+        // If something is trying to flow out, stop that too.
+        if (plugin.getPortalManager().isPortal(event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
     public void playerMove(PlayerMoveEvent event) {
-        if (event.isCancelled() || !MultiversePortals.UseOnMove) {
+        if (event.isCancelled()) {
             return;
         }
         Player p = event.getPlayer(); // Grab Player
         Location loc = p.getLocation(); // Grab Location
-        /**
-         * Check the Player has actually moved a block to prevent unneeded calculations... This is to prevent huge performance drops on high player count servers.
-         */
+
+        // Check the Player has actually moved a block to prevent unneeded calculations... This is to prevent huge performance drops on high player count servers.
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         ps.setStaleLocation(loc, MoveType.PLAYER_MOVE);
 

@@ -91,7 +91,7 @@ public class ConfigCommand extends PortalCommand {
         }
         if (this.plugin.saveMainConfig()) {
             sender.sendMessage(ChatColor.GREEN + "SUCCESS!" + ChatColor.WHITE + " Values were updated successfully!");
-            this.plugin.loadConfig();
+            this.plugin.reloadConfigs(false);
         } else {
             sender.sendMessage(ChatColor.RED + "FAIL!" + ChatColor.WHITE + " Check your console for details!");
         }

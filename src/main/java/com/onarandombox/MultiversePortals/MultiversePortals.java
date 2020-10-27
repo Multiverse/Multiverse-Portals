@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
@@ -40,8 +39,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -154,7 +156,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         PlayerListenerHelper playerListenerHelper = new PlayerListenerHelper(this);
         MVPPlayerListener playerListener = new MVPPlayerListener(this, playerListenerHelper);
         MVPBlockListener blockListener = new MVPBlockListener(this);
-        MVPVehicleListener vehicleListener = new MVPVehicleListener(this);
         MVPCoreListener coreListener = new MVPCoreListener(this);
 
         // Register our listeners with the Bukkit Server
@@ -163,7 +164,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         pm.registerEvents(playerListener, this);
         pm.registerEvents(blockListener, this);
         if (MultiversePortals.TeleportVehicles) {
-            pm.registerEvents(vehicleListener, this);
+            pm.registerEvents(new MVPVehicleListener(this), this);
         }
         if (MultiversePortals.UseOnMove) {
             pm.registerEvents(new MVPPlayerMoveListener(this, playerListenerHelper), this);
@@ -415,9 +416,37 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public void reloadConfigs() {
-        this.portalManager.removeAll(false);
-        this.loadPortals();
+        this.reloadConfigs(true);
+    }
+
+    public void reloadConfigs(boolean reloadPortals) {
+        if (reloadPortals) {
+            this.portalManager.removeAll(false);
+            this.loadPortals();
+        }
+
+        PluginManager pm = this.getServer().getPluginManager();
+        boolean previousTeleportVehicles = MultiversePortals.TeleportVehicles;
+        boolean previousUseOnMove = MultiversePortals.UseOnMove;
+
         this.loadConfig();
+
+        if (MultiversePortals.TeleportVehicles != previousTeleportVehicles) {
+            if (MultiversePortals.TeleportVehicles) {
+                pm.registerEvents(new MVPVehicleListener(this), this);
+            } else {
+                VehicleMoveEvent.getHandlerList().unregister(this);
+            }
+        }
+
+        if (MultiversePortals.UseOnMove != previousUseOnMove) {
+            if (MultiversePortals.UseOnMove) {
+                pm.registerEvents(new MVPPlayerMoveListener(this, new PlayerListenerHelper(this)), this);
+            } else {
+                BlockFromToEvent.getHandlerList().unregister(this);
+                PlayerMoveEvent.getHandlerList().unregister(this);
+            }
+        }
     }
 
     /**
