@@ -62,7 +62,9 @@ public class PortalFiller {
         if (isValidPortalRegion(newLoc.getLocation(), type)) {
             // we need to check if the fill material is nether_portal so we can rotate it if necessary
             if (type == Material.NETHER_PORTAL) {
-                // for now we won't use physics because it causes errors
+                // we won't use physics with nether_portal blocks because we cancel
+                // the BlockPhysicsEvent to prevent accidentally breaking the blocks.
+                // if we were to use physics, errors would be thrown upon breaking the portal blocks.
                 boolean usePhysics = false;
                 newLoc.setType(type, usePhysics);
                 if (useX == 0) {
