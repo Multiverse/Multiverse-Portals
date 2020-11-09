@@ -49,6 +49,7 @@ public class MVPPlayerListener implements Listener {
     public MVPPlayerListener(MultiversePortals plugin, PlayerListenerHelper helper) {
         this.plugin = plugin;
         this.helper = helper;
+        this.portalManager = plugin.getPortalManager();
         this.filler = new PortalFiller(plugin.getCore());
     }
 
@@ -199,7 +200,6 @@ public class MVPPlayerListener implements Listener {
     private Location getTranslatedLocation(Block clickedBlock, BlockFace face) {
         Location clickedLoc = clickedBlock.getLocation();
         Location newLoc = new Location(clickedBlock.getWorld(), face.getModX() + clickedLoc.getBlockX(), face.getModY() + clickedLoc.getBlockY(), face.getModZ() + clickedLoc.getBlockZ());
-        this.portalManager = this.plugin.getPortalManager();
         this.plugin.log(Level.FINEST, "Clicked Block: " + clickedBlock.getLocation());
         this.plugin.log(Level.FINEST, "Translated Block: " + newLoc);
         return newLoc;
