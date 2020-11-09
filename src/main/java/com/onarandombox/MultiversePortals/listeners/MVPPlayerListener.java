@@ -55,6 +55,7 @@ public class MVPPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void playerTeleport(PlayerTeleportEvent event) {
         if (event.isCancelled()) {
+            this.plugin.log(Level.FINE, "The PlayerTeleportEvent was already cancelled. Doing nothing.");
             return;
         }
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
@@ -63,6 +64,11 @@ public class MVPPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerBucketFill(PlayerBucketFillEvent event) {
+        if (event.isCancelled()) {
+            this.plugin.log(Level.FINE, "The PlayerBucketFillEvent was already cancelled. Doing nothing.");
+            return;
+        }
+
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
 
@@ -82,6 +88,11 @@ public class MVPPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerBucketEmpty(PlayerBucketEmptyEvent event) {
+        if (event.isCancelled()) {
+            this.plugin.log(Level.FINE, "The PlayerBucketEmptyEvent was already cancelled. Doing nothing.");
+            return;
+        }
+
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         this.plugin.log(Level.FINER, "Fill: ");
         this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
@@ -111,6 +122,11 @@ public class MVPPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteract(PlayerInteractEvent event) {
+        if (event.isCancelled()) {
+            this.plugin.log(Level.FINE, "The PlayerInteractEvent was already cancelled. Doing nothing.");
+            return;
+        }
+
         // Portal lighting stuff
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
@@ -192,7 +208,7 @@ public class MVPPlayerListener implements Listener {
     @EventHandler
     public void playerPortal(PlayerPortalEvent event) {
         if (event.isCancelled()) {
-            this.plugin.log(Level.FINE, "This Portal event was already cancelled.");
+            this.plugin.log(Level.FINE, "The PlayerPortalEvent was already cancelled. Doing nothing.");
             return;
         }
         this.plugin.log(Level.FINER, "onPlayerPortal called!");
