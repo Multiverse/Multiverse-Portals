@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.onarandombox.multiverseportals</groupId>
     <artifactId>Multiverse-Portals</artifactId>
-    <version>4.2.1-SNAPSHOT</version>
+    <version>4.2.2</version>
     <name>Multiverse-Portals</name>
     <description>Multiverse Portals module</description>
     <properties>
