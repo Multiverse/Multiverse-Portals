@@ -21,7 +21,6 @@ import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -95,7 +94,9 @@ public class MVPPlayerMoveListener implements Listener {
             }
 
             Location destLocation = d.getLocation(p);
-            if (destLocation == null) return;
+            if (destLocation == null) {
+                return;
+            }
 
             MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(destLocation.getWorld().getName());
             if (world == null) {
