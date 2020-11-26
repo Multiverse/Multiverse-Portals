@@ -239,6 +239,7 @@ public class MVPPlayerListener implements Listener {
 
                 Location destLocation = portalDest.getLocation(event.getPlayer());
                 if (destLocation == null) {
+                    event.setCancelled(true);
                     return;
                 }
 
