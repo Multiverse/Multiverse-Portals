@@ -9,6 +9,7 @@ package com.onarandombox.MultiversePortals.utils;
 
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Axis;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,16 +38,16 @@ public class PortalFiller {
 
     public boolean fillRegion(MultiverseRegion r, Location l, Material type) {
         if (r.getWidth() != 1 && r.getDepth() != 1) {
-            this.plugin.log(Level.FINER, "Cannot fill portal, it is too big... w:[" + r.getWidth() + "] d:[" + r.getDepth() + "]");
+            Logging.finer("Cannot fill portal, it is too big... w:[" + r.getWidth() + "] d:[" + r.getDepth() + "]");
             return false;
         }
-        this.plugin.log(Level.FINER, "Neat, Starting Portal fill w:[" + r.getWidth() + "] h:[" + r.getHeight() + "] d:[" + r.getDepth() + "]");
+        Logging.finer("Neat, Starting Portal fill w:[" + r.getWidth() + "] h:[" + r.getHeight() + "] d:[" + r.getDepth() + "]");
 
 
         int useX = (r.getWidth() == 1) ? 0 : 1;
         int useZ = (r.getDepth() == 1) ? 0 : 1;
         Block oldLoc = l.getWorld().getBlockAt(l);
-        this.plugin.log(Level.FINER, "Filling: " + type);
+        Logging.finer("Filling: " + type);
         doFill(oldLoc, useX, useZ, r, type);
         return true;
     }
@@ -82,7 +83,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Right/Left: " + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
+            Logging.finest("Moving Right/Left: " + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 0, 1, useZ * 0).getLocation(), type)) {
@@ -90,7 +91,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Up" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
+            Logging.finest("Moving Up" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * -1, 0, useZ * -1).getLocation(), type)) {
@@ -98,7 +99,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Left/Right" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
+            Logging.finest("Moving Left/Right" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
         if (isValidPortalRegion(newLoc.getRelative(useX * 0, -1, useZ * 0).getLocation(), type)) {
@@ -106,7 +107,7 @@ public class PortalFiller {
             if (!r.containsVector(tmpLoc.getLocation())) {
                 return;
             }
-            this.plugin.log(Level.FINEST, "Moving Down" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
+            Logging.finest("Moving Down" + this.plugin.getLocationManipulation().strCoordsRaw(tmpLoc.getLocation()));
             doFill(tmpLoc, useX, useZ, r, type);
         }
     }

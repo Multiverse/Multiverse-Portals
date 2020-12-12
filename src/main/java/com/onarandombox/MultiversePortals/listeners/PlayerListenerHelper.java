@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
 import com.onarandombox.MultiverseCore.enums.TeleportResult;
@@ -25,13 +26,13 @@ public class PlayerListenerHelper {
     }
 
     void stateSuccess(String playerName, String worldName) {
-        this.plugin.log(Level.FINE, String.format(
+        Logging.fine(String.format(
                 "MV-Portals is allowing Player '%s' to use the portal '%s'.",
                 playerName, worldName));
     }
 
     void stateFailure(String playerName, String portalName) {
-        this.plugin.log(Level.FINE, String.format(
+        Logging.fine(String.format(
                 "MV-Portals is DENYING Player '%s' access to use the portal '%s'.",
                 playerName, portalName));
     }
@@ -75,14 +76,14 @@ public class PlayerListenerHelper {
                     if (!portalEvent.isCancelled()) {
                         return true;
                     }
-                    plugin.log(Level.FINE, "A plugin cancelled the portal after script handling.");
+                    Logging.fine("A plugin cancelled the portal after script handling.");
                     return false;
                 } else {
-                    plugin.log(Level.FINE, "Portal denied by script!");
+                    Logging.fine("Portal denied by script!");
                     return false;
                 }
             } else {
-                plugin.log(Level.FINE, "Portal denied by script because allowPortal not a boolean!");
+                Logging.fine("Portal denied by script because allowPortal not a boolean!");
                 return false;
             }
         }

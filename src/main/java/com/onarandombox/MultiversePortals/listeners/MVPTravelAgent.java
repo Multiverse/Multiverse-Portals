@@ -2,6 +2,7 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.utils.BukkitTravelAgent;
@@ -20,7 +21,7 @@ class MVPTravelAgent extends MVTravelAgent {
             Class.forName("org.bukkit.TravelAgent");
             new BukkitTravelAgent(this).setPortalEventTravelAgent(event);
         } catch (ClassNotFoundException ignore) {
-            core.log(Level.FINE, "TravelAgent not available for PlayerPortalEvent for " + player.getName());
+            Logging.fine("TravelAgent not available for PlayerPortalEvent for " + player.getName());
         }
     }
 }

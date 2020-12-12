@@ -10,6 +10,7 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
@@ -56,7 +57,7 @@ public class MVPPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void playerTeleport(PlayerTeleportEvent event) {
         if (event.isCancelled()) {
-            this.plugin.log(Level.FINE, "The PlayerTeleportEvent was already cancelled. Doing nothing.");
+            Logging.fine("The PlayerTeleportEvent was already cancelled. Doing nothing.");
             return;
         }
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
@@ -66,12 +67,12 @@ public class MVPPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void playerBucketFill(PlayerBucketFillEvent event) {
         if (event.isCancelled()) {
-            this.plugin.log(Level.FINE, "The PlayerBucketFillEvent was already cancelled. Doing nothing.");
+            Logging.fine("The PlayerBucketFillEvent was already cancelled. Doing nothing.");
             return;
         }
 
-        this.plugin.log(Level.FINER, "Fill: ");
-        this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
+        Logging.finer("Fill: ");
+        Logging.finer("Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         MVPortal portal = portalManager.getPortal(event.getPlayer(), event.getBlockClicked().getLocation());
@@ -81,7 +82,7 @@ public class MVPPlayerListener implements Listener {
                 event.setCancelled(true);
             } else {
                 Material fillMaterial = Material.AIR;
-                this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
+                Logging.finer("Fill Material: " + fillMaterial);
                 this.filler.fillRegion(portal.getLocation().getRegion(), event.getBlockClicked().getLocation(), fillMaterial, event.getPlayer());
             }
         }
@@ -90,14 +91,14 @@ public class MVPPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void playerBucketEmpty(PlayerBucketEmptyEvent event) {
         if (event.isCancelled()) {
-            this.plugin.log(Level.FINE, "The PlayerBucketEmptyEvent was already cancelled. Doing nothing.");
+            Logging.fine("The PlayerBucketEmptyEvent was already cancelled. Doing nothing.");
             return;
         }
 
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
-        this.plugin.log(Level.FINER, "Fill: ");
-        this.plugin.log(Level.FINER, "Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
-        this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
+        Logging.finer("Fill: ");
+        Logging.finer("Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
+        Logging.finer("Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
 
         PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
         MVPortal portal = portalManager.getPortal(event.getPlayer(), translatedLocation);
@@ -115,7 +116,7 @@ public class MVPPlayerListener implements Listener {
                     fillMaterial = Material.LAVA;
                 }
 
-                this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
+                Logging.finer("Fill Material: " + fillMaterial);
                 this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
             }
         }
@@ -124,14 +125,14 @@ public class MVPPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteract(PlayerInteractEvent event) {
         if (event.isCancelled()) {
-            this.plugin.log(Level.FINE, "The PlayerInteractEvent was already cancelled. Doing nothing.");
+            Logging.fine("The PlayerInteractEvent was already cancelled. Doing nothing.");
             return;
         }
 
         // Portal lighting stuff
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
             // They're lighting somethin'
-            this.plugin.log(Level.FINER, "Player is lighting block: " + this.plugin.getCore().getLocationManipulation().strCoordsRaw(event.getClickedBlock().getLocation()));
+            Logging.finer("Player is lighting block: " + this.plugin.getCore().getLocationManipulation().strCoordsRaw(event.getClickedBlock().getLocation()));
             PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
             Location translatedLocation = this.getTranslatedLocation(event.getClickedBlock(), event.getBlockFace());
             if (!portalManager.isPortal(translatedLocation)) {
@@ -156,10 +157,10 @@ public class MVPPlayerListener implements Listener {
                     return;
                 }
 
-                this.plugin.log(Level.FINER, "Right Clicked: ");
-                this.plugin.log(Level.FINER, "Block Clicked: " + event.getClickedBlock() + ":" + event.getClickedBlock().getType());
-                this.plugin.log(Level.FINER, "Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
-                this.plugin.log(Level.FINER, "In Hand: " + inHand);
+                Logging.finer("Right Clicked: ");
+                Logging.finer("Block Clicked: " + event.getClickedBlock() + ":" + event.getClickedBlock().getType());
+                Logging.finer("Translated Block: " + event.getPlayer().getWorld().getBlockAt(translatedLocation) + ":" + event.getPlayer().getWorld().getBlockAt(translatedLocation).getType());
+                Logging.finer("In Hand: " + inHand);
                 if (ps.isDebugModeOn()) {
                     ps.showDebugInfo(portal);
                     event.setCancelled(true);
@@ -168,7 +169,7 @@ public class MVPPlayerListener implements Listener {
                     if (translatedLocation.getWorld().getBlockAt(translatedLocation).getType() == Material.NETHER_PORTAL) {
                         fillMaterial = Material.AIR;
                     }
-                    this.plugin.log(Level.FINER, "Fill Material: " + fillMaterial);
+                    Logging.finer("Fill Material: " + fillMaterial);
                     event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer()));
                 }
             }
@@ -200,18 +201,18 @@ public class MVPPlayerListener implements Listener {
     private Location getTranslatedLocation(Block clickedBlock, BlockFace face) {
         Location clickedLoc = clickedBlock.getLocation();
         Location newLoc = new Location(clickedBlock.getWorld(), face.getModX() + clickedLoc.getBlockX(), face.getModY() + clickedLoc.getBlockY(), face.getModZ() + clickedLoc.getBlockZ());
-        this.plugin.log(Level.FINEST, "Clicked Block: " + clickedBlock.getLocation());
-        this.plugin.log(Level.FINEST, "Translated Block: " + newLoc);
+        Logging.finest("Clicked Block: " + clickedBlock.getLocation());
+        Logging.finest("Translated Block: " + newLoc);
         return newLoc;
     }
 
     @EventHandler
     public void playerPortal(PlayerPortalEvent event) {
         if (event.isCancelled()) {
-            this.plugin.log(Level.FINE, "The PlayerPortalEvent was already cancelled. Doing nothing.");
+            Logging.fine("This Portal event was already cancelled.");
             return;
         }
-        this.plugin.log(Level.FINER, "onPlayerPortal called!");
+        Logging.finer("onPlayerPortal called!");
         PortalManager pm = this.plugin.getPortalManager();
         Location playerPortalLoc = event.getPlayer().getLocation();
         // Determine if we're in a portal
@@ -223,12 +224,12 @@ public class MVPPlayerListener implements Listener {
             // Check around the player to make sure
             playerPortalLoc = this.plugin.getCore().getSafeTTeleporter().findPortalBlockNextTo(event.getFrom());
             if (playerPortalLoc != null) {
-                this.plugin.log(Level.FINER, "Player was outside of portal, The location has been successfully translated.");
+                Logging.finer("Player was outside of portal, The location has been successfully translated.");
                 portal = pm.getPortal(event.getPlayer(), playerPortalLoc);
             }
         }
         if (portal != null) {
-            this.plugin.log(Level.FINER, "There was a portal found!");
+            Logging.finer("There was a portal found!");
             MVDestination portalDest = portal.getDestination();
             if (portalDest != null && !(portalDest instanceof InvalidDestination)) {
                 if (!portal.isFrameValid(playerPortalLoc)) {
@@ -290,7 +291,7 @@ public class MVPPlayerListener implements Listener {
 
                 if (portalEvent.isCancelled()) {
                     event.setCancelled(true);
-                    this.plugin.log(Level.FINE, "Someone cancelled the MVPlayerPortal Event!");
+                    Logging.fine("Someone cancelled the MVPlayerPortal Event!");
                     return;
                 } else if (shouldPay) {
                     if (price < 0D) {
@@ -303,12 +304,12 @@ public class MVPPlayerListener implements Listener {
                             economist.formatPrice(price, currency),
                             portal.getName()));
                 }
-                this.plugin.log(Level.FINE, "Sending player to a location via our Sexy Travel Agent!");
+                Logging.fine("Sending player to a location via our Sexy Travel Agent!");
             } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
                 // If portals should not default to the nether, cancel the event
                 event.getPlayer().sendMessage(String.format(
                         "This portal %sdoesn't go anywhere. You should exit it now.", ChatColor.RED));
-                this.plugin.log(Level.FINE, "Event canceled because this was a MVPortal with an invalid destination. But you had 'portalsdefaulttonether' set to false!");
+                Logging.fine("Event canceled because this was a MVPortal with an invalid destination. But you had 'portalsdefaulttonether' set to false!");
                 event.setCancelled(true);
             }
         }

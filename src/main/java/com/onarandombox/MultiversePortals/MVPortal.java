@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -248,7 +249,7 @@ public class MVPortal {
     public boolean setPortalLocation(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
-            this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid LOCATION!");
+            Logging.warning("Portal " + this.name + " has an invalid LOCATION!");
             return false;
         }
         this.config.set(this.portalConfigString + ".location", this.location.toString());
@@ -257,7 +258,7 @@ public class MVPortal {
 
             this.config.set(this.portalConfigString + ".world", world.getName());
         } else {
-            this.plugin.log(Level.WARNING, "Portal " + this.name + " has an invalid WORLD");
+            Logging.warning("Portal " + this.name + " has an invalid WORLD");
             return false;
         }
         saveConfig();
@@ -274,7 +275,7 @@ public class MVPortal {
     public boolean setDestination(String destinationString) {
         this.destination = this.plugin.getCore().getDestFactory().getDestination(destinationString);
         if (this.destination instanceof InvalidDestination) {
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
+            Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
         this.config.set(this.portalConfigString + ".destination", this.destination.toString());
@@ -287,7 +288,7 @@ public class MVPortal {
         ((ExactDestination) this.destination).setDestination(location);
         if (!this.destination.isValid()) {
             this.destination = new InvalidDestination();
-            this.plugin.getCore().log(Level.WARNING, "Portal " + this.name + " has an invalid DESTINATION!");
+            Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
         this.config.set(this.portalConfigString + ".destination", this.destination.toString());
@@ -432,7 +433,7 @@ public class MVPortal {
             return true;
         }
 
-        MultiversePortals.staticLog(Level.FINER, String.format("checking portal frame at %d,%d,%d",
+        Logging.finer(String.format("checking portal frame at %d,%d,%d",
                 l.getBlockX(), l.getBlockY(), l.getBlockZ()));
 
         // Limit the search to the portal's region, extended by 1 block.
@@ -484,9 +485,7 @@ public class MVPortal {
             return false;
         }
 
-        Level debugLevel = Level.FINER;
-
-        MultiversePortals.staticLog(debugLevel, String.format("checking portal around %d,%d,%d",
+        Logging.finer(String.format("checking portal around %d,%d,%d",
                 location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
         Material commonMaterial = null;
@@ -501,7 +500,7 @@ public class MVPortal {
             Location toCheck = frontier.pop();
             visited.add(toCheck);
 
-            MultiversePortals.staticLog(debugLevel, String.format("          ... block at %d,%d,%d",
+            Logging.finer(String.format("          ... block at %d,%d,%d",
                     toCheck.getBlockX(), toCheck.getBlockY(), toCheck.getBlockZ()));
 
             if (isPortalInterior(toCheck.getBlock().getType())) {
@@ -540,12 +539,12 @@ public class MVPortal {
                 }
                 else if (commonMaterial != material) {
                     // This frame block doesn't match other frame blocks.
-                    MultiversePortals.staticLog(debugLevel, "frame has multiple materials");
+                    Logging.finer("frame has multiple materials");
                     return false;
                 }
             }
         }
-        MultiversePortals.staticLog(debugLevel, String.format("frame has common material %s", commonMaterial));
+        Logging.finer(String.format("frame has common material %s", commonMaterial));
 
         return MultiversePortals.FrameMaterials.contains(commonMaterial);
     }

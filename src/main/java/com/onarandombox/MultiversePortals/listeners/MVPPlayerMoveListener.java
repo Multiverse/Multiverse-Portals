@@ -10,6 +10,7 @@ package com.onarandombox.MultiversePortals.listeners;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
@@ -89,7 +90,7 @@ public class MVPPlayerMoveListener implements Listener {
             p.setFallDistance(0);
 
             if (d instanceof InvalidDestination) {
-                this.plugin.log(Level.FINE, "Invalid Destination!");
+                Logging.fine("Invalid Destination!");
                 return;
             }
 
@@ -113,7 +114,7 @@ public class MVPPlayerMoveListener implements Listener {
                         // Portal not handled by script
                     }
                 } else {
-                    plugin.log(Level.WARNING, "Buscript wasn't initialized, so we can't use scripts!");
+                    Logging.warning("Buscript wasn't initialized, so we can't use scripts!");
                 }
             }
             if (!ps.allowTeleportViaCooldown(new Date())) {
