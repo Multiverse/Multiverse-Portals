@@ -58,33 +58,26 @@ public class ListCommand extends PortalCommand {
             titleString += ChatColor.GOLD + " [" + filter + "]";
         }
         sender.sendMessage(ChatColor.AQUA + "--- " + titleString + ChatColor.AQUA + " ---");
-        sender.sendMessage(getPortals(sender, world, filter));
+        sender.sendMessage(getPortalsList(sender, world, filter));
 
     }
 
-    private String getPortals(CommandSender sender, MultiverseWorld world, String filter) {
-        String portals = "";
-        if (filter == null) {
-            filter = "";
-        }
-        boolean altColor = false;
-        for (MVPortal p : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
-            if (p.getName().matches("(i?).*" + filter + ".*")) {
-                if (altColor) {
-                    portals += ChatColor.YELLOW;
-                    altColor = false;
-                } else {
-                    portals += ChatColor.WHITE;
-                    altColor = true;
-                }
+    private String getPortalsList(CommandSender sender, MultiverseWorld world, String filter) {
+        StringBuilder portalText = new StringBuilder();
+        String expression = "(i?).*" + filter + ".*";
+        boolean altColor = true;
 
-                portals += p.getName() + " ";
+        List<MVPortal> portalList = (world == null)
+                ? this.plugin.getPortalManager().getPortals(sender)
+                : this.plugin.getPortalManager().getPortals(sender, world);
+
+        for (MVPortal portal : portalList) {
+            if (portal.getName().matches(expression)) {
+                portalText.append((altColor ^= true) ? ChatColor.YELLOW : ChatColor.WHITE)
+                        .append(portal.getName());
             }
+        }
 
-        }
-        if (portals.length() > 2) {
-            portals = portals.substring(0, portals.length() - 1);
-        }
-        return portals;
+        return portalText.toString();
     }
 }

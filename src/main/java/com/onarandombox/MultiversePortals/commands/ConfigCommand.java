@@ -7,6 +7,7 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -39,22 +40,9 @@ public class ConfigCommand extends PortalCommand {
     public void runCommand(CommandSender sender, List<String> args) {
         if (args.size() == 1) {
             if (args.get(0).equalsIgnoreCase("show")) {
-                String[] allProps = PortalConfigProperty.getAllValues().split(" ");
-                String currentvals = "";
-                for (String prop : allProps) {
-                    currentvals += ChatColor.GREEN;
-                    currentvals += prop;
-                    currentvals += ChatColor.WHITE;
-                    currentvals += " = ";
-                    currentvals += ChatColor.GOLD;
-                    currentvals += this.plugin.getMainConfig().get(prop, "NOT SET");
-                    currentvals += ChatColor.WHITE;
-                    currentvals += ", ";
-                }
-                sender.sendMessage(currentvals.substring(0,currentvals.length() - 2));
+                showPropertiesValues(sender);
                 return;
             }
-
         }
         if (args.get(0).equalsIgnoreCase("wand") || args.get(0).equalsIgnoreCase("portalcooldown")) {
             if(args.size() == 1) {
@@ -95,5 +83,22 @@ public class ConfigCommand extends PortalCommand {
         } else {
             sender.sendMessage(ChatColor.RED + "FAIL!" + ChatColor.WHITE + " Check your console for details!");
         }
+    }
+
+    private void showPropertiesValues(CommandSender sender) {
+        StringBuilder currentValues = new StringBuilder();
+
+        Arrays.stream(PortalConfigProperty.values())
+                .map(Enum::toString)
+                .forEach(prop -> currentValues.append(ChatColor.GREEN)
+                        .append(prop)
+                        .append(ChatColor.WHITE)
+                        .append(" = ")
+                        .append(ChatColor.GOLD)
+                        .append(this.plugin.getMainConfig().get(prop.toString(), "NOT SET"))
+                        .append(ChatColor.WHITE)
+                        .append(", "));
+
+        sender.sendMessage(currentValues.substring(0, currentValues.length()-2));
     }
 }
