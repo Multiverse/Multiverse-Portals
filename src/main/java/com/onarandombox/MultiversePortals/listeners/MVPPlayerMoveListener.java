@@ -94,7 +94,12 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
 
-            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(d.getLocation(p).getWorld().getName());
+            Location destLocation = d.getLocation(p);
+            if (destLocation == null) {
+                return;
+            }
+
+            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(destLocation.getWorld().getName());
             if (world == null) {
                 return;
             }
