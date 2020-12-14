@@ -8,7 +8,6 @@
 package com.onarandombox.MultiversePortals;
 
 import java.util.Date;
-import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiversePortals.enums.MoveType;
@@ -82,10 +81,10 @@ public class PortalPlayerSession {
 
     private void setLocation(Location loc) {
         this.loc = loc;
-        this.setStandinginLocation();
+        this.setStandingInLocation();
     }
 
-    private void setStandinginLocation() {
+    private void setStandingInLocation() {
         // If they're not in a portal and this location is a portal
         if (this.standingIn == null && this.plugin.getPortalManager().isPortal(this.loc)) {
             this.standingIn = this.plugin.getPortalManager().getPortal(this.loc);

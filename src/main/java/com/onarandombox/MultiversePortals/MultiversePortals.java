@@ -52,7 +52,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.commands.HelpCommand;
-import com.onarandombox.MultiverseCore.utils.DebugLog;
 import com.onarandombox.MultiversePortals.commands.ConfigCommand;
 import com.onarandombox.MultiversePortals.commands.CreateCommand;
 import com.onarandombox.MultiversePortals.commands.DebugCommand;
@@ -383,7 +382,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     /**
      * Returns the WorldEdit compatibility object. Use this to check for WorldEdit and get a player's WorldEdit selection.
      *
-     * @return the WorldEdit compatibility ojbect.
+     * @return the WorldEdit compatibility object.
      */
     public WorldEditConnection getWorldEditConnection() {
         return worldEditConnection;
@@ -449,7 +448,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     /**
-     * Logs a message to Multiverse-Portals's Logger.  If the Message is of fine-finest level, it will be logged to the
+     * Logs a message to Multiverse-Portal's Logger.  If the Message is of fine-finest level, it will be logged to the
      * debug log if enabled.
      * @param level
      * @param msg
