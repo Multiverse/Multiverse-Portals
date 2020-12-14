@@ -55,7 +55,7 @@ public class PortalPlayerSession {
     }
 
     private Player getPlayerFromName() {
-        return this.plugin.getServer().getPlayer(playerName);
+        return this.plugin.getServer().getPlayerExact(playerName);
     }
 
     public void setDebugMode(boolean debugMode) {
