@@ -466,6 +466,14 @@ public class MVPortal {
         return frameValid;
     }
 
+    private MultiverseRegion expandedRegion(MultiverseRegion r, int x, int y, int z) {
+        Vector min = new Vector().copy(r.getMinimumPoint());
+        Vector max = new Vector().copy(r.getMaximumPoint());
+        min.add(new Vector(-x, -y, -z));
+        max.add(new Vector( x,  y,  z));
+        return new MultiverseRegion(min, max, r.getWorld());
+    }
+
     /**
      * Examines a frame around a location, bounded by a search region which has
      * one dimension of size 1 and two dimensions which of size greater than
@@ -557,15 +565,4 @@ public class MVPortal {
     public Permission getExempt() {
         return this.exempt;
     }
-
-
-
-    private MultiverseRegion expandedRegion(MultiverseRegion r, int x, int y, int z) {
-        Vector min = new Vector().copy(r.getMinimumPoint());
-        Vector max = new Vector().copy(r.getMaximumPoint());
-        min.add(new Vector(-x, -y, -z));
-        max.add(new Vector( x,  y,  z));
-        return new MultiverseRegion(min, max, r.getWorld());
-    }
-
 }
