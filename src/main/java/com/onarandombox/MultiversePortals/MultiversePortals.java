@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -82,7 +83,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private WorldEditConnection worldEditConnection;
 
     private PortalManager portalManager;
-    private Map<String, PortalPlayerSession> portalSessions;
+    private Map<UUID, PortalPlayerSession> portalSessions;
 
     private static final Material DEFAULT_WAND = Material.WOODEN_AXE;
     private long portalCooldown = 0;
@@ -133,7 +134,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.createDefaultPerms();
 
         this.portalManager = new PortalManager(this);
-        this.portalSessions = new HashMap<String, PortalPlayerSession>();
+        this.portalSessions = new HashMap<UUID, PortalPlayerSession>();
         this.getCore().getDestFactory().registerDestinationType(PortalDestination.class, "p");
         this.getCore().getDestFactory().registerDestinationType(RandomPortalDestination.class, "rp");
 
@@ -201,11 +202,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     public PortalPlayerSession getPortalSession(Player p) {
-        if (this.portalSessions.containsKey(p.getName())) {
-            return this.portalSessions.get(p.getName());
+        if (this.portalSessions.containsKey(p.getUniqueId())) {
+            return this.portalSessions.get(p.getUniqueId());
         }
         PortalPlayerSession session = new PortalPlayerSession(this, p);
-        this.portalSessions.put(p.getName(), session);
+        this.portalSessions.put(p.getUniqueId(), session);
         return session;
     }
 
