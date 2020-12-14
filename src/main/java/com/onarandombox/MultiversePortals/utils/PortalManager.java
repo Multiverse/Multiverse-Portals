@@ -12,7 +12,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.dumptruckman.minecraft.util.Logging;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -43,7 +46,7 @@ public class PortalManager {
     private Map<MultiverseWorld, Map<Integer, Collection<MVPortal>>> worldChunkPortals;
 
     // getNearbyPortals() returns this instead of null. =)
-    private static final Collection<MVPortal> emptyPortalSet = new ArrayList<MVPortal>();
+    private static final List<MVPortal> emptyPortalSet = new ArrayList<MVPortal>();
 
     public PortalManager(MultiversePortals plugin) {
         this.plugin = plugin;
@@ -52,29 +55,24 @@ public class PortalManager {
     }
     /**
      * Method that checks to see if a player is inside a portal AND if they have perms to use it.
-     * @param sender The sender to check.
+     * @param player The sender to check.
      * @param l The location they're standing.
      * @return A MVPortal if it's valid, null if not.
      */
-    public MVPortal getPortal(Player sender, Location l) {
-        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
+    public MVPortal getPortal(Player player, Location l) {
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld());
+        if (world == null) {
+            Logging.fine("Did not get portals as world is not managed by MV.");
             return null;
         }
 
-        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
-        for (MVPortal portal : getNearbyPortals(world, l)) {
-
-            // Ignore portals the player can't use.
-            if (!MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal((Player) sender)) {
-                PortalLocation portalLoc = portal.getLocation();
-                if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
-                    return portal;
-                }
-            }
-        }
-
-        return null;
+        return getNearbyPortals(world, l).stream()
+                .filter(portal -> (!MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal(player))
+                        && (portal.getLocation().isValidLocation() && portal.getLocation().getRegion().containsVector(l)))
+                .findFirst()
+                .orElse(null);
     }
+
     /**
      * Deprecated, use getPortal instead.
      * @deprecated
@@ -102,14 +100,17 @@ public class PortalManager {
      * @return Null if no portal found, otherwise the MVPortal at that location.
      */
     public MVPortal getPortal(Location l) {
-        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld().getName());
-        for (MVPortal portal : getNearbyPortals(world, l)) {
-            MultiverseRegion r = portal.getLocation().getRegion();
-            if (r != null && r.containsVector(l)) {
-                return portal;
-            }
+        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(l.getWorld());
+        if (world == null) {
+            Logging.fine("Did not get portals as world is not managed by MV.");
+            return null;
         }
-        return null;
+
+        return getNearbyPortals(world, l).stream()
+                .filter(portal -> portal.getLocation().getRegion() != null
+                        && portal.getLocation().getRegion().containsVector(l))
+                .findFirst()
+                .orElse(null);
     }
 
     public boolean addPortal(MVPortal portal) {
@@ -198,52 +199,34 @@ public class PortalManager {
     }
 
     public List<MVPortal> getPortals(CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            return this.getAllPortals();
-        }
-        List<MVPortal> all = this.getAllPortals();
-        List<MVPortal> validItems = new ArrayList<MVPortal>();
-        if (MultiversePortals.EnforcePortalAccess) {
-            for (MVPortal p : all) {
-                if (p.playerCanEnterPortal((Player) sender)) {
-                    validItems.add(p);
-                }
-            }
-        } else {
-            validItems = new ArrayList<MVPortal>(all);
-        }
-        return validItems;
-    }
+        List<MVPortal> allPortals = this.getAllPortals();
+        Player player = (Player) sender;
 
-    private List<MVPortal> getPortals(MultiverseWorld world) {
-        List<MVPortal> all = this.getAllPortals();
-        List<MVPortal> validItems = new ArrayList<MVPortal>();
-        for (MVPortal p : all) {
-            MultiverseWorld portalworld = p.getLocation().getMVWorld();
-            if (portalworld != null && portalworld.equals(world)) {
-                validItems.add(p);
-            }
+        if (player == null) {
+            return allPortals;
         }
-        return validItems;
+
+        return this.portals.values().stream()
+                .filter(portal -> canEnterPortal(player, portal))
+                .collect(Collectors.toList());
     }
 
     public List<MVPortal> getPortals(CommandSender sender, MultiverseWorld world) {
-        if (!(sender instanceof Player)) {
-            return this.getPortals(world);
+        if (world == null) {
+            return emptyPortalSet;
         }
-        List<MVPortal> all = this.getAllPortals();
-        List<MVPortal> validItems = new ArrayList<MVPortal>();
-        if (MultiversePortals.EnforcePortalAccess) {
-            for (MVPortal p : all) {
-                if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
-                        p.playerCanEnterPortal((Player) sender)) {
-                    validItems.add(p);
-                }
-            }
-        } else {
-            validItems = new ArrayList<MVPortal>(all);
-        }
-        return validItems;
+
+        Player player = (Player) sender;
+
+        return this.portals.values().stream()
+                .filter(portal -> portal.getLocation().isValidLocation()
+                        && world.equals(portal.getLocation().getMVWorld())
+                        && canEnterPortal(player, portal))
+                .collect(Collectors.toList());
+    }
+
+    private boolean canEnterPortal(Player player, MVPortal portal) {
+        return !MultiversePortals.EnforcePortalAccess || (player == null || portal.playerCanEnterPortal(player));
     }
 
     public MVPortal getPortal(String portalName) {
