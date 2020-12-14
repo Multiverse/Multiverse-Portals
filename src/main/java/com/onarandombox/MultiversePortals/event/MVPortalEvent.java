@@ -90,13 +90,13 @@ public class MVPortalEvent extends Event implements Cancellable {
      *
      * This will be Legacy for MV1 style portals and Normal for Portals that use the swirly purple goo.
      *
-     * @return A {@link PortalType}
+     * @return The {@link PortalType} of the sending portal.
+     * @throws IllegalStateException If this portal has no valid location.
+     * @deprecated Use {@link #getSendingPortal().getPortalType()} instead.
      */
-    public PortalType getPortalType() {
-        if (this.travelAgent == null) {
-            return PortalType.Legacy;
-        }
-        return PortalType.Legacy;
+    @Deprecated
+    public PortalType getPortalType() throws IllegalStateException {
+        return this.getSendingPortal().getPortalType();
     }
 
     /**
