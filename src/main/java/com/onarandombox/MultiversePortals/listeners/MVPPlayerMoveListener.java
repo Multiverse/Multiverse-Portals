@@ -94,8 +94,14 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
 
-            MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(d.getLocation(p).getWorld().getName());
-            if (world == null) {
+            Location destLocation = d.getLocation(p);
+            if (destLocation == null) {
+                Logging.fine("Unable to teleport player because destination is null!");
+                return;
+            }
+
+            if (!this.plugin.getCore().getMVWorldManager().isMVWorld(destLocation.getWorld())) {
+                Logging.fine("Unable to teleport player because the destination world is not managed by Multiverse!");
                 return;
             }
             if (!portal.isFrameValid(loc)) {

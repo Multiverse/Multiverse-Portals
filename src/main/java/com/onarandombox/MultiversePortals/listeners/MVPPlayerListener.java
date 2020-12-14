@@ -237,6 +237,20 @@ public class MVPPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
+
+                Location destLocation = portalDest.getLocation(event.getPlayer());
+                if (destLocation == null) {
+                    Logging.fine("Portal event cancelled because destination is null!");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (!this.plugin.getCore().getMVWorldManager().isMVWorld(destLocation.getWorld())) {
+                    Logging.fine("Portal event cancelled because the destination world is not managed by Multiverse!");
+                    event.setCancelled(true);
+                    return;
+                }
+
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
                 if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
                     try {
@@ -263,7 +277,7 @@ public class MVPPlayerListener implements Listener {
                     return;
                 }
                 MVPTravelAgent agent = new MVPTravelAgent(this.plugin.getCore(), portalDest, event.getPlayer());
-                event.setTo(portalDest.getLocation(event.getPlayer()));
+                event.setTo(destLocation);
                 if (portalDest.useSafeTeleporter()) {
                     SafeTTeleporter teleporter = this.plugin.getCore().getSafeTTeleporter();
                     event.setTo(teleporter.getSafeLocation(event.getPlayer(), portalDest));
