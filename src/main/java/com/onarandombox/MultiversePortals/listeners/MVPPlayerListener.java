@@ -249,9 +249,7 @@ public class MVPPlayerListener implements Listener {
                         // Portal not handled by script
                     }
                 }
-                long cooldownMs = ps.getRemainingTeleportCooldown(new Date());
-                if (cooldownMs > 0) {
-                    event.getPlayer().sendMessage(ps.getCooldownMessage(cooldownMs));
+                if (ps.checkAndSendCooldownMessage()) {
                     event.setCancelled(true);
                     return;
                 }

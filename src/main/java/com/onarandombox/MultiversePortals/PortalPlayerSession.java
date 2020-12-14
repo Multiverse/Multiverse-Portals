@@ -283,30 +283,59 @@ public class PortalPlayerSession {
     }
 
     /**
-     * Check if the teleport cooldown will finish before the given time is
-     * reached. If so, return the remaining cooldown time in ms. If not, return 0.
+     * Checks if the teleport cooldown is still in effect. If it is, a message is sent
+     * to the player informing them.
+     *
+     * @return True if the teleport cooldown is still in effect, false otherwise.
      */
-    public long getRemainingTeleportCooldown(Date time) {
-        long cooldownEndMs = this.lastTeleportTime.getTime() + this.plugin.getCooldownTime();
-        long timeMs = time.getTime();
-        if (cooldownEndMs > timeMs) {
-            return cooldownEndMs - timeMs;
-        } else {
-            return 0;
+    public boolean checkAndSendCooldownMessage() {
+        long cooldownMs = this.getRemainingTeleportCooldown();
+        if (cooldownMs > 0) {
+            this.getPlayerFromName().sendMessage(this.getCooldownMessage(cooldownMs));
+            return true;
         }
+
+        return false;
     }
 
-    public String getCooldownMessage(long cooldownMs) {
-        String remaining = "There is a portal " + ChatColor.AQUA + "cooldown " +
-            ChatColor.WHITE + "in effect. Please try again in " +
-            ChatColor.GOLD;
+    /**
+     * Get the remaining teleport cooldown time in milliseconds.
+     * If the value returned is not positive, the cooldown is no longer in effect.
+     *
+     * @return The remaining teleport cooldown time in milliseconds. Note that a
+     *         negative value may be returned if the cooldown is no longer in effect.
+     */
+    private long getRemainingTeleportCooldown() {
+        long cooldownEndMs = this.lastTeleportTime.getTime() + this.plugin.getCooldownTime();
+        long timeMs = (new Date()).getTime();
+        return cooldownEndMs - timeMs;
+    }
 
+    /**
+     * Constructs a message informing a player about the
+     * remaining cooldown time.
+     *
+     * @param cooldownMs The cooldown time in milliseconds.
+     * @return           A message to be sent to a player, informing them about the remaining cooldown time.
+     */
+    private String getCooldownMessage(long cooldownMs) {
+        return "There is a portal " + ChatColor.AQUA + "cooldown "
+                + ChatColor.WHITE + "in effect. Please try again in "
+                + ChatColor.GOLD + this.formatCooldownTime(cooldownMs)
+                + ChatColor.WHITE + ".";
+    }
+
+    /**
+     * Converts a long representing a time in milliseconds to a human-readable String.
+     *
+     * @param cooldownMs Time in milliseconds.
+     * @return Human-readable String with the given time in seconds.
+     */
+    private String formatCooldownTime(long cooldownMs) {
         if (cooldownMs < 1000) {
-            remaining += "1 s";
-        } else {
-            remaining += (cooldownMs/1000) + " s";
+            return "1s";
         }
-        remaining += ChatColor.WHITE + ".";
-        return remaining;
+
+        return (cooldownMs / 1000) + "s";
     }
 }
