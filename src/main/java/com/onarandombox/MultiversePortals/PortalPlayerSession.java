@@ -10,6 +10,7 @@ package com.onarandombox.MultiversePortals;
 import java.util.Date;
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -251,7 +252,7 @@ public class PortalPlayerSession {
             showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
             showPortalPriceInfo(portal);
         } else {
-            this.plugin.log(Level.INFO, "Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
+            Logging.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
         }
         return true;
     }

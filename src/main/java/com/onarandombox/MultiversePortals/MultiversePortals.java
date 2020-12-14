@@ -74,7 +74,6 @@ import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
-    protected static DebugLog debugLog;
     private MultiverseCore core;
 
     private FileConfiguration MVPPortalConfig;
@@ -223,10 +222,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
                 if (portal.getLocation().isValidLocation()) {
                     this.portalManager.addPortal(portal);
                 } else {
-                    staticLog(Level.WARNING, String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));
+                    Logging.warning(String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));
                 }
             }
-            staticLog(Level.INFO, keys.size() + " - Portals(s) loaded");
+            Logging.info(keys.size() + " - Portals(s) loaded");
         }
 
         // Now Resolve destinations
@@ -271,22 +270,22 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
             this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
-            this.log(Level.INFO, "Migrating useportalaccess -> enforceportalaccess...");
+            Logging.info("Migrating useportalaccess -> enforceportalaccess...");
         }
 
         if (this.MVPConfig.get("mvportals_default_to_nether") != null) {
             this.MVPConfig.set("portalsdefaulttonether", this.MVPConfig.getBoolean("mvportals_default_to_nether", false));
-            this.log(Level.INFO, "Migrating mvportals_default_to_nether -> portalsdefaulttonether...");
+            Logging.info("Migrating mvportals_default_to_nether -> portalsdefaulttonether...");
         }
 
         if (this.MVPConfig.get("use_onmove") != null) {
             this.MVPConfig.set("useonmove", this.MVPConfig.getBoolean("use_onmove", false));
-            this.log(Level.INFO, "Migrating use_onmove -> useonmove...");
+            Logging.info("Migrating use_onmove -> useonmove...");
         }
 
         if (this.MVPConfig.get("portal_cooldown") != null) {
             this.MVPConfig.set("portalcooldown", this.MVPConfig.getInt("portal_cooldown", 1000));
-            this.log(Level.INFO, "Migrating portal_cooldown -> portalcooldown...");
+            Logging.info("Migrating portal_cooldown -> portalcooldown...");
         }
 
         // Remove old properties
@@ -315,7 +314,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             this.MVPConfig.save(new File(this.getDataFolder(), "config.yml"));
             return true;
         } catch (IOException e) {
-            this.log(Level.SEVERE, "Failed to save Portals config.yml.");
+            Logging.severe("Failed to save Portals config.yml.");
             return false;
         }
     }
@@ -325,7 +324,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             this.MVPPortalConfig.save(new File(this.getDataFolder(), "portals.yml"));
             return true;
         } catch (IOException e) {
-            this.log(Level.SEVERE, "Failed to save Portals portals.yml.");
+            Logging.severe("Failed to save Portals portals.yml.");
             return false;
         }
     }
@@ -472,7 +471,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         Logging.log(level, msg);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated This is now deprecated, nobody needs it any longer.
+     * All logging is now done with {@link Logging}.
+     */
     @Override
+    @Deprecated
     public void log(Level level, String msg) {
         Logging.log(level, msg);
     }
@@ -508,7 +514,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     private String logAndAddToPasteBinBuffer(String string) {
-        this.log(Level.INFO, string);
+        Logging.info(string);
         return "[Multiverse-Portals] " + string + "\n";
     }
 

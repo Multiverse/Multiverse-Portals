@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
+import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -43,11 +44,11 @@ public class PortalLocation {
     public static PortalLocation parseLocation(String locationString, MultiverseWorld world, String portalName) {
         String[] split = locationString.split(":");
         if (split.length != 2) {
-            MultiversePortals.staticLog(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
+            Logging.warning("Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
             return getInvalidPortalLocation();
         }
         if (world == null) {
-            MultiversePortals.staticLog(Level.WARNING, "Failed Parsing World for: " + portalName + " (World Error, World did not exist or was not imported into Multiverse-Core!)");
+            Logging.warning("Failed Parsing World for: " + portalName + " (World Error, World did not exist or was not imported into Multiverse-Core!)");
             return getInvalidPortalLocation();
         }
 
@@ -55,7 +56,7 @@ public class PortalLocation {
         Vector pos2 = parseVector(split[1]);
 
         if (pos1 == null || pos2 == null) {
-            MultiversePortals.staticLog(Level.WARNING, "Failed Parsing Location for: " + portalName + " (Vector Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
+            Logging.warning("Failed Parsing Location for: " + portalName + " (Vector Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
             return getInvalidPortalLocation();
         }
         return new PortalLocation(pos1, pos2, world);
