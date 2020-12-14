@@ -123,8 +123,7 @@ public class MVPPlayerMoveListener implements Listener {
                     Logging.warning("Buscript wasn't initialized, so we can't use scripts!");
                 }
             }
-            if (!ps.allowTeleportViaCooldown(new Date())) {
-                p.sendMessage(ps.getFriendlyRemainingTimeMessage());
+            if (ps.checkAndSendCooldownMessage()) {
                 return;
             }
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
