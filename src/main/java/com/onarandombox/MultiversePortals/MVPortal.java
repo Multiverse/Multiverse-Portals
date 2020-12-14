@@ -17,9 +17,11 @@ import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
@@ -564,5 +566,35 @@ public class MVPortal {
 
     public Permission getExempt() {
         return this.exempt;
+    }
+
+    /**
+     * Display information about a portal.
+     *
+     * @param sender  Who to send the portal info messages to.
+     * @param title   Header to show based on situation.
+     */
+    public void showInfo(CommandSender sender, String title) {
+        sender.sendMessage(title + ChatColor.DARK_AQUA + this.getName());
+        sender.sendMessage("It's coords are: " + ChatColor.GOLD + this.getLocation().toString());
+        if (this.getDestination() == null) {
+            sender.sendMessage("This portal has " + ChatColor.RED + "NO DESTINATION SET.");
+        } else {
+            sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + this.getDestination().getType());
+            sender.sendMessage("The destination's name is: " + ChatColor.GREEN + this.getDestination().getName());
+        }
+        sender.sendMessage("Permission to use portal: " + ChatColor.YELLOW + permission.getName());
+        showPortalPriceInfo(sender);
+    }
+
+    private void showPortalPriceInfo(CommandSender sender) {
+        sender.sendMessage("More details for you: " + ChatColor.GREEN + getDestination());
+        if (getPrice() > 0D) {
+            sender.sendMessage("Price: " + ChatColor.GREEN + this.plugin.getCore().getEconomist().formatPrice(getPrice(), getCurrency()));
+        } else if (getPrice() < 0D) {
+            sender.sendMessage("Prize: " + ChatColor.GREEN + this.plugin.getCore().getEconomist().formatPrice(-getPrice(), getCurrency()));
+        } else {
+            sender.sendMessage("Price: " + ChatColor.GREEN + "FREE!");
+        }
     }
 }

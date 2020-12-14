@@ -13,7 +13,6 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -241,41 +240,17 @@ public class PortalPlayerSession {
             return false;
         }
 
-        showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
-        this.showPortalPriceInfo(this.standingIn);
+        this.standingIn.showInfo(this.getPlayerFromName(), "You are currently standing in ");
         return true;
     }
 
     public boolean showDebugInfo(MVPortal portal) {
         if (portal.playerCanEnterPortal(this.getPlayerFromName())) {
-            showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
-            showPortalPriceInfo(portal);
+            portal.showInfo(this.getPlayerFromName(), "Portal Info ");
         } else {
             Logging.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
         }
         return true;
-    }
-
-    private void showPortalPriceInfo(MVPortal portal) {
-        getPlayerFromName().sendMessage("More details for you: " + ChatColor.GREEN + portal.getDestination());
-        if (portal.getPrice() > 0D) {
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(portal.getPrice(), portal.getCurrency()));
-        } else if (portal.getPrice() < 0D) {
-            getPlayerFromName().sendMessage("Prize: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(-portal.getPrice(), portal.getCurrency()));
-        } else {
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + "FREE!");
-        }
-    }
-
-    public static void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
-        sender.sendMessage(message + ChatColor.DARK_AQUA + portal.getName());
-        sender.sendMessage("It's coords are: " + ChatColor.GOLD + portal.getLocation().toString());
-        if (portal.getDestination() == null) {
-            sender.sendMessage("This portal has " + ChatColor.RED + "NO DESTINATION SET.");
-        } else {
-            sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
-            sender.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
-        }
     }
 
     public void setTeleportTime(Date date) {

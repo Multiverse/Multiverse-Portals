@@ -16,7 +16,6 @@ import org.bukkit.permissions.PermissionDefault;
 
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
-import com.onarandombox.MultiversePortals.PortalPlayerSession;
 
 public class InfoCommand extends PortalCommand {
 
@@ -33,16 +32,16 @@ public class InfoCommand extends PortalCommand {
 
     @Override
     public void runCommand(CommandSender sender, List<String> args) {
-        MVPortal selected = this.plugin.getPortalManager().getPortal(args.get(0), sender);
-        if(selected == null) {
+        MVPortal selectedPortal = this.plugin.getPortalManager().getPortal(args.get(0), sender);
+        if(selectedPortal == null) {
             sender.sendMessage("Sorry! That portal doesn't exist or you're not allowed to use it!");
             return;
         }
         if(sender instanceof Player) {
             Player p = (Player) sender;
-            this.plugin.getPortalSession(p).showDebugInfo(selected);
+            this.plugin.getPortalSession(p).showDebugInfo(selectedPortal);
         } else {
-            PortalPlayerSession.showStaticInfo(sender, selected, "Portal Info: ");
+            selectedPortal.showInfo(sender, "Portal Info: ");
         }
     }
 }
