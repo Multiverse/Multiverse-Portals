@@ -240,6 +240,13 @@ public class MVPPlayerListener implements Listener {
 
                 Location destLocation = portalDest.getLocation(event.getPlayer());
                 if (destLocation == null) {
+                    Logging.fine("Portal event cancelled because destination is null!");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if (!this.plugin.getCore().getMVWorldManager().isMVWorld(destLocation.getWorld())) {
+                    Logging.fine("Portal event cancelled because the destination world is not managed by Multiverse!");
                     event.setCancelled(true);
                     return;
                 }
