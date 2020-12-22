@@ -10,6 +10,7 @@ package com.onarandombox.MultiversePortals.utils;
 import com.onarandombox.MultiverseCore.commandTools.MVCommandManager;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.commands_acf.ConfigCommand;
+import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.acf.BukkitCommandExecutionContext;
 import com.onarandombox.acf.InvalidCommandArgument;
@@ -38,6 +39,7 @@ public class CommandTools {
 
         // Commands
         this.manager.registerCommand(new ConfigCommand(this.plugin));
+        this.manager.registerCommand(new DebugCommand(this.plugin));
     }
 
     @NotNull
