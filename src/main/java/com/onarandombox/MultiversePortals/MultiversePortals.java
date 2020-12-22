@@ -7,31 +7,22 @@
 
 package com.onarandombox.MultiversePortals;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-
 import com.dumptruckman.minecraft.util.Logging;
+import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import com.onarandombox.MultiversePortals.destination.PortalDestination;
+import com.onarandombox.MultiversePortals.destination.RandomPortalDestination;
+import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
+import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
+import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
+import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
+import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
-import com.onarandombox.commandhandler.CommandHandler;
+import com.onarandombox.MultiversePortals.utils.PortalManager;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -49,27 +40,20 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.api.MVPlugin;
-import com.onarandombox.MultiverseCore.commands.HelpCommand;
-import com.onarandombox.MultiversePortals.commands.ConfigCommand;
-import com.onarandombox.MultiversePortals.commands.CreateCommand;
-import com.onarandombox.MultiversePortals.commands.DebugCommand;
-import com.onarandombox.MultiversePortals.commands.InfoCommand;
-import com.onarandombox.MultiversePortals.commands.ListCommand;
-import com.onarandombox.MultiversePortals.commands.ModifyCommand;
-import com.onarandombox.MultiversePortals.commands.RemoveCommand;
-import com.onarandombox.MultiversePortals.commands.SelectCommand;
-import com.onarandombox.MultiversePortals.commands.WandCommand;
-import com.onarandombox.MultiversePortals.destination.PortalDestination;
-import com.onarandombox.MultiversePortals.destination.RandomPortalDestination;
-import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
-import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
-import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
-import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
-import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
-import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
-import com.onarandombox.MultiversePortals.utils.PortalManager;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
@@ -78,7 +62,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private FileConfiguration MVPPortalConfig;
     private FileConfiguration MVPConfig;
 
-    private CommandHandler commandHandler;
     private WorldEditConnection worldEditConnection;
 
     private PortalManager portalManager;
@@ -126,9 +109,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         // Register ourselves with Core
         this.core.incrementPluginCount();
 
-        // Register our commands
-        this.registerCommands();
-
         // Ensure permissions are created
         this.createDefaultPerms();
 
@@ -140,12 +120,18 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadPortals();
         this.loadConfig();
 
+        this.registerCommands();
+
         // Register our events AFTER the config.
         this.registerEvents();
 
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
 
         Logging.log(true, Level.INFO, " Enabled - By %s", getAuthors());
+    }
+
+    private void registerCommands() {
+
     }
 
     private void registerEvents() {
@@ -330,36 +316,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     public void onDisable() {
 
-    }
-
-    /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
-    private void registerCommands() {
-        this.commandHandler = this.core.getCommandHandler();
-        this.commandHandler.registerCommand(new InfoCommand(this));
-        this.commandHandler.registerCommand(new ListCommand(this));
-        this.commandHandler.registerCommand(new CreateCommand(this));
-        this.commandHandler.registerCommand(new DebugCommand(this));
-        this.commandHandler.registerCommand(new RemoveCommand(this));
-        this.commandHandler.registerCommand(new ModifyCommand(this));
-        this.commandHandler.registerCommand(new SelectCommand(this));
-        this.commandHandler.registerCommand(new WandCommand(this));
-        this.commandHandler.registerCommand(new ConfigCommand(this));
-        for (com.onarandombox.commandhandler.Command c : this.commandHandler.getAllCommands()) {
-            if (c instanceof HelpCommand) {
-                c.addKey("mvp");
-            }
-        }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if (!this.isEnabled()) {
-            sender.sendMessage("This plugin is Disabled!");
-            return true;
-        }
-        ArrayList<String> allArgs = new ArrayList<String>(Arrays.asList(args));
-        allArgs.add(0, command.getName());
-        return this.commandHandler.locateAndRunCommand(sender, allArgs);
     }
 
     /**

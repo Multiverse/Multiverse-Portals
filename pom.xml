@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.onarandombox.multiverseportals</groupId>
     <artifactId>Multiverse-Portals</artifactId>
-    <version>4.2.2-SNAPSHOT</version>
+    <version>5.0.0-ACF-BETA</version>
     <name>Multiverse-Portals</name>
     <description>Multiverse Portals module</description>
     <properties>
@@ -167,9 +167,9 @@
         <dependency>
             <groupId>com.onarandombox.multiversecore</groupId>
             <artifactId>Multiverse-Core</artifactId>
-            <version>4.2.2</version>
-            <type>jar</type>
-            <scope>provided</scope>
+            <version>5.0.0-ACF-BETA</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/Multiverse-Core-5.0.0-ACF-BETA.jar</systemPath>
         </dependency>
         <!-- End of Multiverse Core Dependency -->
 
