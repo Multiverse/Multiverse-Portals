@@ -300,6 +300,10 @@ public class MVPortal {
         return this.name;
     }
 
+    public String getOwner() {
+        return owner;
+    }
+
     public PortalLocation getLocation() {
         return this.location;
     }

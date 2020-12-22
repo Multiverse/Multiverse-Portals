@@ -11,7 +11,6 @@ import com.onarandombox.acf.annotation.Single;
 import com.onarandombox.acf.annotation.Subcommand;
 import com.onarandombox.acf.annotation.Syntax;
 import com.onarandombox.acf.annotation.Values;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
