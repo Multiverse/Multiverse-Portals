@@ -14,6 +14,7 @@ import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.commands_acf.ConfigCommand;
 import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
 import com.onarandombox.MultiversePortals.commands_acf.ListCommand;
+import com.onarandombox.MultiversePortals.commands_acf.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands_acf.SelectCommand;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.acf.BukkitCommandCompletionContext;
@@ -54,6 +55,7 @@ public class CommandTools {
         this.manager.registerCommand(new DebugCommand(this.plugin));
         this.manager.registerCommand(new SelectCommand(this.plugin));
         this.manager.registerCommand(new ListCommand(this.plugin));
+        this.manager.registerCommand(new RemoveCommand(this.plugin));
     }
 
     @NotNull
