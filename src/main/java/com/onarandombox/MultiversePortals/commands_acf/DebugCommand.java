@@ -26,10 +26,10 @@ public class DebugCommand extends PortalCommand {
     @CommandPermission("multiverse.portal.debug")
     @Syntax("[on|off]")
     //TODO: Have a complete called @toggles
-    @CommandCompletion("on|off")
+    @CommandCompletion("@toggles")
     @Description("Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.")
     public void onDebugCommand(@NotNull Player player,
-                                     @Nullable @Optional @Single @Values("on|off") String mode) {
+                               @Nullable @Optional @Single @Values("@toggles") String mode) {
 
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
         ps.setDebugMode((mode == null)
