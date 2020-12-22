@@ -8,17 +8,21 @@
 package com.onarandombox.MultiversePortals.utils;
 
 import com.onarandombox.MultiverseCore.commandTools.MVCommandManager;
+import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.commands_acf.ConfigCommand;
 import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
+import com.onarandombox.MultiversePortals.commands_acf.SelectCommand;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
+import com.onarandombox.acf.BukkitCommandCompletionContext;
 import com.onarandombox.acf.BukkitCommandExecutionContext;
 import com.onarandombox.acf.InvalidCommandArgument;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class CommandTools {
 
@@ -30,9 +34,11 @@ public class CommandTools {
         this.manager = plugin.getCore().getMVCommandManager();
 
         // Completions
+        this.manager.getCommandCompletions().registerAsyncCompletion("MVPortals", this::suggestMVPortals);
         this.manager.getCommandCompletions().registerStaticCompletion("MVPConfigs", this::suggestMVPConfigs);
 
         // Contexts
+        this.manager.getCommandContexts().registerIssuerAwareContext(MVPortal.class, this::deriveMVPortal);
         this.manager.getCommandContexts().registerContext(PortalProperty.class, this::derivePortalProperty);
 
         // Conditions
@@ -40,11 +46,42 @@ public class CommandTools {
         // Commands
         this.manager.registerCommand(new ConfigCommand(this.plugin));
         this.manager.registerCommand(new DebugCommand(this.plugin));
+        this.manager.registerCommand(new SelectCommand(this.plugin));
+    }
+
+    @NotNull
+    private Collection<String> suggestMVPortals(@NotNull BukkitCommandCompletionContext context) {
+        return this.plugin.getPortalManager().getPortals(context.getSender()).stream()
+                .unordered()
+                .map(MVPortal::getName)
+                .collect(Collectors.toList());
     }
 
     @NotNull
     private Collection<String> suggestMVPConfigs() {
         return PortalConfigProperty.valueNames();
+    }
+
+    @Nullable
+    private MVPortal deriveMVPortal(@NotNull BukkitCommandExecutionContext context) {
+        String portalName = context.popFirstArg();
+        if (portalName == null) {
+            if (context.isOptional()) {
+                return null;
+            }
+            throw new InvalidCommandArgument("You need to specify a portal name.");
+        }
+
+        if (!this.plugin.getPortalManager().isPortal(portalName)) {
+            throw new InvalidCommandArgument("You do have have any portal named '" + portalName + "'.");
+        }
+
+        MVPortal portal = this.plugin.getPortalManager().getPortal(portalName, context.getSender());
+        if (portal == null) {
+            throw new InvalidCommandArgument("You do have permission to access this portal.");
+        }
+
+        return portal;
     }
 
     @NotNull
@@ -63,6 +100,13 @@ public class CommandTools {
             throw new InvalidCommandArgument("'" + propertyString + "' is not a valid config property.");
         }
 
+        return new PortalProperty(property, parseValueClass(context, property));
+    }
+
+    @NotNull
+    private Object parseValueClass(@NotNull BukkitCommandExecutionContext context,
+                                   @NotNull PortalConfigProperty<?> property) {
+
         Class<?> valueType = property.getType();
         String value = context.getFirstArg();
         Object result = this.manager.getCommandContexts().getResolver(valueType).getContext(context);
@@ -74,9 +118,6 @@ public class CommandTools {
         if (result instanceof Integer && ((int) result) < 0) {
             throw new InvalidCommandArgument(ChatColor.RED + "Value cannot be a negative number.");
         }
-
-        return new PortalProperty(property, result);
+        return result;
     }
-
-
 }
