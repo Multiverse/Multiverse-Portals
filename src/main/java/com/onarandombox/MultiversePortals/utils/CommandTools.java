@@ -10,6 +10,7 @@ package com.onarandombox.MultiversePortals.utils;
 import com.onarandombox.MultiverseCore.commandTools.MVCommandManager;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.commands_acf.ConfigCommand;
 import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
 import com.onarandombox.MultiversePortals.commands_acf.SelectCommand;
@@ -18,6 +19,7 @@ import com.onarandombox.acf.BukkitCommandCompletionContext;
 import com.onarandombox.acf.BukkitCommandExecutionContext;
 import com.onarandombox.acf.InvalidCommandArgument;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,10 +29,12 @@ import java.util.stream.Collectors;
 public class CommandTools {
 
     private final MultiversePortals plugin;
+    private final PortalManager portalManager;
     private final MVCommandManager manager;
 
     public CommandTools(@NotNull MultiversePortals plugin) {
         this.plugin = plugin;
+        this.portalManager = plugin.getPortalManager();
         this.manager = plugin.getCore().getMVCommandManager();
 
         // Completions
@@ -38,6 +42,7 @@ public class CommandTools {
         this.manager.getCommandCompletions().registerStaticCompletion("MVPConfigs", this::suggestMVPConfigs);
 
         // Contexts
+        this.manager.getCommandContexts().registerIssuerOnlyContext(PortalPlayerSession.class, this::derivePortalPlayerSession);
         this.manager.getCommandContexts().registerIssuerAwareContext(MVPortal.class, this::deriveMVPortal);
         this.manager.getCommandContexts().registerContext(PortalProperty.class, this::derivePortalProperty);
 
@@ -51,7 +56,7 @@ public class CommandTools {
 
     @NotNull
     private Collection<String> suggestMVPortals(@NotNull BukkitCommandCompletionContext context) {
-        return this.plugin.getPortalManager().getPortals(context.getSender()).stream()
+        return this.portalManager.getPortals(context.getSender()).stream()
                 .unordered()
                 .map(MVPortal::getName)
                 .collect(Collectors.toList());
@@ -60,6 +65,19 @@ public class CommandTools {
     @NotNull
     private Collection<String> suggestMVPConfigs() {
         return PortalConfigProperty.valueNames();
+    }
+
+    @NotNull
+    private PortalPlayerSession derivePortalPlayerSession(@NotNull BukkitCommandExecutionContext context) {
+        Player player = context.getPlayer();
+        if (player == null) {
+            throw new InvalidCommandArgument("You need to be a player to run this command.");
+        }
+        PortalPlayerSession ps = this.plugin.getPortalSession(player);
+        if (ps == null) {
+            throw new InvalidCommandArgument("There was an issue getting your portal sessions! Please report to the authors.");
+        }
+        return ps;
     }
 
     @Nullable
@@ -72,11 +90,11 @@ public class CommandTools {
             throw new InvalidCommandArgument("You need to specify a portal name.");
         }
 
-        if (!this.plugin.getPortalManager().isPortal(portalName)) {
+        if (!this.portalManager.isPortal(portalName)) {
             throw new InvalidCommandArgument("You do have have any portal named '" + portalName + "'.");
         }
 
-        MVPortal portal = this.plugin.getPortalManager().getPortal(portalName, context.getSender());
+        MVPortal portal = this.portalManager.getPortal(portalName, context.getSender());
         if (portal == null) {
             throw new InvalidCommandArgument("You do have permission to access this portal.");
         }

@@ -43,9 +43,8 @@ public class SelectCommand extends PortalCommand {
     @CommandCompletion("@MVPortals")
     @Description("Selects a portal so you can perform multiple modifications on it.")
     public void onSelectCommand(@NotNull Player player,
+                                @NotNull PortalPlayerSession ps,
                                 @Nullable @Optional MVPortal portal) {
-
-        PortalPlayerSession ps = this.plugin.getPortalSession(player);
 
         if (portal == null) {
             showCurrentSelection(player, ps);

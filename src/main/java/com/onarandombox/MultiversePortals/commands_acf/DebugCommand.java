@@ -28,10 +28,9 @@ public class DebugCommand extends PortalCommand {
     //TODO: Have a complete called @toggles
     @CommandCompletion("@toggles")
     @Description("Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.")
-    public void onDebugCommand(@NotNull Player player,
+    public void onDebugCommand(@NotNull PortalPlayerSession ps,
                                @Nullable @Optional @Single @Values("@toggles") String mode) {
 
-        PortalPlayerSession ps = this.plugin.getPortalSession(player);
         ps.setDebugMode((mode == null)
                 ? !ps.isDebugModeOn()
                 : mode.equalsIgnoreCase("on"));
