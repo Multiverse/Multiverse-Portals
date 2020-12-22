@@ -24,14 +24,13 @@ public class DebugCommand extends PortalCommand {
     @Subcommand("debug")
     @CommandPermission("multiverse.portal.debug")
     @Syntax("[on|off]")
-    //TODO: Have a complete called @toggles
     @CommandCompletion("@toggles")
     @Description("Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.")
-    public void onDebugCommand(@NotNull PortalPlayerSession ps,
+    public void onDebugCommand(@NotNull PortalPlayerSession portalSession,
                                @Nullable @Optional @Single @Values("@toggles") String mode) {
 
-        ps.setDebugMode((mode == null)
-                ? !ps.isDebugModeOn()
+        portalSession.setDebugMode((mode == null)
+                ? !portalSession.isDebugModeOn()
                 : mode.equalsIgnoreCase("on"));
     }
 }

@@ -43,15 +43,15 @@ public class SelectCommand extends PortalCommand {
     @CommandCompletion("@MVPortals")
     @Description("Selects a portal so you can perform multiple modifications on it.")
     public void onSelectCommand(@NotNull Player player,
-                                @NotNull PortalPlayerSession ps,
+                                @NotNull PortalPlayerSession portalSession,
                                 @Nullable @Optional MVPortal portal) {
 
         if (portal == null) {
-            showCurrentSelection(player, ps);
+            showCurrentSelection(player, portalSession);
             return;
         }
 
-        ps.selectPortal(portal);
+        portalSession.selectPortal(portal);
         player.sendMessage("You have successfully selected portal " + ChatColor.AQUA + portal.getName() + ChatColor.WHITE + "!");
     }
 

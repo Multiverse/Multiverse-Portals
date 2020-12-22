@@ -13,6 +13,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.commands_acf.ConfigCommand;
 import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
+import com.onarandombox.MultiversePortals.commands_acf.InfoCommand;
 import com.onarandombox.MultiversePortals.commands_acf.ListCommand;
 import com.onarandombox.MultiversePortals.commands_acf.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands_acf.SelectCommand;
@@ -58,6 +59,7 @@ public class CommandTools {
         this.manager.registerCommand(new ListCommand(this.plugin));
         this.manager.registerCommand(new RemoveCommand(this.plugin));
         this.manager.registerCommand(new WandCommand(this.plugin));
+        this.manager.registerCommand(new InfoCommand(this.plugin));
     }
 
     @NotNull
@@ -73,17 +75,20 @@ public class CommandTools {
         return PortalConfigProperty.valueNames();
     }
 
-    @NotNull
+    @Nullable
     private PortalPlayerSession derivePortalPlayerSession(@NotNull BukkitCommandExecutionContext context) {
         Player player = context.getPlayer();
         if (player == null) {
+            if (context.isOptional()) {
+                return null;
+            }
             throw new InvalidCommandArgument("You need to be a player to run this command.");
         }
-        PortalPlayerSession ps = this.plugin.getPortalSession(player);
-        if (ps == null) {
+        PortalPlayerSession portalSession = this.plugin.getPortalSession(player);
+        if (portalSession == null) {
             throw new InvalidCommandArgument("There was an issue getting your portal sessions! Please report to the authors.");
         }
-        return ps;
+        return portalSession;
     }
 
     @Nullable
@@ -97,12 +102,12 @@ public class CommandTools {
         }
 
         if (!this.portalManager.isPortal(portalName)) {
-            throw new InvalidCommandArgument("You do have have any portal named '" + portalName + "'.");
+            throw new InvalidCommandArgument("You do not have have any portal named '" + portalName + "'.");
         }
 
         MVPortal portal = this.portalManager.getPortal(portalName, context.getSender());
         if (portal == null) {
-            throw new InvalidCommandArgument("You do have permission to access this portal.");
+            throw new InvalidCommandArgument("You do not have permission to access this portal.");
         }
 
         return portal;
