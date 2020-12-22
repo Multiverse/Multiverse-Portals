@@ -11,6 +11,7 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MVPlugin;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import com.onarandombox.MultiversePortals.commands_acf.PortalCommand;
 import com.onarandombox.MultiversePortals.destination.PortalDestination;
 import com.onarandombox.MultiversePortals.destination.RandomPortalDestination;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
@@ -21,6 +22,7 @@ import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
 import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
+import com.onarandombox.MultiversePortals.utils.CommandTools;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -120,7 +122,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.loadPortals();
         this.loadConfig();
 
-        this.registerCommands();
+        // Setup commands
+        new CommandTools(this);
 
         // Register our events AFTER the config.
         this.registerEvents();
@@ -128,10 +131,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
 
         Logging.log(true, Level.INFO, " Enabled - By %s", getAuthors());
-    }
-
-    private void registerCommands() {
-
     }
 
     private void registerEvents() {
@@ -444,12 +443,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         buffer += logAndAddToPasteBinBuffer("Bukkit Version: " + this.getServer().getVersion());
         buffer += logAndAddToPasteBinBuffer("Loaded Portals: " + this.getPortalManager().getAllPortals().size());
         buffer += logAndAddToPasteBinBuffer("Dumping Portal Values: (version " + this.getMainConfig().getString("version", "NOT SET") + ")");
-        for (PortalConfigProperty property : PortalConfigProperty.values()) {
-            String propStr = property.toString();
-            if (!("version".equals(propStr))) {
-                buffer += logAndAddToPasteBinBuffer(propStr + ": " + this.getMainConfig().getString(propStr, "NOT SET"));
-            }
-        }
+//        for (PortalConfigProperty property : PortalConfigProperty.values()) {
+//            String propStr = property.toString();
+//            if (!("version".equals(propStr))) {
+//                buffer += logAndAddToPasteBinBuffer(propStr + ": " + this.getMainConfig().getString(propStr, "NOT SET"));
+//            }
+//        }
         buffer += logAndAddToPasteBinBuffer("Special Code: FRN001");
         return buffer;
     }
