@@ -5,7 +5,6 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.acf.annotation.CommandAlias;
 import com.onarandombox.acf.annotation.CommandCompletion;
-import com.onarandombox.acf.annotation.CommandPermission;
 import com.onarandombox.acf.annotation.Description;
 import com.onarandombox.acf.annotation.Optional;
 import com.onarandombox.acf.annotation.Subcommand;
@@ -38,12 +37,14 @@ public class SelectCommand extends PortalCommand {
     }
 
     @Subcommand("select")
-    // Permission defined above.
     @Syntax("[portal]")
     @CommandCompletion("@MVPortals")
     @Description("Selects a portal so you can perform multiple modifications on it.")
     public void onSelectCommand(@NotNull Player player,
                                 @NotNull PortalPlayerSession portalSession,
+
+                                @Syntax("<portal>")
+                                @Description("Portal name that you want to select.")
                                 @Nullable @Optional MVPortal portal) {
 
         if (portal == null) {

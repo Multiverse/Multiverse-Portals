@@ -29,6 +29,9 @@ public class WandCommand extends PortalCommand {
     @CommandCompletion("@toggles")
     @Description("Gives you the wand that MV uses. This will only work if you are NOT using WorldEdit.")
     public void onWandCommand(@NotNull Player player,
+
+                              @Syntax("[on|off]")
+                              @Description("Set if wand function should be active.")
                               @Nullable @Optional @Values("@toggles") Boolean state) {
 
         if (state != null) {

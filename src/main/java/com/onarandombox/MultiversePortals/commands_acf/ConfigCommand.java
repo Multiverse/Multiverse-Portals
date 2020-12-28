@@ -50,6 +50,9 @@ public class ConfigCommand extends PortalCommand {
     @CommandCompletion("@MVPConfigs")
     @Description("Set Global MV Portals Variables.")
     public void onConfigSetCommand(@NotNull CommandSender sender,
+
+                                   @Syntax("<property> <value>")
+                                   @Description("Config key, and the value you want to set it to.")
                                    @NotNull PortalProperty<?> property) {
 
         String propertyName = property.getProperty().getName();

@@ -27,6 +27,9 @@ public class DebugCommand extends PortalCommand {
     @CommandCompletion("@toggles")
     @Description("Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.")
     public void onDebugCommand(@NotNull PortalPlayerSession portalSession,
+
+                               @Syntax("[on|off]")
+                               @Description("Set the state of portal debug mode.")
                                @Nullable @Optional @Single @Values("@toggles") String mode) {
 
         portalSession.setDebugMode((mode == null)

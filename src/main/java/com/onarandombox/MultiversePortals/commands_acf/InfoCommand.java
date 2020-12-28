@@ -28,6 +28,9 @@ public class InfoCommand extends PortalCommand {
     @Description("Displays information about a portal.")
     public void onInfoCommand(@NotNull CommandSender sender,
                               @Nullable @Optional PortalPlayerSession playerSession,
+
+                              @Syntax("<portal>")
+                              @Description("Portal name you want info to be displayed.")
                               @NotNull MVPortal portal) {
 
         if (playerSession != null) {

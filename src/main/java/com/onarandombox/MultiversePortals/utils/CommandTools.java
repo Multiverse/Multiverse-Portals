@@ -18,6 +18,7 @@ import com.onarandombox.MultiversePortals.commands_acf.ListCommand;
 import com.onarandombox.MultiversePortals.commands_acf.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands_acf.RootCommand;
 import com.onarandombox.MultiversePortals.commands_acf.SelectCommand;
+import com.onarandombox.MultiversePortals.commands_acf.UsageCommand;
 import com.onarandombox.MultiversePortals.commands_acf.WandCommand;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.acf.BukkitCommandCompletionContext;
@@ -62,6 +63,7 @@ public class CommandTools {
         this.manager.registerCommand(new RemoveCommand(this.plugin));
         this.manager.registerCommand(new WandCommand(this.plugin));
         this.manager.registerCommand(new InfoCommand(this.plugin));
+        this.manager.registerCommand(new UsageCommand(this.plugin));
     }
 
     @NotNull
@@ -84,11 +86,11 @@ public class CommandTools {
             if (context.isOptional()) {
                 return null;
             }
-            throw new InvalidCommandArgument("You need to be a player to run this command.");
+            throw new InvalidCommandArgument("You need to be a player to run this command.", false);
         }
         PortalPlayerSession portalSession = this.plugin.getPortalSession(player);
         if (portalSession == null) {
-            throw new InvalidCommandArgument("There was an issue getting your portal sessions! Please report to the authors.");
+            throw new InvalidCommandArgument("There was an issue getting your portal sessions! Please report to the authors.", false);
         }
         return portalSession;
     }

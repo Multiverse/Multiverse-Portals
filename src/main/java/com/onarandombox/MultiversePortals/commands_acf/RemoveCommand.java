@@ -25,6 +25,9 @@ public class RemoveCommand extends PortalCommand {
     @CommandCompletion("@MVPortals")
     @Description("Remove a portal.")
     public void onRemoveCommand(@NotNull CommandSender sender,
+
+                                @Syntax("<portal>")
+                                @Description("Portal name you remove.")
                                 @NotNull MVPortal portal) {
 
         MVPortal removedPortal = this.plugin.getPortalManager().removePortal(portal.getName(), true);
