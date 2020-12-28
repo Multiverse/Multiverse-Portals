@@ -7,21 +7,15 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-//import com.onarandombox.MultiversePortals.MultiversePortals;
-///**
-// * Convenience class so we don't have to cast each time.
-// * @author fernferret
-// *
-// */
-//public abstract class PortalCommand extends Command {
-//
-//    protected MultiversePortals plugin;
-//    public PortalCommand(MultiversePortals plugin) {
-//        super(plugin);
-//        this.plugin = plugin;
-//    }
-//
-//    @Override
-//    public abstract void runCommand(CommandSender sender, List<String> args);
-//
-//}
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.acf.BaseCommand;
+
+
+public abstract class PortalCommand extends BaseCommand {
+
+    protected final MultiversePortals plugin;
+
+    protected PortalCommand(MultiversePortals plugin) {
+        this.plugin = plugin;
+    }
+}

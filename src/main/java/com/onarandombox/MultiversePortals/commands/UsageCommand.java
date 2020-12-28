@@ -1,4 +1,4 @@
-package com.onarandombox.MultiversePortals.commands_acf;
+package com.onarandombox.MultiversePortals.commands;
 
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.acf.CommandHelp;

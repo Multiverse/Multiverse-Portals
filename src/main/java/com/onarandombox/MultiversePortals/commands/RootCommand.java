@@ -1,4 +1,4 @@
-package com.onarandombox.MultiversePortals.commands_acf;
+package com.onarandombox.MultiversePortals.commands;
 
 import com.onarandombox.MultiverseCore.commandTools.ColourAlternator;
 import com.onarandombox.MultiversePortals.MultiversePortals;

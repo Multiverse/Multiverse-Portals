@@ -1,86 +1,77 @@
-/*
- * Multiverse 2 Copyright (c) the Multiverse Team 2011.
- * Multiverse 2 is licensed under the BSD License.
- * For more information please check the README.md file included
- * with this project
- */
-
 package com.onarandombox.MultiversePortals.commands;
 
-//public class CreateCommand extends PortalCommand {
-//
-//    public CreateCommand(MultiversePortals plugin) {
-//        super(plugin);
-//        this.setName("Create a Portal");
-//        this.setCommandUsage("/mvp create" + ChatColor.GREEN + " {NAME}" + ChatColor.GOLD + " [DESTINATION]");
-//        this.setArgRange(1, 2);
-//        this.addKey("mvp create");
-//        this.addKey("mvpc");
-//        this.addKey("mvpcreate");
-//        this.setPermission("multiverse.portal.create", "Creates a new portal, assuming you have a region selected.", PermissionDefault.OP);
-//    }
-//
-//    @Override
-//    public void runCommand(CommandSender sender, List<String> args) {
-//        Player p = null;
-//        if (!(sender instanceof Player)) {
-//            sender.sendMessage("This command must be run by a player");
-//            return;
-//        }
-//        p = (Player) sender;
-//
-//        if (!this.plugin.getCore().getMVWorldManager().isMVWorld(p.getWorld().getName())) {
-//            this.plugin.getCore().showNotMVWorldMessage(sender, p.getWorld().getName());
-//            return;
-//        }
-//        MultiverseWorld world = this.plugin.getCore().getMVWorldManager().getMVWorld(p.getWorld().getName());
-//
-//        PortalPlayerSession ps = this.plugin.getPortalSession(p);
-//
-//        MultiverseRegion r = ps.getSelectedRegion();
-//        if (r == null) {
-//            return;
-//        }
-//        MVPortal portal = this.plugin.getPortalManager().getPortal(args.get(0));
-//        PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
-//        if (this.plugin.getPortalManager().addPortal(world, args.get(0), p.getName(), location)) {
-//            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") created and selected!");
-//            // If the portal did not exist, ie: we're creating it.
-//            // we have to re select it, because it would be null
-//            portal = this.plugin.getPortalManager().getPortal(args.get(0));
-//
-//        } else {
-//            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") was NOT created!");
-//            sender.sendMessage("It already existed and has been selected.");
-//        }
-//
-//        ps.selectPortal(portal);
-//
-//        if (args.size() > 1 && portal != null) {
-//            String dest = args.get(1);
-//            if (dest.equalsIgnoreCase("here")) {
-//                MVPortal standingIn = ps.getUncachedStandingInPortal();
-//                if (standingIn != null) {
-//                    // If they're standing in a portal. treat it differently, niftily you might say...
-//                    String cardinal = LocationManipulation.getDirection(p.getLocation());
-//                    portal.setDestination("p:" + standingIn.getName() + ":" + cardinal);
-//                } else {
-//                    portal.setExactDestination(p.getLocation());
-//                }
-//            } else if (dest.matches("(i?)cannon-[\\d]+(\\.[\\d]+)?")) {
-//                // We found a Cannon Destination!
-//                Location l = p.getLocation();
-//                try {
-//                    double speed = Double.parseDouble(args.get(1).split("-")[1]);
-//                    portal.setDestination("ca:" + l.getWorld().getName() + ":" + l.getX() + "," + l.getY() + "," + l.getZ() + ":" + l.getPitch() + ":" + l.getYaw() + ":" + speed);
-//                } catch (NumberFormatException e) {
-//                    portal.setDestination("i:invalid");
-//                }
-//
-//            } else {
-//                portal.setDestination(args.get(1));
-//            }
-//
-//        }
-//    }
-//}
+import com.onarandombox.MultiverseCore.api.MVDestination;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalLocation;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import com.onarandombox.acf.annotation.CommandAlias;
+import com.onarandombox.acf.annotation.CommandCompletion;
+import com.onarandombox.acf.annotation.CommandPermission;
+import com.onarandombox.acf.annotation.Conditions;
+import com.onarandombox.acf.annotation.Description;
+import com.onarandombox.acf.annotation.Flags;
+import com.onarandombox.acf.annotation.Optional;
+import com.onarandombox.acf.annotation.Subcommand;
+import com.onarandombox.acf.annotation.Syntax;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+@CommandAlias("mvp")
+public class CreateCommand extends PortalCommand {
+
+    public CreateCommand(MultiversePortals plugin) {
+        super(plugin);
+    }
+
+    @Subcommand("create")
+    @CommandPermission("multiverse.portal.create")
+    @Syntax("<name> [destination]")
+    @CommandCompletion("@empty @MVWorlds|@destinations|here")
+    @Description("Create a Portal.")
+    public void onCreateCommand(@NotNull Player player,
+                                @NotNull PortalPlayerSession portalSession,
+                                @NotNull MultiverseWorld world,
+                                @NotNull @Flags("type=portal name") @Conditions("creatablePortalName") String portalName,
+                                @Nullable @Optional @Flags("type=destination") String destinationName) {
+
+        MultiverseRegion region = portalSession.getSelectedRegion();
+        if (region == null) {
+            return;
+        }
+
+        PortalLocation location = new PortalLocation(region.getMinimumPoint(), region.getMaximumPoint(), world);
+        if (!this.plugin.getPortalManager().addPortal(world, portalName, player.getName(), location)) {
+            player.sendMessage("There was an error creating portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE
+                    + "'! Check console for more details.");
+            return;
+        }
+
+        MVPortal newPortal = this.plugin.getPortalManager().getPortal(portalName);
+        portalSession.selectPortal(newPortal);
+
+        player.sendMessage("New portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + "' is created and selected!");
+
+        if (destinationName == null) {
+            return;
+        }
+
+        if (destinationName.equalsIgnoreCase("here")) {
+            newPortal.setHereDestination(player, portalSession);
+            return;
+        }
+
+        MVDestination destination = this.plugin.getCore()
+                .getDestFactory()
+                .getPlayerAwareDestination(destinationName, player);
+
+        player.sendMessage((newPortal.setDestination(destination))
+                ? "Destination of new portal is " + ChatColor.AQUA + destination.toString() + ChatColor.WHITE + "."
+                : ChatColor.RED + "There was an error setting Destination " + ChatColor.AQUA + destination.toString()
+                + ChatColor.RED + ". Is it formatted correctly?");
+    }
+}

@@ -1,54 +1,73 @@
-/*
- * Multiverse 2 Copyright (c) the Multiverse Team 2011.
- * Multiverse 2 is licensed under the BSD License.
- * For more information please check the README.md file included
- * with this project
- */
-
 package com.onarandombox.MultiversePortals.commands;
 
-//public class SelectCommand extends PortalCommand {
-//
-//    public SelectCommand(MultiversePortals plugin) {
-//        super(plugin);
-//        this.setName("Select a portal");
-//        this.setCommandUsage("/mvp select " + ChatColor.GREEN + "{PORTAL}");
-//        this.setArgRange(0, 1);
-//        this.addKey("mvp select");
-//        this.addKey("mvps");
-//        this.addKey("mvpselect");
-//        this.setPermission("multiverse.portal.select", "Selects a portal so you can perform multiple modifications on it.", PermissionDefault.OP);
-//    }
-//
-//    @Override
-//    public void runCommand(CommandSender sender, List<String> args) {
-//        if (!(sender instanceof Player)) {
-//            sender.sendMessage("This command must be run as a player, sorry. :(");
-//            return;
-//        }
-//        Player p = (Player) sender;
-//        if (!this.plugin.getCore().getMVPerms().hasPermission(p, "multiverse.portal.create", true)) {
-//            p.sendMessage("You need create permissions to do this!(multiverse.portal.create)");
-//            return;
-//        }
-//        if (args.size() == 0) {
-//            MVPortal selected = this.plugin.getPortalSession(p).getSelectedPortal();
-//            if (this.plugin.getPortalSession(p).getSelectedPortal() == null) {
-//                p.sendMessage("You have not selected a portal yet!");
-//                ItemStack wand = new ItemStack(plugin.getWandMaterial());
-//                p.sendMessage("Use a " + ChatColor.GREEN + wand.getType() + ChatColor.WHITE + " to do so!");
-//                return;
-//            }
-//            p.sendMessage("You have selected: " + ChatColor.DARK_AQUA + selected.getName());
-//            return;
-//        }
-//
-//        MVPortal selected = this.plugin.getPortalManager().getPortal(args.get(0));
-//        this.plugin.getPortalSession(p).selectPortal(selected);
-//        if (selected != null) {
-//            p.sendMessage("Portal: " + ChatColor.DARK_AQUA + selected.getName() + ChatColor.WHITE + " has been selected.");
-//        } else {
-//            p.sendMessage("Could not find portal: " + ChatColor.RED + args.get(0));
-//        }
-//    }
-//}
+import com.onarandombox.MultiversePortals.MVPortal;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.MultiversePortals.PortalPlayerSession;
+import com.onarandombox.acf.annotation.CommandAlias;
+import com.onarandombox.acf.annotation.CommandCompletion;
+import com.onarandombox.acf.annotation.Description;
+import com.onarandombox.acf.annotation.Optional;
+import com.onarandombox.acf.annotation.Subcommand;
+import com.onarandombox.acf.annotation.Syntax;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+@CommandAlias("mvp")
+public class SelectCommand extends PortalCommand {
+
+    private static final Set<String> requiredPermissions = Collections.unmodifiableSet(new HashSet<String>() {{
+        add("AND");
+        add("multiverse.portal.select");
+        add("multiverse.portal.create");
+    }});
+
+    public SelectCommand(MultiversePortals plugin) {
+        super(plugin);
+    }
+
+    @Override
+    public Set<String> getRequiredPermissions() {
+        return requiredPermissions;
+    }
+
+    @Subcommand("select")
+    @Syntax("[portal]")
+    @CommandCompletion("@MVPortals")
+    @Description("Selects a portal so you can perform multiple modifications on it.")
+    public void onSelectCommand(@NotNull Player player,
+                                @NotNull PortalPlayerSession portalSession,
+
+                                @Syntax("<portal>")
+                                @Description("Portal name that you want to select.")
+                                @Nullable @Optional MVPortal portal) {
+
+        if (portal == null) {
+            showCurrentSelection(player, portalSession);
+            return;
+        }
+
+        portalSession.selectPortal(portal);
+        player.sendMessage("You have successfully selected portal " + ChatColor.AQUA + portal.getName() + ChatColor.WHITE + "!");
+    }
+
+    private void showCurrentSelection(@NotNull Player player,
+                                      @NotNull PortalPlayerSession ps) {
+
+        MVPortal selectedPortal = ps.getSelectedPortal();
+        if (selectedPortal == null) {
+            player.sendMessage(ChatColor.RED + "You do not have any selection yet.");
+            player.sendMessage("Do " + ChatColor.GREEN + "/mvp select <portal>" + ChatColor.WHITE + " to select a portal!");
+            return;
+        }
+
+        player.sendMessage("You have currently selected portal " + ChatColor.AQUA + selectedPortal.getName() + ChatColor.WHITE + ".");
+    }
+
+    //TODO: Deselect portal.
+}
