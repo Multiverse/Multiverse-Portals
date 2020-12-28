@@ -273,7 +273,14 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
-        this.destination = this.plugin.getCore().getDestFactory().getDestination(destinationString);
+        return setDestination(this.plugin.getCore().getDestFactory().getDestination(destinationString));
+    }
+
+    public boolean setDestination(MVDestination destination) {
+        if (destination == null) {
+            return false;
+        }
+        this.destination = destination;
         if (this.destination instanceof InvalidDestination) {
             Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
