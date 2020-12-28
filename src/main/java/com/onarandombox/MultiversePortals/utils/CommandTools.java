@@ -54,6 +54,7 @@ public class CommandTools {
         // Conditions
 
         // Commands
+        this.manager.registerSubModule("mvp", new RootCommand(this.plugin));
         this.manager.registerCommand(new ConfigCommand(this.plugin));
         this.manager.registerCommand(new DebugCommand(this.plugin));
         this.manager.registerCommand(new SelectCommand(this.plugin));
@@ -61,7 +62,6 @@ public class CommandTools {
         this.manager.registerCommand(new RemoveCommand(this.plugin));
         this.manager.registerCommand(new WandCommand(this.plugin));
         this.manager.registerCommand(new InfoCommand(this.plugin));
-        this.manager.registerCommand(new RootCommand(this.plugin));
     }
 
     @NotNull
