@@ -61,7 +61,7 @@ public class CreateCommand extends PortalCommand {
         }
 
         if (destinationName.equalsIgnoreCase("here")) {
-            setHereDestination(player, portalSession, newPortal);
+            newPortal.setHereDestination(player, portalSession);
             return;
         }
 
@@ -73,16 +73,5 @@ public class CreateCommand extends PortalCommand {
                 ? "Destination of new portal is " + ChatColor.AQUA + destination.toString() + ChatColor.WHITE + "."
                 : ChatColor.RED + "There was an error setting Destination " + ChatColor.AQUA + destination.toString()
                 + ChatColor.RED + ". Is it formatted correctly?");
-    }
-
-    private void setHereDestination(@NotNull Player player, @NotNull PortalPlayerSession portalSession, MVPortal newPortal) {
-        MVPortal standingIn = portalSession.getUncachedStandingInPortal();
-        if (standingIn == null) {
-            newPortal.setExactDestination(player.getLocation());
-            return;
-        }
-        // If they're standing in a portal. treat it differently, niftily you might say...
-        String cardinal = this.plugin.getCore().getLocationManipulation().getDirection(player.getLocation());
-        newPortal.setDestination("p:" + standingIn.getName() + ":" + cardinal);
     }
 }

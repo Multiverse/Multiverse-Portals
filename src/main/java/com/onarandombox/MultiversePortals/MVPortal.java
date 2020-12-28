@@ -290,6 +290,23 @@ public class MVPortal {
         return !(this.destination instanceof InvalidDestination);
     }
 
+    public boolean setHereDestination(Player player, PortalPlayerSession ps) {
+        if (player == null || ps == null) {
+            return false;
+        }
+
+        MVPortal standingIn = ps.getUncachedStandingInPortal();
+        if (standingIn == null) {
+            this.setExactDestination(player.getLocation());
+            return true;
+        }
+
+        // If they're standing in a portal. treat it differently, niftily you might say...
+        String cardinal = this.plugin.getCore().getLocationManipulation().getDirection(player.getLocation());
+        this.setDestination("p:" + standingIn.getName() + ":" + cardinal);
+        return true;
+    }
+
     public boolean setExactDestination(Location location) {
         this.destination = new ExactDestination();
         ((ExactDestination) this.destination).setDestination(location);
