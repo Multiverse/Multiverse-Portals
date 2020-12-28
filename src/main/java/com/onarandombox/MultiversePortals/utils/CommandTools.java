@@ -8,6 +8,7 @@
 package com.onarandombox.MultiversePortals.utils;
 
 import com.onarandombox.MultiverseCore.commandTools.MVCommandManager;
+import com.onarandombox.MultiverseCore.utils.webpaste.PasteServiceType;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
@@ -16,12 +17,14 @@ import com.onarandombox.MultiversePortals.commands_acf.CreateCommand;
 import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
 import com.onarandombox.MultiversePortals.commands_acf.InfoCommand;
 import com.onarandombox.MultiversePortals.commands_acf.ListCommand;
+import com.onarandombox.MultiversePortals.commands_acf.ModifyCommand;
 import com.onarandombox.MultiversePortals.commands_acf.RemoveCommand;
 import com.onarandombox.MultiversePortals.commands_acf.RootCommand;
 import com.onarandombox.MultiversePortals.commands_acf.SelectCommand;
 import com.onarandombox.MultiversePortals.commands_acf.UsageCommand;
 import com.onarandombox.MultiversePortals.commands_acf.WandCommand;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
+import com.onarandombox.MultiversePortals.enums.SetProperties;
 import com.onarandombox.acf.BukkitCommandCompletionContext;
 import com.onarandombox.acf.BukkitCommandExecutionContext;
 import com.onarandombox.acf.BukkitCommandIssuer;
@@ -29,11 +32,11 @@ import com.onarandombox.acf.ConditionContext;
 import com.onarandombox.acf.ConditionFailedException;
 import com.onarandombox.acf.InvalidCommandArgument;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -51,11 +54,13 @@ public class CommandTools {
         // Completions
         this.manager.getCommandCompletions().registerAsyncCompletion("MVPortals", this::suggestMVPortals);
         this.manager.getCommandCompletions().registerStaticCompletion("MVPConfigs", this::suggestMVPConfigs);
+        this.manager.getCommandCompletions().registerStaticCompletion("portalProperties", this::suggestPortalProperties);
 
         // Contexts
         this.manager.getCommandContexts().registerIssuerOnlyContext(PortalPlayerSession.class, this::derivePortalPlayerSession);
         this.manager.getCommandContexts().registerIssuerAwareContext(MVPortal.class, this::deriveMVPortal);
         this.manager.getCommandContexts().registerContext(PortalProperty.class, this::derivePortalProperty);
+        this.manager.getCommandContexts().registerContext(SetProperties.class, this::deriveSetProperties);
 
         // Conditions
         this.manager.getCommandConditions().addCondition(String.class, "creatablePortalName", this::checkCreatablePortalName);
@@ -71,16 +76,7 @@ public class CommandTools {
         this.manager.registerCommand(new InfoCommand(this.plugin));
         this.manager.registerCommand(new UsageCommand(this.plugin));
         this.manager.registerCommand(new CreateCommand(this.plugin));
-    }
-
-    private void checkCreatablePortalName(@NotNull ConditionContext<BukkitCommandIssuer> context,
-                                          @NotNull BukkitCommandExecutionContext executionContext,
-                                          @NotNull String portalName) {
-
-        if (this.portalManager.isPortal(portalName)) {
-            throw new ConditionFailedException("Portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.RED
-                    + "' already exists. You can run " + ChatColor.AQUA + "/mvp select " + portalName + ChatColor.RED + " to select it.");
-        }
+        this.manager.registerCommand(new ModifyCommand(this.plugin));
     }
 
     @NotNull
@@ -94,6 +90,12 @@ public class CommandTools {
     @NotNull
     private Collection<String> suggestMVPConfigs() {
         return PortalConfigProperty.valueNames();
+    }
+
+    private Collection<String> suggestPortalProperties() {
+        return Arrays.stream(SetProperties.values())
+                .map(Enum::toString)
+                .collect(Collectors.toList());
     }
 
     @Nullable
@@ -116,6 +118,9 @@ public class CommandTools {
     private MVPortal deriveMVPortal(@NotNull BukkitCommandExecutionContext context) {
         String portalName = context.popFirstArg();
         if (portalName == null) {
+            if (context.getPlayer() != null && context.hasFlag("defaultself")) {
+                return getSelfSelectedPortal(context.getPlayer());
+            }
             if (context.isOptional()) {
                 return null;
             }
@@ -131,6 +136,21 @@ public class CommandTools {
             throw new InvalidCommandArgument("You do not have permission to access this portal.");
         }
 
+        return portal;
+    }
+
+    @NotNull
+    private MVPortal getSelfSelectedPortal(@NotNull Player player) {
+        PortalPlayerSession portalSession = this.plugin.getPortalSession(player);
+        if (portalSession == null) {
+            throw new InvalidCommandArgument("Error getting portal session!");
+        }
+        MVPortal portal = portalSession.getSelectedPortal();
+        if (portal == null) {
+            player.sendMessage("You need to select a portal using " + ChatColor.AQUA + "/mvp select {NAME}");
+            player.sendMessage("or add " + ChatColor.DARK_AQUA + "[portal]" + ChatColor.WHITE + " to this command.");
+            throw new InvalidCommandArgument();
+        }
         return portal;
     }
 
@@ -169,5 +189,26 @@ public class CommandTools {
             throw new InvalidCommandArgument(ChatColor.RED + "Value cannot be a negative number.");
         }
         return result;
+    }
+
+
+    private SetProperties deriveSetProperties(@NotNull BukkitCommandExecutionContext context) {
+        String prop = context.popFirstArg();
+        try {
+            return SetProperties.valueOf(prop.toLowerCase());
+        }
+        catch (IllegalArgumentException e) {
+            throw new InvalidCommandArgument("Sorry, there is no such portal property '" + prop + "' to set.");
+        }
+    }
+
+    private void checkCreatablePortalName(@NotNull ConditionContext<BukkitCommandIssuer> context,
+                                          @NotNull BukkitCommandExecutionContext executionContext,
+                                          @NotNull String portalName) {
+
+        if (this.portalManager.isPortal(portalName)) {
+            throw new ConditionFailedException("Portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.RED
+                    + "' already exists. You can run " + ChatColor.AQUA + "/mvp select " + portalName + ChatColor.RED + " to select it.");
+        }
     }
 }
