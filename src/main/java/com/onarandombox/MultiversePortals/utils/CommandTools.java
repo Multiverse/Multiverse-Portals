@@ -12,6 +12,7 @@ import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.commands_acf.ConfigCommand;
+import com.onarandombox.MultiversePortals.commands_acf.CreateCommand;
 import com.onarandombox.MultiversePortals.commands_acf.DebugCommand;
 import com.onarandombox.MultiversePortals.commands_acf.InfoCommand;
 import com.onarandombox.MultiversePortals.commands_acf.ListCommand;
@@ -23,8 +24,12 @@ import com.onarandombox.MultiversePortals.commands_acf.WandCommand;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.acf.BukkitCommandCompletionContext;
 import com.onarandombox.acf.BukkitCommandExecutionContext;
+import com.onarandombox.acf.BukkitCommandIssuer;
+import com.onarandombox.acf.ConditionContext;
+import com.onarandombox.acf.ConditionFailedException;
 import com.onarandombox.acf.InvalidCommandArgument;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +58,7 @@ public class CommandTools {
         this.manager.getCommandContexts().registerContext(PortalProperty.class, this::derivePortalProperty);
 
         // Conditions
+        this.manager.getCommandConditions().addCondition(String.class, "creatablePortalName", this::checkCreatablePortalName);
 
         // Commands
         this.manager.registerSubModule("mvp", new RootCommand(this.plugin));
@@ -64,6 +70,17 @@ public class CommandTools {
         this.manager.registerCommand(new WandCommand(this.plugin));
         this.manager.registerCommand(new InfoCommand(this.plugin));
         this.manager.registerCommand(new UsageCommand(this.plugin));
+        this.manager.registerCommand(new CreateCommand(this.plugin));
+    }
+
+    private void checkCreatablePortalName(@NotNull ConditionContext<BukkitCommandIssuer> context,
+                                          @NotNull BukkitCommandExecutionContext executionContext,
+                                          @NotNull String portalName) {
+
+        if (this.portalManager.isPortal(portalName)) {
+            throw new ConditionFailedException("Portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.RED
+                    + "' already exists. You can run " + ChatColor.AQUA + "/mvp select " + portalName + ChatColor.RED + " to select it.");
+        }
     }
 
     @NotNull
