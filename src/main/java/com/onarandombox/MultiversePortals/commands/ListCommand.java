@@ -1,8 +1,9 @@
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.commandTools.ColourAlternator;
-import com.onarandombox.MultiverseCore.commandTools.PageDisplay;
 import com.onarandombox.MultiverseCore.commandTools.PageFilter;
+import com.onarandombox.MultiverseCore.commandTools.display.ColourAlternator;
+import com.onarandombox.MultiverseCore.commandTools.display.ContentCreator;
+import com.onarandombox.MultiverseCore.commandTools.display.page.PageDisplay;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.acf.annotation.CommandAlias;
 import com.onarandombox.acf.annotation.CommandPermission;
@@ -30,21 +31,25 @@ public class ListCommand extends PortalCommand {
     public void onListCommand(@NotNull CommandSender sender,
                               @NotNull PageFilter pageFilter) {
 
-        PageDisplay pageDisplay = new PageDisplay(
+        PageDisplay display = new PageDisplay(
+                this.plugin,
                 sender,
                 ChatColor.AQUA + "==== [ Multiverse Portals List ] ====",
                 buildPortalList(sender),
-                pageFilter,
-                new ColourAlternator(ChatColor.YELLOW, ChatColor.WHITE)
+                pageFilter.getFilter(),
+                new ColourAlternator(ChatColor.YELLOW, ChatColor.WHITE),
+                pageFilter.getPage(),
+                8
         );
 
-        pageDisplay.showPageAsync(this.plugin);
+        display.showContentAsync();
     }
 
-    private List<String> buildPortalList(@NotNull CommandSender sender) {
-        return this.plugin.getPortalManager().getPortals(sender).stream()
-                .map(portal -> portal.getName() + ChatColor.GRAY + " - " + ChatColor.RED + portal.getOwner()
-                        + ChatColor.GRAY + " - " + portal.getLocation().getMVWorld().getColoredWorldString())
+    private ContentCreator<List<String>> buildPortalList(@NotNull CommandSender sender) {
+        return () -> this.plugin.getPortalManager().getPortals(sender).stream()
+                .map(portal -> portal.getName() + ChatColor.GRAY + " - "
+                        + ChatColor.RED + portal.getOwner() + ChatColor.GRAY + " - "
+                        + portal.getLocation().getMVWorld().getColoredWorldString())
                 .collect(Collectors.toList());
     }
 }

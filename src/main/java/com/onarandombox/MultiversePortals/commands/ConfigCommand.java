@@ -7,6 +7,10 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
+import com.onarandombox.MultiverseCore.commandTools.display.ColourAlternator;
+import com.onarandombox.MultiverseCore.commandTools.display.ContentCreator;
+import com.onarandombox.MultiverseCore.commandTools.display.ContentFilter;
+import com.onarandombox.MultiverseCore.commandTools.display.kvpair.KeyValueDisplay;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.MultiversePortals.utils.PortalProperty;
@@ -20,6 +24,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @CommandAlias("mvp")
 @Subcommand("config")
 @CommandPermission("multiverse.portal.config")
@@ -29,20 +36,29 @@ public class ConfigCommand extends PortalCommand {
         super(plugin);
     }
 
-    @Subcommand("list")
+    @Subcommand("list [filter]")
     @Description("View Global MV Portals Variables.")
-    public void onConfigListCommand(@NotNull CommandSender sender) {
-        StringBuilder values = new StringBuilder();
-        PortalConfigProperty.valueNames()
-                .forEach(prop -> values.append(ChatColor.GREEN)
-                .append(prop).append(ChatColor.WHITE)
-                .append(" = ")
-                .append(ChatColor.GOLD)
-                .append(this.plugin.getMainConfig().get(prop, ChatColor.RED + "NOT SET"))
-                .append(ChatColor.WHITE)
-                .append(", "));
+    public void onConfigListCommand(@NotNull CommandSender sender,
+                                    @NotNull ContentFilter filter) {
 
-        sender.sendMessage(values.substring(0,values.length() - 2));
+        KeyValueDisplay display = new KeyValueDisplay(
+                this.plugin,
+                sender,
+                ChatColor.RED + "===[ Multiverse-Portals Config ]===",
+                getPortalsConfigMap(),
+                filter,
+                new ColourAlternator(ChatColor.GREEN, ChatColor.GOLD),
+                " = "
+        );
+
+        display.showContentAsync();
+    }
+
+    private ContentCreator<Map<String, Object>> getPortalsConfigMap() {
+        return () -> new HashMap<String, Object>() {{
+            PortalConfigProperty.valueNames()
+                    .forEach(prop -> put(prop, plugin.getMainConfig().get(prop, ChatColor.RED + "NOT SET")));
+        }};
     }
 
     @Subcommand("set")
