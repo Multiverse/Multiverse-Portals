@@ -17,6 +17,7 @@ import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import com.onarandombox.MultiversePortals.enums.PortalType;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -330,6 +331,48 @@ public class MVPortal {
 
     public PortalLocation getLocation() {
         return this.location;
+    }
+
+    /**
+     * Gets the Material that fills this portal. Specifically,
+     * this get the Material at the center of the portal.
+     *
+     * @return The Material that fills this portal.
+     * @throws IllegalStateException If this portal has no valid location.
+     */
+    public Material getFillMaterial() throws IllegalStateException {
+        if (!this.location.isValidLocation()) {
+            throw new IllegalStateException();
+        }
+
+        return this.location.getMinimum().getMidpoint(this.location.getMaximum())
+                .toLocation(this.location.getMVWorld().getCBWorld()).getBlock().getType();
+    }
+
+    /**
+     * Returns what type of portal this is.
+     * This will be {@link PortalType#Normal} for portals filled with the nether portal block,
+     * and {@link PortalType#Legacy} for portals filled with anything else.
+     *
+     * @return The type of this portal.
+     * @throws IllegalStateException If this portal has no valid location.
+     */
+    public PortalType getPortalType() throws IllegalStateException {
+        if (this.getFillMaterial() == Material.NETHER_PORTAL) {
+            return PortalType.Normal;
+        }
+
+        return PortalType.Legacy;
+    }
+
+    /**
+     * Returns whether this portal is of the {@link PortalType#Legacy} type.
+     *
+     * @return True if and only if this portal is of the {@link PortalType#Legacy} type, false otherwise.
+     * @throws IllegalStateException If this portal has no valid location.
+     */
+    public boolean isLegacyPortal() throws IllegalStateException {
+        return this.getPortalType() == PortalType.Legacy;
     }
 
     public boolean playerCanEnterPortal(Player player) {
