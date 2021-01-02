@@ -1,7 +1,7 @@
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.commandTools.PageFilter;
-import com.onarandombox.MultiverseCore.commandTools.display.ColourAlternator;
+import com.onarandombox.MultiverseCore.commandTools.contexts.PageFilter;
+import com.onarandombox.MultiverseCore.commandTools.display.ColorAlternator;
 import com.onarandombox.MultiverseCore.commandTools.display.ContentCreator;
 import com.onarandombox.MultiverseCore.commandTools.display.page.PageDisplay;
 import com.onarandombox.MultiversePortals.MultiversePortals;
@@ -31,18 +31,14 @@ public class ListCommand extends PortalCommand {
     public void onListCommand(@NotNull CommandSender sender,
                               @NotNull PageFilter pageFilter) {
 
-        PageDisplay display = new PageDisplay(
-                this.plugin,
-                sender,
-                ChatColor.AQUA + "==== [ Multiverse Portals List ] ====",
-                buildPortalList(sender),
-                pageFilter.getFilter(),
-                new ColourAlternator(ChatColor.YELLOW, ChatColor.WHITE),
-                pageFilter.getPage(),
-                8
-        );
-
-        display.showContentAsync();
+        new PageDisplay().withSender(sender)
+                .withHeader(String.format("%s==== [ Portals List %s| %sname - owner - world %s] ====",
+                        ChatColor.DARK_AQUA, ChatColor.DARK_GRAY, ChatColor.AQUA, ChatColor.DARK_AQUA))
+                .withCreator(buildPortalList(sender))
+                .withPageFilter(pageFilter)
+                .withColors( new ColorAlternator(ChatColor.YELLOW, ChatColor.WHITE))
+                .build()
+                .runTaskAsynchronously(this.plugin);
     }
 
     private ContentCreator<List<String>> buildPortalList(@NotNull CommandSender sender) {

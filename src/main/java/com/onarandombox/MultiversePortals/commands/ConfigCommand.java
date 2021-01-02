@@ -7,10 +7,10 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.commandTools.display.ColourAlternator;
+import com.onarandombox.MultiverseCore.commandTools.display.ColorAlternator;
 import com.onarandombox.MultiverseCore.commandTools.display.ContentCreator;
 import com.onarandombox.MultiverseCore.commandTools.display.ContentFilter;
-import com.onarandombox.MultiverseCore.commandTools.display.kvpair.KeyValueDisplay;
+import com.onarandombox.MultiverseCore.commandTools.display.inline.KeyValueDisplay;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
 import com.onarandombox.MultiversePortals.utils.PortalProperty;
@@ -41,17 +41,13 @@ public class ConfigCommand extends PortalCommand {
     public void onConfigListCommand(@NotNull CommandSender sender,
                                     @NotNull ContentFilter filter) {
 
-        KeyValueDisplay display = new KeyValueDisplay(
-                this.plugin,
-                sender,
-                ChatColor.RED + "===[ Multiverse-Portals Config ]===",
-                getPortalsConfigMap(),
-                filter,
-                new ColourAlternator(ChatColor.GREEN, ChatColor.GOLD),
-                " = "
-        );
-
-        display.showContentAsync();
+        new KeyValueDisplay().withSender(sender)
+                .withHeader(String.format("%s===[ Multiverse-Portals Config ]===", ChatColor.RED))
+                .withCreator(getPortalsConfigMap())
+                .withFilter(filter)
+                .withColors(new ColorAlternator(ChatColor.GREEN, ChatColor.GOLD))
+                .build()
+                .runTaskAsynchronously(this.plugin);
     }
 
     private ContentCreator<Map<String, Object>> getPortalsConfigMap() {

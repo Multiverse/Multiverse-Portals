@@ -46,7 +46,7 @@ public class ModifyCommand extends PortalCommand {
 
             MVDestination destination = this.plugin.getCore()
                     .getDestFactory()
-                    .getPlayerAwareDestination(value, player);
+                    .getPlayerAwareDestination(player, value);
 
             sender.sendMessage((portal.setDestination(destination))
                     ? "Destination of new portal is " + ChatColor.AQUA + destination.toString() + ChatColor.WHITE + "."

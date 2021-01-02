@@ -67,7 +67,7 @@ public class CreateCommand extends PortalCommand {
 
         MVDestination destination = this.plugin.getCore()
                 .getDestFactory()
-                .getPlayerAwareDestination(destinationName, player);
+                .getPlayerAwareDestination(player, destinationName);
 
         player.sendMessage((newPortal.setDestination(destination))
                 ? "Destination of new portal is " + ChatColor.AQUA + destination.toString() + ChatColor.WHITE + "."

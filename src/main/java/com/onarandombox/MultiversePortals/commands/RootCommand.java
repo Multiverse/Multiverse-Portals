@@ -1,6 +1,6 @@
 package com.onarandombox.MultiversePortals.commands;
 
-import com.onarandombox.MultiverseCore.commandTools.display.ColourAlternator;
+import com.onarandombox.MultiverseCore.commandTools.display.ColorAlternator;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.acf.annotation.CommandAlias;
 import com.onarandombox.acf.annotation.Description;
@@ -20,7 +20,7 @@ public class RootCommand extends PortalCommand {
         this.plugin.getCore().getMVCommandManager().showPluginInfo(
                 sender,
                 this.plugin.getDescription(),
-                new ColourAlternator(ChatColor.DARK_RED, ChatColor.RED),
+                new ColorAlternator(ChatColor.DARK_RED, ChatColor.RED),
                 "mvp"
         );
     }
