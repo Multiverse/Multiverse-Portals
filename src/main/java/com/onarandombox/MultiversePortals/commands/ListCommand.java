@@ -32,8 +32,8 @@ public class ListCommand extends PortalCommand {
                               @NotNull PageFilter pageFilter) {
 
         new PageDisplay().withSender(sender)
-                .withHeader(String.format("%s==== [ Portals List %s| %sname - owner - world %s] ====",
-                        ChatColor.DARK_AQUA, ChatColor.DARK_GRAY, ChatColor.AQUA, ChatColor.DARK_AQUA))
+                .withHeader(String.format("%s==== [ Portals List %s| %sname - world - owner %s] ====",
+                        ChatColor.DARK_RED, ChatColor.DARK_GRAY, ChatColor.RED, ChatColor.DARK_RED))
                 .withCreator(buildPortalList(sender))
                 .withPageFilter(pageFilter)
                 .withColors( new ColorAlternator(ChatColor.YELLOW, ChatColor.WHITE))
@@ -43,9 +43,9 @@ public class ListCommand extends PortalCommand {
 
     private ContentCreator<List<String>> buildPortalList(@NotNull CommandSender sender) {
         return () -> this.plugin.getPortalManager().getPortals(sender).stream()
-                .map(portal -> portal.getName() + ChatColor.GRAY + " - "
-                        + ChatColor.RED + portal.getOwner() + ChatColor.GRAY + " - "
-                        + portal.getLocation().getMVWorld().getColoredWorldString())
+                .map(portal -> portal.getName()
+                        + " - " + portal.getLocation().getMVWorld().getColoredWorldString()
+                        + " - " + portal.getOwner())
                 .collect(Collectors.toList());
     }
 }
