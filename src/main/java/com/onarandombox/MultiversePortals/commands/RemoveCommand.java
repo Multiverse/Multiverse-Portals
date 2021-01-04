@@ -32,8 +32,8 @@ public class RemoveCommand extends PortalCommand {
 
         MVPortal removedPortal = this.plugin.getPortalManager().removePortal(portal.getName(), true);
         sender.sendMessage((removedPortal == null)
-                ? ChatColor.RED + "There was an error removing portal '" + portal.getName() + "'."
-                : "Portal " + ChatColor.DARK_AQUA + portal.getName() + ChatColor.WHITE + " was removed "
-                + ChatColor.GREEN + "successfully" + ChatColor.WHITE + "!");
+                ? String.format("%sThere was an error removing portal '%s'.", ChatColor.RED, portal.getName())
+                : String.format("Portal %s%s%s was %sremoved %ssuccessfully!",
+                ChatColor.AQUA, portal.getName(), ChatColor.WHITE, ChatColor.RED, ChatColor.WHITE));
     }
 }

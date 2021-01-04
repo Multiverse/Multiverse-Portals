@@ -72,17 +72,19 @@ public class ConfigCommand extends PortalCommand {
             this.plugin.getMainConfig().set(propertyName, property.getValue());
         }
         catch (Exception e) {
-            sender.sendMessage(ChatColor.RED + "There was an error setting property '" + propertyName + "' to '" + property.getValue() + "'.");
+            sender.sendMessage(String.format("%sThere was an issue setting property '%s' to '%s'.",
+                    ChatColor.RED, propertyName, property.getValue()));
             return;
         }
 
         if (!this.plugin.saveMainConfig()) {
-            sender.sendMessage(ChatColor.RED + "FAIL!" + ChatColor.WHITE + " Check your console for details!");
+            sender.sendMessage(String.format("%sFailed! Check your console for more details.", ChatColor.RED));
             return;
         }
 
-        sender.sendMessage(ChatColor.GREEN + "SUCCESS!" + ChatColor.WHITE + " Property '" + ChatColor.AQUA + propertyName
-                + ChatColor.WHITE + "' is now set to '" + ChatColor.AQUA + property.getValue() + ChatColor.WHITE + "'.");
+        sender.sendMessage(String.format("%sSuccess! %sProperty '%s%s%s' is now set to '%s%s%s'.",
+                ChatColor.GREEN, ChatColor.WHITE, ChatColor.AQUA, propertyName,
+                ChatColor.WHITE, ChatColor.AQUA, property.getValue(), ChatColor.WHITE));
         this.plugin.reloadConfigs(false);
     }
 }

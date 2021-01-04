@@ -46,15 +46,15 @@ public class CreateCommand extends PortalCommand {
 
         PortalLocation location = new PortalLocation(region.getMinimumPoint(), region.getMaximumPoint(), world);
         if (!this.plugin.getPortalManager().addPortal(world, portalName, player.getName(), location)) {
-            player.sendMessage("There was an error creating portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE
-                    + "'! Check console for more details.");
+            player.sendMessage(String.format("%sThere was an error creating portal '%s%s%s'! Check console for more details.",
+                    ChatColor.RED, ChatColor.DARK_AQUA, portalName, ChatColor.RED));
             return;
         }
 
         MVPortal newPortal = this.plugin.getPortalManager().getPortal(portalName);
         portalSession.selectPortal(newPortal);
 
-        player.sendMessage("New portal '" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + "' is created and selected!");
+        player.sendMessage(String.format("New portal '%s' is created and selected!", ChatColor.DARK_AQUA + portalName + ChatColor.WHITE));
 
         if (destinationName == null) {
             return;

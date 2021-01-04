@@ -36,9 +36,8 @@ public class WandCommand extends PortalCommand {
 
         if (state != null) {
             this.plugin.setWandEnabled(state);
-            player.sendMessage("Selection wand is now " + ((state)
-                    ? ChatColor.GREEN + "enabled"
-                    : ChatColor.RED + "disabled") + ChatColor.WHITE + "!");
+            player.sendMessage(String.format("Selection wand is now %s%s!",
+                    (state) ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled", ChatColor.WHITE));
             return;
         }
 
@@ -50,24 +49,27 @@ public class WandCommand extends PortalCommand {
 
         if (player.getInventory().getItemInMainHand().getAmount() == 0) {
             player.getInventory().setItemInMainHand(wand);
-            player.sendMessage("You have been given a " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")!");
+            player.sendMessage(String.format("You have been given a %sMultiverse Portal Wand(%s)!",
+                    ChatColor.GREEN, wand.getType()));
             return;
         }
-
         if (player.getInventory().addItem(wand).isEmpty()) {
-            player.sendMessage("A " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")" + ChatColor.WHITE + " has been placed in your inventory.");
+            player.sendMessage(String.format("A %sMultiverse Portal Wand(%s) %shas been placed in your inventory.",
+                    ChatColor.GREEN, wand.getType(), ChatColor.WHITE));
             return;
         }
-
-        player.sendMessage("Your Inventory is full. A " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")" + ChatColor.WHITE + " has been placed dropped nearby.");
+        player.sendMessage(String.format("Your Inventory is full. A %sMultiverse Portal Wand(%s) %sas been placed dropped nearby.",
+                ChatColor.GREEN, wand.getType(), ChatColor.WHITE));
         player.getWorld().dropItemNaturally(player.getLocation(), wand);
     }
 
     private boolean isUseWorldEdit(@NotNull Player player) {
         WorldEditConnection worldEdit = this.plugin.getWorldEditConnection();
         if (worldEdit != null && worldEdit.isConnected()) {
-            player.sendMessage(ChatColor.GREEN + "Cool!" + ChatColor.WHITE + " You're using" + ChatColor.AQUA + " WorldEdit! ");
-            player.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit " + ChatColor.DARK_PURPLE + "//wand " + ChatColor.WHITE + "to perform portal selections!");
+            player.sendMessage(String.format("%sCool! %sYou are using %sWorldEdit!",
+                    ChatColor.GREEN, ChatColor.WHITE, ChatColor.AQUA));
+            player.sendMessage(String.format("Just use %sthe WorldEdit %s//wand %sto perform portal selections!",
+                    ChatColor.GOLD, ChatColor.DARK_PURPLE, ChatColor.WHITE));
             return true;
         }
         return false;

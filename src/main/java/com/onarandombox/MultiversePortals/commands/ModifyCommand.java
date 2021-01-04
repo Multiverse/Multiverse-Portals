@@ -47,7 +47,13 @@ public class ModifyCommand extends PortalCommand {
         }
 
         sender.sendMessage((portal.setProperty(property.toString(), value))
-                ? "Property " + property.toString() + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value
-                : "Error! Property " + property.toString() + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " could not be set to " + ChatColor.AQUA + value);
+
+                ? String.format("%sSuccess! %sProperty %s%s%s of Portal %s%s%s was set to %s%s%s.",
+                ChatColor.GREEN, ChatColor.WHITE, ChatColor.AQUA, property.toString(), ChatColor.WHITE,
+                ChatColor.YELLOW, portal.getName(), ChatColor.WHITE, ChatColor.GREEN, value, ChatColor.WHITE)
+
+                : String.format("%sError! Property %s%s%s of Portal %s%s%s could not be set to %s%s%s.",
+                ChatColor.RED, ChatColor.AQUA, property.toString(), ChatColor.WHITE,
+                ChatColor.YELLOW, portal.getName(), ChatColor.RED, ChatColor.DARK_AQUA, value, ChatColor.RED));
     }
 }

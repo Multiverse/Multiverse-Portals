@@ -52,8 +52,11 @@ public class SelectCommand extends PortalCommand {
             return;
         }
 
-        portalSession.selectPortal(portal);
-        player.sendMessage("You have successfully selected portal " + ChatColor.AQUA + portal.getName() + ChatColor.WHITE + "!");
+        player.sendMessage((portalSession.selectPortal(portal))
+                ? String.format("You have successfully selected portal %s%s%s!",
+                ChatColor.AQUA, portal.getName(), ChatColor.WHITE)
+                : String.format("%s There was an error selecting portal %s%s%s! Please check console for more details.",
+                ChatColor.RED, ChatColor.AQUA, portal.getName(), ChatColor.RED));
     }
 
     private void showCurrentSelection(@NotNull Player player,
@@ -61,13 +64,12 @@ public class SelectCommand extends PortalCommand {
 
         MVPortal selectedPortal = ps.getSelectedPortal();
         if (selectedPortal == null) {
-            player.sendMessage(ChatColor.RED + "You do not have any selection yet.");
-            player.sendMessage("Do " + ChatColor.GREEN + "/mvp select <portal>" + ChatColor.WHITE + " to select a portal!");
+            player.sendMessage(String.format("%sYou do not have any selection yet.", ChatColor.RED));
+            player.sendMessage(String.format("Do %s/mvp select <portal> %sto select a portal!", ChatColor.AQUA, ChatColor.WHITE));
             return;
         }
 
-        player.sendMessage("You have currently selected portal " + ChatColor.AQUA + selectedPortal.getName() + ChatColor.WHITE + ".");
+        player.sendMessage(String.format("You have currently selected portal %s%s%s.",
+                ChatColor.AQUA, selectedPortal.getName(), ChatColor.WHITE));
     }
-
-    //TODO: Deselect portal.
 }
