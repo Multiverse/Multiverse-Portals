@@ -1,5 +1,5 @@
 /*
- * Multiverse 2 Copyright (c) the Multiverse Team 2011.
+ * Multiverse 2 Copyright (c) the Multiverse Team 2020.
  * Multiverse 2 is licensed under the BSD License.
  * For more information please check the README.md file included
  * with this project
@@ -7,93 +7,84 @@
 
 package com.onarandombox.MultiversePortals.commands;
 
-import java.util.List;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.PermissionDefault;
-
+import com.onarandombox.MultiverseCore.commandTools.display.ColorAlternator;
+import com.onarandombox.MultiverseCore.commandTools.display.ContentCreator;
+import com.onarandombox.MultiverseCore.commandTools.display.ContentFilter;
+import com.onarandombox.MultiverseCore.commandTools.display.inline.KeyValueDisplay;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.enums.PortalConfigProperty;
+import com.onarandombox.MultiversePortals.utils.PortalProperty;
+import com.onarandombox.acf.annotation.CommandAlias;
+import com.onarandombox.acf.annotation.CommandCompletion;
+import com.onarandombox.acf.annotation.CommandPermission;
+import com.onarandombox.acf.annotation.Description;
+import com.onarandombox.acf.annotation.Subcommand;
+import com.onarandombox.acf.annotation.Syntax;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@CommandAlias("mvp")
+@Subcommand("config")
+@CommandPermission("multiverse.portal.config")
 public class ConfigCommand extends PortalCommand {
 
     public ConfigCommand(MultiversePortals plugin) {
         super(plugin);
-        this.setName("Configuration");
-        this.setCommandUsage("/mvp config " + ChatColor.GREEN + "{PROPERTY} {VALUE}");
-        this.setArgRange(1, 2);
-        this.addKey("mvp config");
-        this.addKey("mvpconfig");
-        this.addKey("mvp conf");
-        this.addKey("mvpconf");
-        this.addCommandExample("All values: " + PortalConfigProperty.getAllValues());
-        this.addCommandExample("/mvp config show");
-        this.addCommandExample("/mvp config " + ChatColor.GREEN + "wand" + ChatColor.AQUA + " 271");
-        this.addCommandExample("/mvp config " + ChatColor.GREEN + "useonmove" + ChatColor.AQUA + " false");
-        this.addCommandExample("/mvp config " + ChatColor.GREEN + "enforceportalaccess" + ChatColor.AQUA + " true");
-        this.setPermission("multiverse.portal.config", "Allows you to set Global MV Portals Variables.", PermissionDefault.OP);
     }
 
-    @Override
-    public void runCommand(CommandSender sender, List<String> args) {
-        if (args.size() == 1) {
-            if (args.get(0).equalsIgnoreCase("show")) {
-                String[] allProps = PortalConfigProperty.getAllValues().split(" ");
-                String currentvals = "";
-                for (String prop : allProps) {
-                    currentvals += ChatColor.GREEN;
-                    currentvals += prop;
-                    currentvals += ChatColor.WHITE;
-                    currentvals += " = ";
-                    currentvals += ChatColor.GOLD;
-                    currentvals += this.plugin.getMainConfig().get(prop, "NOT SET");
-                    currentvals += ChatColor.WHITE;
-                    currentvals += ", ";
-                }
-                sender.sendMessage(currentvals.substring(0,currentvals.length() - 2));
-                return;
-            }
+    @Subcommand("list [filter]")
+    @Description("View Global MV Portals Variables.")
+    public void onConfigListCommand(@NotNull CommandSender sender,
+                                    @NotNull ContentFilter filter) {
 
-        }
-        if (args.get(0).equalsIgnoreCase("wand") || args.get(0).equalsIgnoreCase("portalcooldown")) {
-            if(args.size() == 1) {
-                sender.sendMessage(ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " has value " + ChatColor.GREEN + this.plugin.getMainConfig().get(args.get(0).toLowerCase()));
-                return;
-            } else {
-                try {
-                    this.plugin.getMainConfig().set(args.get(0).toLowerCase(), Integer.parseInt(args.get(1)));
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " must be an integer!");
-                    return;
-                }
-            }
-        } else {
-            PortalConfigProperty property = null;
-            try {
-                property = PortalConfigProperty.valueOf(args.get(0).toLowerCase());
-            } catch (IllegalArgumentException e) {
-                sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " you can't set " + ChatColor.AQUA + args.get(0));
-                sender.sendMessage(ChatColor.GREEN + "Valid values are:");
-                sender.sendMessage(PortalConfigProperty.getAllValues());
-                return;
-            }
+        new KeyValueDisplay().withSender(sender)
+                .withHeader(String.format("%s===[ Multiverse-Portals Config ]===", ChatColor.RED))
+                .withCreator(getPortalsConfigMap())
+                .withFilter(filter)
+                .withColors(new ColorAlternator(ChatColor.GREEN, ChatColor.GOLD))
+                .build()
+                .runTaskAsynchronously(this.plugin);
+    }
 
-            if (property != null) {
-                try {
-                    this.plugin.getMainConfig().set(args.get(0).toLowerCase(), Boolean.parseBoolean(args.get(1)));
-                } catch (Exception e) {
-                    sender.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + args.get(0) + ChatColor.WHITE + " must be true or false!");
-                    return;
-                }
+    private ContentCreator<Map<String, Object>> getPortalsConfigMap() {
+        return () -> new HashMap<String, Object>() {{
+            PortalConfigProperty.valueNames()
+                    .forEach(prop -> put(prop, plugin.getMainConfig().get(prop, ChatColor.RED + "NOT SET")));
+        }};
+    }
 
-            }
+    @Subcommand("set")
+    @Syntax("<property> <value>")
+    @CommandCompletion("@MVPConfigs")
+    @Description("Set Global MV Portals Variables.")
+    public void onConfigSetCommand(@NotNull CommandSender sender,
+
+                                   @Syntax("<property> <value>")
+                                   @Description("Config key, and the value you want to set it to.")
+                                   @NotNull PortalProperty<?> property) {
+
+        String propertyName = property.getProperty().getName();
+        try {
+            this.plugin.getMainConfig().set(propertyName, property.getValue());
         }
-        if (this.plugin.saveMainConfig()) {
-            sender.sendMessage(ChatColor.GREEN + "SUCCESS!" + ChatColor.WHITE + " Values were updated successfully!");
-            this.plugin.reloadConfigs(false);
-        } else {
-            sender.sendMessage(ChatColor.RED + "FAIL!" + ChatColor.WHITE + " Check your console for details!");
+        catch (Exception e) {
+            sender.sendMessage(String.format("%sThere was an issue setting property '%s' to '%s'.",
+                    ChatColor.RED, propertyName, property.getValue()));
+            return;
         }
+
+        if (!this.plugin.saveMainConfig()) {
+            sender.sendMessage(String.format("%sFailed! Check your console for more details.", ChatColor.RED));
+            return;
+        }
+
+        sender.sendMessage(String.format("%sSuccess! %sProperty '%s%s%s' is now set to '%s%s%s'.",
+                ChatColor.GREEN, ChatColor.WHITE, ChatColor.AQUA, propertyName,
+                ChatColor.WHITE, ChatColor.AQUA, property.getValue(), ChatColor.WHITE));
+        this.plugin.reloadConfigs(false);
     }
 }

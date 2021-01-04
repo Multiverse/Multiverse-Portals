@@ -1,90 +1,51 @@
-/*
- * Multiverse 2 Copyright (c) the Multiverse Team 2011.
- * Multiverse 2 is licensed under the BSD License.
- * For more information please check the README.md file included
- * with this project
- */
-
 package com.onarandombox.MultiversePortals.commands;
 
-import java.util.List;
-
+import com.onarandombox.MultiverseCore.commandTools.contexts.PageFilter;
+import com.onarandombox.MultiverseCore.commandTools.display.ColorAlternator;
+import com.onarandombox.MultiverseCore.commandTools.display.ContentCreator;
+import com.onarandombox.MultiverseCore.commandTools.display.page.PageDisplay;
+import com.onarandombox.MultiversePortals.MultiversePortals;
+import com.onarandombox.acf.annotation.CommandAlias;
+import com.onarandombox.acf.annotation.CommandPermission;
+import com.onarandombox.acf.annotation.Description;
+import com.onarandombox.acf.annotation.Subcommand;
+import com.onarandombox.acf.annotation.Syntax;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.PermissionDefault;
+import org.jetbrains.annotations.NotNull;
 
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiversePortals.MVPortal;
-import com.onarandombox.MultiversePortals.MultiversePortals;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@CommandAlias("mvp")
 public class ListCommand extends PortalCommand {
 
     public ListCommand(MultiversePortals plugin) {
         super(plugin);
-        this.setName("Portal Listing");
-        this.setCommandUsage("/mvp list " + ChatColor.GOLD + "[FILTER] [WORLD]");
-        this.setArgRange(0, 2);
-        this.addKey("mvp list");
-        this.addKey("mvpl");
-        this.addKey("mvplist");
-        this.setPermission("multiverse.portal.list", "Displays a listing of all portals that you can enter.", PermissionDefault.OP);
     }
 
-    @Override
-    public void runCommand(CommandSender sender, List<String> args) {
-        MultiverseWorld world = null;
-        String filter = null;
-        if (args.size() > 0) {
-            world = this.plugin.getCore().getMVWorldManager().getMVWorld(args.get(args.size() - 1));
-            filter = args.get(0);
-        }
-        if (args.size() == 2) {
-            if (world == null) {
-                sender.sendMessage("Multiverse does not know about " + ChatColor.GOLD + args.get(1));
-                return;
-            }
-        } else if (world == null && filter == null && args.size() > 0) {
-            sender.sendMessage("Multiverse does not know about " + ChatColor.GOLD + args.get(1));
-            return;
-        }
-        if (args.size() == 1 && world != null) {
-            filter = null;
-        }
-        String titleString = ChatColor.AQUA + "Portals";
-        if (world != null) {
-            titleString += " in " + ChatColor.YELLOW + world.getAlias();
-        }
-        if (filter != null) {
-            titleString += ChatColor.GOLD + " [" + filter + "]";
-        }
-        sender.sendMessage(ChatColor.AQUA + "--- " + titleString + ChatColor.AQUA + " ---");
-        sender.sendMessage(getPortals(sender, world, filter));
+    @Subcommand("list")
+    @CommandPermission("multiverse.portal.list")
+    @Syntax("[filler] [page]")
+    @Description("Displays a listing of all portals that you can enter.")
+    public void onListCommand(@NotNull CommandSender sender,
+                              @NotNull PageFilter pageFilter) {
 
+        new PageDisplay().withSender(sender)
+                .withHeader(String.format("%s==== [ Portals List %s| %sname - world - owner %s] ====",
+                        ChatColor.DARK_RED, ChatColor.DARK_GRAY, ChatColor.RED, ChatColor.DARK_RED))
+                .withCreator(buildPortalList(sender))
+                .withPageFilter(pageFilter)
+                .withColors( new ColorAlternator(ChatColor.YELLOW, ChatColor.WHITE))
+                .build()
+                .runTaskAsynchronously(this.plugin);
     }
 
-    private String getPortals(CommandSender sender, MultiverseWorld world, String filter) {
-        String portals = "";
-        if (filter == null) {
-            filter = "";
-        }
-        boolean altColor = false;
-        for (MVPortal p : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
-            if (p.getName().matches("(i?).*" + filter + ".*")) {
-                if (altColor) {
-                    portals += ChatColor.YELLOW;
-                    altColor = false;
-                } else {
-                    portals += ChatColor.WHITE;
-                    altColor = true;
-                }
-
-                portals += p.getName() + " ";
-            }
-
-        }
-        if (portals.length() > 2) {
-            portals = portals.substring(0, portals.length() - 1);
-        }
-        return portals;
+    private ContentCreator<List<String>> buildPortalList(@NotNull CommandSender sender) {
+        return () -> this.plugin.getPortalManager().getPortals(sender).stream()
+                .map(portal -> portal.getName()
+                        + " - " + portal.getLocation().getMVWorld().getColoredWorldString()
+                        + " - " + portal.getOwner())
+                .collect(Collectors.toList());
     }
 }

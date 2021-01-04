@@ -8,5 +8,5 @@
 package com.onarandombox.MultiversePortals.enums;
 
 public enum SetProperties {
-    destination, dest, owner, loc, location, price, currency, curr, safe, telenonplayers, handlerscript
+    destination, owner, price, currency, safe, telenonplayers, handlerscript
 }

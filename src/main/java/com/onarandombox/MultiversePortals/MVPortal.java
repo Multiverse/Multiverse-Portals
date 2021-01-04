@@ -32,6 +32,8 @@ import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MVPortal {
     private String name;
@@ -272,8 +274,29 @@ public class MVPortal {
         return true;
     }
 
+    public boolean setDestination(Player player, String destinationString) {
+        if (player == null) {
+            return setDestination(destinationString);
+        }
+        if (destinationString.equalsIgnoreCase("here")) {
+            return this.setHereDestination(player);
+        }
+        return this.setDestination(this.plugin.getCore()
+                .getDestFactory()
+                .getPlayerAwareDestination(player, destinationString));
+    }
+
     public boolean setDestination(String destinationString) {
-        this.destination = this.plugin.getCore().getDestFactory().getDestination(destinationString);
+        return setDestination(this.plugin.getCore()
+                .getDestFactory()
+                .getDestination(destinationString));
+    }
+
+    public boolean setDestination(MVDestination destination) {
+        if (destination == null) {
+            return false;
+        }
+        this.destination = destination;
         if (this.destination instanceof InvalidDestination) {
             Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
@@ -281,6 +304,24 @@ public class MVPortal {
         this.config.set(this.portalConfigString + ".destination", this.destination.toString());
         saveConfig();
         return !(this.destination instanceof InvalidDestination);
+    }
+
+    public boolean setHereDestination(Player player) {
+        PortalPlayerSession ps = this.plugin.getPortalSession(player);
+        if (ps == null) {
+            return false;
+        }
+
+        MVPortal standingIn = ps.getUncachedStandingInPortal();
+        if (standingIn == null) {
+            this.setExactDestination(player.getLocation());
+            return true;
+        }
+
+        // If they're standing in a portal. treat it differently, niftily you might say...
+        String cardinal = this.plugin.getCore().getLocationManipulation().getDirection(player.getLocation());
+        this.setDestination("p:" + standingIn.getName() + ":" + cardinal);
+        return true;
     }
 
     public boolean setExactDestination(Location location) {
@@ -298,6 +339,10 @@ public class MVPortal {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     public PortalLocation getLocation() {
