@@ -44,6 +44,7 @@ public class ModifyCommand extends PortalCommand {
                     ChatColor.AQUA, portal.getName(), ChatColor.WHITE, ChatColor.AQUA, portal.getDestination().toString(), ChatColor.WHITE)
                     : String.format("%sThere was an error setting Destination to %s%s%s. Is it formatted correctly?",
                     ChatColor.RED, ChatColor.AQUA, value, ChatColor.RED));
+            return;
         }
 
         sender.sendMessage((portal.setProperty(property.toString(), value))
@@ -53,7 +54,7 @@ public class ModifyCommand extends PortalCommand {
                 ChatColor.YELLOW, portal.getName(), ChatColor.WHITE, ChatColor.GREEN, value, ChatColor.WHITE)
 
                 : String.format("%sError! Property %s%s%s of Portal %s%s%s could not be set to %s%s%s.",
-                ChatColor.RED, ChatColor.AQUA, property.toString(), ChatColor.WHITE,
-                ChatColor.YELLOW, portal.getName(), ChatColor.RED, ChatColor.DARK_AQUA, value, ChatColor.RED));
+                ChatColor.RED, ChatColor.AQUA, property.toString(), ChatColor.RED,
+                ChatColor.YELLOW, portal.getName(), ChatColor.RED, ChatColor.WHITE, value, ChatColor.RED));
     }
 }
