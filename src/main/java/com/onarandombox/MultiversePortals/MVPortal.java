@@ -32,6 +32,8 @@ import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.ExactDestination;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MVPortal {
     private String name;
@@ -272,8 +274,22 @@ public class MVPortal {
         return true;
     }
 
+    public boolean setDestination(Player player, String destinationString) {
+        if (player == null) {
+            return setDestination(destinationString);
+        }
+        if (destinationString.equalsIgnoreCase("here")) {
+            return this.setHereDestination(player);
+        }
+        return this.setDestination(this.plugin.getCore()
+                .getDestFactory()
+                .getPlayerAwareDestination(player, destinationString));
+    }
+
     public boolean setDestination(String destinationString) {
-        return setDestination(this.plugin.getCore().getDestFactory().getDestination(destinationString));
+        return setDestination(this.plugin.getCore()
+                .getDestFactory()
+                .getDestination(destinationString));
     }
 
     public boolean setDestination(MVDestination destination) {
@@ -290,8 +306,9 @@ public class MVPortal {
         return !(this.destination instanceof InvalidDestination);
     }
 
-    public boolean setHereDestination(Player player, PortalPlayerSession ps) {
-        if (player == null || ps == null) {
+    public boolean setHereDestination(Player player) {
+        PortalPlayerSession ps = this.plugin.getPortalSession(player);
+        if (ps == null) {
             return false;
         }
 
