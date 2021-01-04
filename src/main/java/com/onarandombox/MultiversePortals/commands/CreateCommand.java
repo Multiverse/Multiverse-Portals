@@ -60,18 +60,10 @@ public class CreateCommand extends PortalCommand {
             return;
         }
 
-        if (destinationName.equalsIgnoreCase("here")) {
-            newPortal.setHereDestination(player, portalSession);
-            return;
-        }
-
-        MVDestination destination = this.plugin.getCore()
-                .getDestFactory()
-                .getPlayerAwareDestination(player, destinationName);
-
-        player.sendMessage((newPortal.setDestination(destination))
-                ? "Destination of new portal is " + ChatColor.AQUA + destination.toString() + ChatColor.WHITE + "."
-                : ChatColor.RED + "There was an error setting Destination " + ChatColor.AQUA + destination.toString()
-                + ChatColor.RED + ". Is it formatted correctly?");
+        player.sendMessage((newPortal.setDestination(player, destinationName))
+                ? String.format("Destination of new portal is %s%s%s.",
+                ChatColor.AQUA, newPortal.getDestination().toString(), ChatColor.WHITE)
+                : String.format("%sThere was an error setting Destination to %s%s%s. Is it formatted correctly?",
+                ChatColor.RED, ChatColor.AQUA, destinationName, ChatColor.RED));
     }
 }

@@ -39,19 +39,11 @@ public class ModifyCommand extends PortalCommand {
                                 @NotNull @Flags("defaultself") MVPortal portal) {
 
         if (property == SetProperties.destination) {
-            if (value.equalsIgnoreCase("here") && player != null) {
-                portal.setHereDestination(player, portalSession);
-                return;
-            }
-
-            MVDestination destination = this.plugin.getCore()
-                    .getDestFactory()
-                    .getPlayerAwareDestination(player, value);
-
-            sender.sendMessage((portal.setDestination(destination))
-                    ? "Destination of new portal is " + ChatColor.AQUA + destination.toString() + ChatColor.WHITE + "."
-                    : ChatColor.RED + "There was an error setting Destination " + ChatColor.AQUA + destination.toString()
-                    + ChatColor.RED + ". Is it formatted correctly?");
+            sender.sendMessage((portal.setDestination(player, value))
+                    ? String.format("Destination of portal '%s%s%s' is now %s%s%s.",
+                    ChatColor.AQUA, portal.getName(), ChatColor.WHITE, ChatColor.AQUA, portal.getDestination().toString(), ChatColor.WHITE)
+                    : String.format("%sThere was an error setting Destination to %s%s%s. Is it formatted correctly?",
+                    ChatColor.RED, ChatColor.AQUA, value, ChatColor.RED));
         }
 
         sender.sendMessage((portal.setProperty(property.toString(), value))
