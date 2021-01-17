@@ -336,6 +336,8 @@ public class MVPortal {
             return PortalType.Normal;
         }
 
+        // TODO in 5.0.0: Catch IllegalStateException and return a new PortalType, INVALID.
+
         return PortalType.Legacy;
     }
 
