@@ -310,11 +310,13 @@ public class MVPortal {
      * this gets the Material at the center of the portal.
      *
      * @return The Material that fills this portal.
-     * @throws IllegalStateException If this portal has no valid location.
+     * @throws IllegalStateException If this portal's location is no longer valid.
      */
     public Material getFillMaterial() throws IllegalStateException {
         if (!this.location.isValidLocation()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(String.format(
+                    "Failed to get fill material from MV Portal (%s): Portal location is invalid.",
+                    this.getName()));
         }
 
         return this.location.getMinimum().getMidpoint(this.location.getMaximum())
@@ -327,7 +329,7 @@ public class MVPortal {
      * and {@link PortalType#Legacy} for portals filled with anything else.
      *
      * @return The type of this portal.
-     * @throws IllegalStateException If this portal has no valid location.
+     * @throws IllegalStateException If this portal's location is no longer valid.
      */
     public PortalType getPortalType() throws IllegalStateException {
         if (this.getFillMaterial() == Material.NETHER_PORTAL) {
@@ -341,7 +343,7 @@ public class MVPortal {
      * Returns whether this portal is of the {@link PortalType#Legacy} type.
      *
      * @return True if and only if this portal is of the {@link PortalType#Legacy} type, false otherwise.
-     * @throws IllegalStateException If this portal has no valid location.
+     * @throws IllegalStateException If this portal's location is no longer valid.
      */
     public boolean isLegacyPortal() throws IllegalStateException {
         return this.getPortalType() == PortalType.Legacy;
