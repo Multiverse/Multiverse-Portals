@@ -23,6 +23,7 @@ import com.onarandombox.MultiversePortals.WorldEditConnection;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
 import com.onarandombox.MultiversePortals.utils.PortalFiller;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
+import com.onarandombox.MultiversePortals.utils.PortalMaterials;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -81,7 +82,7 @@ public class MVPPlayerListener implements Listener {
                 ps.showDebugInfo(portal);
                 event.setCancelled(true);
             } else {
-                Material fillMaterial = Material.AIR;
+                Material fillMaterial = PortalMaterials.AIR;
                 Logging.finer("Fill Material: " + fillMaterial);
                 this.filler.fillRegion(portal.getLocation().getRegion(), event.getBlockClicked().getLocation(), fillMaterial, event.getPlayer());
             }
@@ -111,9 +112,9 @@ public class MVPPlayerListener implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                Material fillMaterial = Material.WATER;
-                if (event.getBucket().equals(Material.LAVA_BUCKET)) {
-                    fillMaterial = Material.LAVA;
+                Material fillMaterial = PortalMaterials.WATER;
+                if (event.getBucket().equals(PortalMaterials.LAVA_BUCKET)) {
+                    fillMaterial = PortalMaterials.LAVA;
                 }
 
                 Logging.finer("Fill Material: " + fillMaterial);
@@ -130,7 +131,7 @@ public class MVPPlayerListener implements Listener {
         }
 
         // Portal lighting stuff
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == Material.FLINT_AND_STEEL) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getMaterial() == PortalMaterials.FLINT_AND_STEEL) {
             // They're lighting somethin'
             Logging.finer("Player is lighting block: " + this.plugin.getCore().getLocationManipulation().strCoordsRaw(event.getClickedBlock().getLocation()));
             PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
@@ -165,9 +166,9 @@ public class MVPPlayerListener implements Listener {
                     ps.showDebugInfo(portal);
                     event.setCancelled(true);
                 } else {
-                    Material fillMaterial = Material.NETHER_PORTAL;
-                    if (translatedLocation.getWorld().getBlockAt(translatedLocation).getType() == Material.NETHER_PORTAL) {
-                        fillMaterial = Material.AIR;
+                    Material fillMaterial = PortalMaterials.NETHER_PORTAL;
+                    if (translatedLocation.getWorld().getBlockAt(translatedLocation).getType() == PortalMaterials.NETHER_PORTAL) {
+                        fillMaterial = PortalMaterials.AIR;
                     }
                     Logging.finer("Fill Material: " + fillMaterial);
                     event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer()));
