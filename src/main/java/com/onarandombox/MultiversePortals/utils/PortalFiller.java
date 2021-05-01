@@ -7,25 +7,27 @@
 
 package com.onarandombox.MultiversePortals.utils;
 
-import java.util.logging.Level;
-
 import com.dumptruckman.minecraft.util.Logging;
-import org.bukkit.Axis;
+import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import com.onarandombox.MultiversePortals.MultiversePortals;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiversePortals.MVPortal;
 
 public class PortalFiller {
-    private MultiverseCore plugin;
+    private final MultiverseCore plugin;
+    private final BlockModifier netherPortalRotator;
 
     public PortalFiller(MultiverseCore plugin) {
         this.plugin = plugin;
+        this.netherPortalRotator = (LegacyNetherPortalRotator.legacyBlockSetData == null)
+                ? new NetherPortalRotator()
+                : new LegacyNetherPortalRotator();
     }
 
     public boolean fillRegion(MultiverseRegion r, Location l, Material type, Player player) {
@@ -62,17 +64,13 @@ public class PortalFiller {
     private void doFill(Block newLoc, int useX, int useZ, MultiverseRegion r, Material type) {
         if (isValidPortalRegion(newLoc.getLocation(), type)) {
             // we need to check if the fill material is nether_portal so we can rotate it if necessary
-            if (type == Material.NETHER_PORTAL) {
+            if (type == PortalMaterials.NETHER_PORTAL) {
                 // we won't use physics with nether_portal blocks because we cancel
                 // the BlockPhysicsEvent to prevent accidentally breaking the blocks.
                 // if we were to use physics, errors would be thrown upon breaking the portal blocks.
-                boolean usePhysics = false;
-                newLoc.setType(type, usePhysics);
+                newLoc.setType(type, false);
                 if (useX == 0) {
-                    Orientable b = (Orientable) newLoc.getBlockData();
-                    b.setAxis(Axis.Z);
-                    // also don't use physics here
-                    newLoc.setBlockData(b, usePhysics);
+                    this.netherPortalRotator.modify(newLoc);
                 }
             } else {
                 newLoc.setType(type);

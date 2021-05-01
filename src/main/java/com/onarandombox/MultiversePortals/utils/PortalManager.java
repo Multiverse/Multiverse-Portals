@@ -177,7 +177,7 @@ public class PortalManager {
             // player to the nether instead of their expected destination).
 
             MultiverseRegion region = removed.getLocation().getRegion();
-            replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR);
+            replaceInRegion(removed.getWorld(), region,  PortalMaterials.NETHER_PORTAL, PortalMaterials.AIR);
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());

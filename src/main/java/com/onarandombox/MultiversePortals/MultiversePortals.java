@@ -28,6 +28,7 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
+import com.onarandombox.MultiversePortals.utils.PortalMaterials;
 import com.onarandombox.commandhandler.CommandHandler;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -84,7 +85,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private PortalManager portalManager;
     private Map<String, PortalPlayerSession> portalSessions;
 
-    private static final Material DEFAULT_WAND = Material.WOODEN_AXE;
+    private static final Material DEFAULT_WAND = PortalMaterials.WOODEN_AXE;
     private long portalCooldown = 0;
     private final static int requiresProtocol = 24;
     public static boolean UseOnMove = true;

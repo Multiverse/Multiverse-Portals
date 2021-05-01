@@ -17,6 +17,7 @@ import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
+import com.onarandombox.MultiversePortals.utils.PortalMaterials;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -52,8 +53,15 @@ public class MVPortal {
     private boolean allowSave;
     private String handlerScript;
 
-    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
-            Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
+    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(
+            PortalMaterials.NETHER_PORTAL,
+            PortalMaterials.GRASS,
+            PortalMaterials.VINE,
+            PortalMaterials.SNOW,
+            PortalMaterials.AIR,
+            PortalMaterials.WATER,
+            PortalMaterials.LAVA
+    );
 
     public static boolean isPortalInterior(Material material) {
         return INTERIOR_MATERIALS.contains(material);

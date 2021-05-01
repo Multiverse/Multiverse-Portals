@@ -5,7 +5,7 @@
 # A config with explanations can be found here:
 # https://github.com/Multiverse/Multiverse-Core/wiki/config.yml-(Portals)
 
-wand: 271
+wand: WOODEN_AXE
 useonmove: true
 portalsdefaulttonether: false
 enforceportalaccess: true
