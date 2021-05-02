@@ -96,17 +96,16 @@ public class ListCommand extends PortalCommand {
             String destination = "";
             if(p.getDestination() != null) {
                 destination = p.getDestination().toString();
-
                 MultiverseWorld destWorld = this.plugin.getCore().getMVWorldManager().getMVWorld(destination);
                 if (destWorld != null) {
                     destination = "(World) " + ChatColor.DARK_AQUA + destination;
                 } else {
                     String destType = destination.substring(0, 1);
                     if (destType.equals("p")) {
-                        destination = "(Portal) " + ChatColor.DARK_AQUA + p.getDestination().getName();
+                        String targetWorldName = plugin.getPortalManager().getPortal(p.getDestination().getName()).getWorld().getName();
+                        destination = "(Portal) " + ChatColor.DARK_AQUA + p.getDestination().getName() + ChatColor.GRAY + " (" + targetWorldName + ")";
                     }
                     if (destType.equals("e")) {
-                        //String destParts = p.getDestination().toString().substring(2, p.getDestination().toString().length()-1);
                         String destinationWorld = p.getDestination().toString().split(":")[1];
                         String destPart = p.getDestination().toString().split(":")[2];
                         String[] locParts = destPart.split(",");
