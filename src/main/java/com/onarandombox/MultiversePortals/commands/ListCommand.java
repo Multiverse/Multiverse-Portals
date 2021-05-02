@@ -9,6 +9,7 @@ package com.onarandombox.MultiversePortals.commands;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -92,38 +93,40 @@ public class ListCommand extends PortalCommand {
         if (filter == null) {
             filter = "";
         }
-        for (MVPortal p : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
+        for (MVPortal portal : (world == null) ? this.plugin.getPortalManager().getPortals(sender) : this.plugin.getPortalManager().getPortals(sender, world)) {
             String destination = "";
-            if(p.getDestination() != null) {
-                destination = p.getDestination().toString();
-                MultiverseWorld destWorld = this.plugin.getCore().getMVWorldManager().getMVWorld(destination);
-                if (destWorld != null) {
-                    destination = "(World) " + ChatColor.DARK_AQUA + destination;
-                } else {
-                    String destType = destination.substring(0, 1);
-                    if (destType.equals("p")) {
-                        String targetWorldName = plugin.getPortalManager().getPortal(p.getDestination().getName()).getWorld().getName();
-                        destination = "(Portal) " + ChatColor.DARK_AQUA + p.getDestination().getName() + ChatColor.GRAY + " (" + targetWorldName + ")";
-                    }
-                    if (destType.equals("e")) {
-                        String destinationWorld = p.getDestination().toString().split(":")[1];
-                        String destPart = p.getDestination().toString().split(":")[2];
-                        String[] locParts = destPart.split(",");
-                        int x, y, z;
-                        try {
-                            x = (int) Double.parseDouble(locParts[0]);
-                            y = (int) Double.parseDouble(locParts[1]);
-                            z = (int) Double.parseDouble(locParts[2]);
-                        } catch(NumberFormatException e) {
-                            e.printStackTrace();
-                            continue;
-                        }
-                        destination = "(Location) " + ChatColor.DARK_AQUA + destinationWorld + ", " + x + ", " + y + ", " + z;
+            if(portal.getDestination() != null) {
+                destination = portal.getDestination().toString();
+                String destType = portal.getDestination().getIdentifier();
+                if(destType.equals("w")) {
+                    MultiverseWorld destWorld = this.plugin.getCore().getMVWorldManager().getMVWorld(destination);
+                    if (destWorld != null) {
+                        destination = "(World) " + ChatColor.DARK_AQUA + destination;
                     }
                 }
+                if (destType.equals("p")) {
+                    String targetWorldName = plugin.getPortalManager().getPortal(portal.getDestination().getName()).getWorld().getName();
+                    destination = "(Portal) " + ChatColor.DARK_AQUA + portal.getDestination().getName() + ChatColor.GRAY + " (" + targetWorldName + ")";
+                }
+                if (destType.equals("e")) {
+                    String destinationWorld = portal.getDestination().toString().split(":")[1];
+                    String destPart = portal.getDestination().toString().split(":")[2];
+                    String[] locParts = destPart.split(",");
+                    int x, y, z;
+                    try {
+                        x = (int) Double.parseDouble(locParts[0]);
+                        y = (int) Double.parseDouble(locParts[1]);
+                        z = (int) Double.parseDouble(locParts[2]);
+                    } catch(NumberFormatException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+                    destination = "(Location) " + ChatColor.DARK_AQUA + destinationWorld + ", " + x + ", " + y + ", " + z;
+                }
             }
-            if (p.getName().matches("(i?).*" + filter + ".*") || ( p.getDestination() != null && destination.matches("(i?).*" + filter + ".*"))) {
-                portals.add(ChatColor.YELLOW + p.getName() + ((p.getDestination() != null) ? (ChatColor.AQUA + " -> " + ChatColor.GOLD + destination) : ""));
+
+            if (portal.getName().toLowerCase().contains(filter.toLowerCase()) || ( portal.getDestination() != null && destination.toLowerCase().contains(filter.toLowerCase()))) {
+                portals.add(ChatColor.YELLOW + portal.getName() + ((portal.getDestination() != null) ? (ChatColor.AQUA + " -> " + ChatColor.GOLD + destination) : ""));
             }
         }
         java.util.Collections.sort(portals);
