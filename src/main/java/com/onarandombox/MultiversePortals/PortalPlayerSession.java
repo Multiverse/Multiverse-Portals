@@ -257,7 +257,6 @@ public class PortalPlayerSession {
     }
 
     private void showPortalPriceInfo(MVPortal portal) {
-        getPlayerFromName().sendMessage("More details: " + ChatColor.GREEN + portal.getDestination());
         if (portal.getPrice() > 0D) {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(portal.getPrice(), portal.getCurrency()));
         } else if (portal.getPrice() < 0D) {
@@ -270,9 +269,9 @@ public class PortalPlayerSession {
     public static void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
         sender.sendMessage(ChatColor.AQUA + "--- " + message + ChatColor.DARK_AQUA + portal.getName() + ChatColor.AQUA + " ---");
         String[] locParts = portal.getLocation().toString().split(":");
-        sender.sendMessage("Coords from " + ChatColor.GOLD + locParts[0] + ChatColor.WHITE + " to " + ChatColor.GOLD + locParts[1] + ChatColor.WHITE + " in " + ChatColor.GOLD + portal.getWorld().getName() );
+        sender.sendMessage("Coords: " + ChatColor.GOLD + locParts[0] + ChatColor.WHITE + " to " + ChatColor.GOLD + locParts[1] + ChatColor.WHITE + " in " + ChatColor.GOLD + portal.getWorld().getName() );
         if (portal.getDestination() == null) {
-            sender.sendMessage("This portal has " + ChatColor.RED + "NO DESTINATION SET.");
+            sender.sendMessage("Destination: " + ChatColor.RED + ChatColor.ITALIC + "NOT SET!");
         } else {
             String destination = portal.getDestination().toString();
             String destType = portal.getDestination().getIdentifier();
