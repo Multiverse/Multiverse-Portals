@@ -123,6 +123,9 @@ public class ListCommand extends PortalCommand {
                     }
                     destination = "(Location) " + ChatColor.DARK_AQUA + destinationWorld + ", " + x + ", " + y + ", " + z;
                 }
+                if(destType.equals("i")) {
+                    destination = ChatColor.RED + "Invalid Destination!";
+                }
             }
 
             if (portal.getName().toLowerCase().contains(filter.toLowerCase()) || ( portal.getDestination() != null && destination.toLowerCase().contains(filter.toLowerCase()))) {
