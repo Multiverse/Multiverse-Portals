@@ -121,6 +121,9 @@ public class ListCommand extends PortalCommand {
                         e.printStackTrace();
                         continue;
                     }
+                    if(destType.equals("i")) {
+                        destination = ChatColor.RED + "Invalid destination";
+                    }
                     destination = "(Location) " + ChatColor.DARK_AQUA + destinationWorld + ", " + x + ", " + y + ", " + z;
                 }
             }
