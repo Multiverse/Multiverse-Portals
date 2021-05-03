@@ -11,6 +11,7 @@ import java.util.Date;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiversePortals.enums.MoveType;
+import com.onarandombox.MultiversePortals.utils.DisplayManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -22,7 +23,7 @@ import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class PortalPlayerSession {
-    private static MultiversePortals plugin;
+    private MultiversePortals plugin;
     private String playerName;
 
     private MVPortal portalSelection = null;
@@ -241,21 +242,22 @@ public class PortalPlayerSession {
             return false;
         }
 
-        showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
-        this.showPortalPriceInfo(this.standingIn);
+        DisplayManager.showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
+        DisplayManager.showPortalPriceInfo(this.standingIn, this.getPlayerFromName());
         return true;
     }
 
     public boolean showDebugInfo(MVPortal portal) {
         if (portal.playerCanEnterPortal(this.getPlayerFromName())) {
-            showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
-            showPortalPriceInfo(portal);
+            DisplayManager.showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
+            DisplayManager.showPortalPriceInfo(portal, this.getPlayerFromName());
         } else {
             Logging.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
         }
         return true;
     }
 
+    @Deprecated
     private void showPortalPriceInfo(MVPortal portal) {
         if (portal.getPrice() > 0D) {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(portal.getPrice(), portal.getCurrency()));
@@ -266,44 +268,15 @@ public class PortalPlayerSession {
         }
     }
 
+    @Deprecated
     public static void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
-        sender.sendMessage(ChatColor.AQUA + "--- " + message + ChatColor.DARK_AQUA + portal.getName() + ChatColor.AQUA + " ---");
-        String[] locParts = portal.getLocation().toString().split(":");
-        sender.sendMessage("Coords: " + ChatColor.GOLD + locParts[0] + ChatColor.WHITE + " to " + ChatColor.GOLD + locParts[1] + ChatColor.WHITE + " in " + ChatColor.GOLD + portal.getWorld().getName() );
+        sender.sendMessage(message + ChatColor.DARK_AQUA + portal.getName());
+        sender.sendMessage("It's coords are: " + ChatColor.GOLD + portal.getLocation().toString());
         if (portal.getDestination() == null) {
-            sender.sendMessage("Destination: " + ChatColor.RED + ChatColor.ITALIC + "NOT SET!");
+            sender.sendMessage("This portal has " + ChatColor.RED + "NO DESTINATION SET.");
         } else {
-            String destination = portal.getDestination().toString();
-            String destType = portal.getDestination().getIdentifier();
-            if (destType.equals("w")) {
-                MultiverseWorld destWorld = plugin.getCore().getMVWorldManager().getMVWorld(destination);
-                if (destWorld != null) {
-                    destination = "(World) " + ChatColor.DARK_AQUA + destination;
-                }
-            }
-            if (destType.equals("p")) {
-                String targetWorldName = plugin.getPortalManager().getPortal(portal.getDestination().getName()).getWorld().getName();
-                destination = "(Portal) " + ChatColor.DARK_AQUA + portal.getDestination().getName() + ChatColor.GRAY + " (" + targetWorldName + ")";
-            }
-            if (destType.equals("e")) {
-                String destinationWorld = portal.getDestination().toString().split(":")[1];
-                String destPart = portal.getDestination().toString().split(":")[2];
-                String[] targetParts = destPart.split(",");
-                int x, y, z;
-                try {
-                    x = (int) Double.parseDouble(targetParts[0]);
-                    y = (int) Double.parseDouble(targetParts[1]);
-                    z = (int) Double.parseDouble(targetParts[2]);
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    return;
-                }
-                destination = "(Location) " + ChatColor.DARK_AQUA + destinationWorld + ", " + x + ", " + y + ", " + z;
-            }
-            if (destType.equals("i")) {
-                destination = ChatColor.RED + "Invalid Destination!";
-            }
-            sender.sendMessage("Destination: " + ChatColor.GOLD + destination);
+            sender.sendMessage("It will take you to a location of type: " + ChatColor.AQUA + portal.getDestination().getType());
+            sender.sendMessage("The destination's name is: " + ChatColor.GREEN + portal.getDestination().getName());
         }
     }
 

@@ -9,6 +9,8 @@ package com.onarandombox.MultiversePortals.commands;
 
 import java.util.List;
 
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiversePortals.utils.DisplayManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,7 +44,7 @@ public class InfoCommand extends PortalCommand {
             Player p = (Player) sender;
             this.plugin.getPortalSession(p).showDebugInfo(selected);
         } else {
-            PortalPlayerSession.showStaticInfo(sender, selected, "Portal Info: ");
+            DisplayManager.showStaticInfo(sender, selected, "Portal Info: ");
         }
     }
 }
