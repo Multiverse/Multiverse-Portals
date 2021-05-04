@@ -50,13 +50,30 @@ public class PortalManager {
         this.portals = new HashMap<String, MVPortal>();
         this.worldChunkPortals = new HashMap<MultiverseWorld, Map<Integer, Collection<MVPortal>>>();
     }
+
     /**
-     * Method that checks to see if a player is inside a portal AND if they have perms to use it.
-     * @param sender The sender to check.
-     * @param l The location they're standing.
+     * Method that checks to see if a player is inside a portal that they have permission to use.
+     *
+     * @param sender    The sender to check.
+     * @param l         The location they're standing.
+     *
      * @return A MVPortal if it's valid, null if not.
      */
     public MVPortal getPortal(Player sender, Location l) {
+        return getPortal(sender, l, true);
+    }
+
+    /**
+     * Method that checks to see if a player is inside a portal and optionally ensure they have
+     * permission to use.
+     *
+     * @param sender            The sender to check.
+     * @param l                 The location they're standing.
+     * @param checkPermission   The {@link MVPortal} is returned only if player has permission to access it.
+     *
+     * @return A MVPortal if it's valid, null if not.
+     */
+    public MVPortal getPortal(Player sender, Location l, boolean checkPermission) {
         if (!this.plugin.getCore().getMVWorldManager().isMVWorld(l.getWorld().getName())) {
             return null;
         }
@@ -65,7 +82,7 @@ public class PortalManager {
         for (MVPortal portal : getNearbyPortals(world, l)) {
 
             // Ignore portals the player can't use.
-            if (!MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal((Player) sender)) {
+            if (!checkPermission || !MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal(sender)) {
                 PortalLocation portalLoc = portal.getLocation();
                 if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
                     return portal;

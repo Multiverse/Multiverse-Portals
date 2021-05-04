@@ -216,7 +216,7 @@ public class MVPPlayerListener implements Listener {
         PortalManager pm = this.plugin.getPortalManager();
         Location playerPortalLoc = event.getPlayer().getLocation();
         // Determine if we're in a portal
-        MVPortal portal = pm.getPortal(event.getPlayer(), playerPortalLoc);
+        MVPortal portal = pm.getPortal(event.getPlayer(), playerPortalLoc, false);
         Player p = event.getPlayer();
         // Even if the location was null, we still have to see if
         // someone wasn't exactly on (because they can do this).
@@ -225,7 +225,7 @@ public class MVPPlayerListener implements Listener {
             playerPortalLoc = this.plugin.getCore().getSafeTTeleporter().findPortalBlockNextTo(event.getFrom());
             if (playerPortalLoc != null) {
                 Logging.finer("Player was outside of portal, The location has been successfully translated.");
-                portal = pm.getPortal(event.getPlayer(), playerPortalLoc);
+                portal = pm.getPortal(event.getPlayer(), playerPortalLoc, false);
             }
         }
         if (portal != null) {
