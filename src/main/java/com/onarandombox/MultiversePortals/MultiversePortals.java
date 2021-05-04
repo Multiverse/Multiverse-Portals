@@ -28,7 +28,7 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
-import com.onarandombox.MultiversePortals.utils.DisplayManager;
+import com.onarandombox.MultiversePortals.utils.DisplayUtils;
 import com.onarandombox.commandhandler.CommandHandler;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -148,7 +148,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         Logging.log(true, Level.INFO, " Enabled - By %s", getAuthors());
 
-        DisplayManager.plugin = this;
+        DisplayUtils.plugin = this;
     }
 
     private void registerEvents() {

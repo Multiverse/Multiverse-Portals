@@ -11,7 +11,7 @@ import java.util.Date;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiversePortals.enums.MoveType;
-import com.onarandombox.MultiversePortals.utils.DisplayManager;
+import com.onarandombox.MultiversePortals.utils.DisplayUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -242,15 +242,15 @@ public class PortalPlayerSession {
             return false;
         }
 
-        DisplayManager.showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
-        DisplayManager.showPortalPriceInfo(this.standingIn, this.getPlayerFromName());
+        DisplayUtils.showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
+        DisplayUtils.showPortalPriceInfo(this.standingIn, this.getPlayerFromName());
         return true;
     }
 
     public boolean showDebugInfo(MVPortal portal) {
         if (portal.playerCanEnterPortal(this.getPlayerFromName())) {
-            DisplayManager.showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
-            DisplayManager.showPortalPriceInfo(portal, this.getPlayerFromName());
+            DisplayUtils.showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
+            DisplayUtils.showPortalPriceInfo(portal, this.getPlayerFromName());
         } else {
             Logging.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
         }

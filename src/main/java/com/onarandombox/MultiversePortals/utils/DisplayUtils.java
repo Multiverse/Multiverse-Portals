@@ -6,7 +6,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-public class DisplayManager {
+public class DisplayUtils {
 
     public static MultiversePortals plugin;
 
