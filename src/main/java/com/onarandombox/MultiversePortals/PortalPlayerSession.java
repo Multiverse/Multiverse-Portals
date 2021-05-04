@@ -11,6 +11,7 @@ import java.util.Date;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiversePortals.enums.MoveType;
+import com.onarandombox.MultiversePortals.utils.DisplayUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -88,7 +89,7 @@ public class PortalPlayerSession {
         // If they're not in a portal and this location is a portal
         if (this.standingIn == null && this.plugin.getPortalManager().isPortal(this.loc)) {
             this.standingIn = this.plugin.getPortalManager().getPortal(this.loc);
-        // There is no portal here.
+            // There is no portal here.
         } else if (!this.plugin.getPortalManager().isPortal(this.loc)) {
             this.hasMovedOutOfPortal = true;
             this.standingIn = null;
@@ -170,7 +171,7 @@ public class PortalPlayerSession {
                             plugin.getCore().getMVWorldManager().getMVWorld(minPoint.getWorld().getName()));
                 } else {
                     player.sendMessage("You haven't finished your selection.");
-                return null;
+                    return null;
                 }
             } else {
                 player.sendMessage("You must have a WorldEdit selection to do this.");
@@ -241,32 +242,33 @@ public class PortalPlayerSession {
             return false;
         }
 
-        showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
-        this.showPortalPriceInfo(this.standingIn);
+        DisplayUtils.showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
+        DisplayUtils.showPortalPriceInfo(this.standingIn, this.getPlayerFromName());
         return true;
     }
 
     public boolean showDebugInfo(MVPortal portal) {
         if (portal.playerCanEnterPortal(this.getPlayerFromName())) {
-            showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
-            showPortalPriceInfo(portal);
+            DisplayUtils.showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
+            DisplayUtils.showPortalPriceInfo(portal, this.getPlayerFromName());
         } else {
             Logging.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
         }
         return true;
     }
 
+    @Deprecated
     private void showPortalPriceInfo(MVPortal portal) {
-        getPlayerFromName().sendMessage("More details for you: " + ChatColor.GREEN + portal.getDestination());
         if (portal.getPrice() > 0D) {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(portal.getPrice(), portal.getCurrency()));
         } else if (portal.getPrice() < 0D) {
-            getPlayerFromName().sendMessage("Prize: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(-portal.getPrice(), portal.getCurrency()));
+            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(-portal.getPrice(), portal.getCurrency()));
         } else {
             getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + "FREE!");
         }
     }
 
+    @Deprecated
     public static void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
         sender.sendMessage(message + ChatColor.DARK_AQUA + portal.getName());
         sender.sendMessage("It's coords are: " + ChatColor.GOLD + portal.getLocation().toString());
