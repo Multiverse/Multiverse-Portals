@@ -92,7 +92,7 @@ public class MVPortalEvent extends Event implements Cancellable {
      *
      * @return The {@link PortalType} of the sending portal.
      * @throws IllegalStateException If this portal's location is no longer valid.
-     * @deprecated Use {@link #getSendingPortal().getPortalType()} instead.
+     * @deprecated Use {@link MVPortal#getPortalType()} instead (i.e. {@code getSendingPortal().getPortalType()}).
      */
     @Deprecated
     public PortalType getPortalType() throws IllegalStateException {
