@@ -37,21 +37,27 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class MVPPlayerListener implements Listener {
 
-    private MultiversePortals plugin;
-    private PortalFiller filler;
-    private PortalManager portalManager;
-    private PlayerListenerHelper helper;
+    private final MultiversePortals plugin;
+    private final PortalFiller filler;
+    private final PortalManager portalManager;
+    private final PlayerListenerHelper helper;
 
     public MVPPlayerListener(MultiversePortals plugin, PlayerListenerHelper helper) {
         this.plugin = plugin;
         this.helper = helper;
         this.portalManager = plugin.getPortalManager();
         this.filler = new PortalFiller(plugin.getCore());
+    }
+
+    @EventHandler
+    public void playerQuit(PlayerQuitEvent event) {
+        this.plugin.destroyPortalSession(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

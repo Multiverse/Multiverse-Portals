@@ -23,8 +23,8 @@ import com.onarandombox.MultiversePortals.utils.MultiverseRegion;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class PortalPlayerSession {
-    private MultiversePortals plugin;
-    private String playerName;
+    private final MultiversePortals plugin;
+    private final Player player;
 
     private MVPortal portalSelection = null;
     private MVPortal standingIn = null;
@@ -40,7 +40,7 @@ public class PortalPlayerSession {
 
     public PortalPlayerSession(MultiversePortals plugin, Player p) {
         this.plugin = plugin;
-        this.playerName = p.getName();
+        this.player = p;
         this.setLocation(p.getLocation());
         this.lastTeleportTime = new Date(new Date().getTime() - this.plugin.getCooldownTime());
     }
@@ -54,17 +54,13 @@ public class PortalPlayerSession {
         return this.portalSelection;
     }
 
-    private Player getPlayerFromName() {
-        return this.plugin.getServer().getPlayerExact(playerName);
-    }
-
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
         if (this.debugMode) {
-            this.getPlayerFromName().sendMessage("Portal debug mode " + ChatColor.GREEN + "ENABLED");
-            this.getPlayerFromName().sendMessage("Use " + ChatColor.DARK_AQUA + "/mvp debug" + ChatColor.WHITE + " to disable.");
+            this.player.sendMessage("Portal debug mode " + ChatColor.GREEN + "ENABLED");
+            this.player.sendMessage("Use " + ChatColor.DARK_AQUA + "/mvp debug" + ChatColor.WHITE + " to disable.");
         } else {
-            this.getPlayerFromName().sendMessage("Portal debug mode " + ChatColor.RED + "DISABLED");
+            this.player.sendMessage("Portal debug mode " + ChatColor.RED + "DISABLED");
         }
     }
 
@@ -99,7 +95,7 @@ public class PortalPlayerSession {
     }
 
     public boolean doTeleportPlayer(MoveType eventType) {
-        if (eventType == MoveType.PLAYER_MOVE && this.getPlayerFromName().isInsideVehicle()) {
+        if (eventType == MoveType.PLAYER_MOVE && this.player.isInsideVehicle()) {
             return false;
         }
         return this.hasMovedOutOfPortal && this.standingIn != null;
@@ -110,11 +106,11 @@ public class PortalPlayerSession {
     }
 
     public void setStaleLocation(Location loc, MoveType moveType) {
-        if (this.getPlayerFromName() == null) {
+        if (this.player == null) {
             // This should never happen, but seems to when someone gets kicked.
             return;
         }
-        if (this.getPlayerFromName().isInsideVehicle() && moveType != MoveType.VEHICLE_MOVE) {
+        if (this.player.isInsideVehicle() && moveType != MoveType.VEHICLE_MOVE) {
             return;
         }
         // If the player has not moved, they have a stale location
@@ -139,7 +135,7 @@ public class PortalPlayerSession {
             MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
             message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
         }
-        this.getPlayerFromName().sendMessage(message);
+        this.player.sendMessage(message);
         return true;
     }
 
@@ -154,43 +150,42 @@ public class PortalPlayerSession {
             MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
             message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
         }
-        this.getPlayerFromName().sendMessage(message);
+        this.player.sendMessage(message);
         return true;
 
     }
 
     public MultiverseRegion getSelectedRegion() {
-        Player player = getPlayerFromName();
         WorldEditConnection worldEdit = plugin.getWorldEditConnection();
         if (worldEdit != null && worldEdit.isConnected()) {
-            if (worldEdit.isSelectionAvailable(player)) {
-                Location minPoint = worldEdit.getSelectionMinPoint(player);
-                Location maxPoint = worldEdit.getSelectionMaxPoint(player);
+            if (worldEdit.isSelectionAvailable(this.player)) {
+                Location minPoint = worldEdit.getSelectionMinPoint(this.player);
+                Location maxPoint = worldEdit.getSelectionMaxPoint(this.player);
                 if (minPoint != null && maxPoint != null && minPoint.getWorld().equals(maxPoint.getWorld())) {
                     return new MultiverseRegion(minPoint, maxPoint,
                             plugin.getCore().getMVWorldManager().getMVWorld(minPoint.getWorld().getName()));
                 } else {
-                    player.sendMessage("You haven't finished your selection.");
+                    this.player.sendMessage("You haven't finished your selection.");
                     return null;
                 }
             } else {
-                player.sendMessage("You must have a WorldEdit selection to do this.");
+                this.player.sendMessage("You must have a WorldEdit selection to do this.");
                 return null;
             }
         }
         // They're using our crappy selection:
         if (this.leftClick == null) {
-            player.sendMessage("You need to LEFT click on a block with your wand!");
+            this.player.sendMessage("You need to LEFT click on a block with your wand!");
             return null;
         }
         if (this.rightClick == null) {
-            player.sendMessage("You need to RIGHT click on a block with your wand!");
+            this.player.sendMessage("You need to RIGHT click on a block with your wand!");
             return null;
         }
         if (!this.leftClickWorld.equals(this.rightClickWorld)) {
-            player.sendMessage("You need to select both coords in the same world!");
-            player.sendMessage("Left Click Position was in:" + this.leftClickWorld.getColoredWorldString());
-            player.sendMessage("Right Click Position was in:" + this.rightClickWorld.getColoredWorldString());
+            this.player.sendMessage("You need to select both coords in the same world!");
+            this.player.sendMessage("Left Click Position was in:" + this.leftClickWorld.getColoredWorldString());
+            this.player.sendMessage("Right Click Position was in:" + this.rightClickWorld.getColoredWorldString());
             return null;
         }
         return new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
@@ -242,17 +237,17 @@ public class PortalPlayerSession {
             return false;
         }
 
-        DisplayUtils.showStaticInfo(this.getPlayerFromName(), this.standingIn, "You are currently standing in ");
-        DisplayUtils.showPortalPriceInfo(this.standingIn, this.getPlayerFromName());
+        DisplayUtils.showStaticInfo(this.player, this.standingIn, "You are currently standing in ");
+        DisplayUtils.showPortalPriceInfo(this.standingIn, this.player);
         return true;
     }
 
     public boolean showDebugInfo(MVPortal portal) {
-        if (portal.playerCanEnterPortal(this.getPlayerFromName())) {
-            DisplayUtils.showStaticInfo(this.getPlayerFromName(), portal, "Portal Info ");
-            DisplayUtils.showPortalPriceInfo(portal, this.getPlayerFromName());
+        if (portal.playerCanEnterPortal(this.player)) {
+            DisplayUtils.showStaticInfo(this.player, portal, "Portal Info ");
+            DisplayUtils.showPortalPriceInfo(portal, this.player);
         } else {
-            Logging.info("Player " + this.playerName + " walked through" + portal.getName() + " with debug on.");
+            Logging.info("Player " + this.player.getName() + " walked through" + portal.getName() + " with debug on.");
         }
         return true;
     }
@@ -260,11 +255,11 @@ public class PortalPlayerSession {
     @Deprecated
     private void showPortalPriceInfo(MVPortal portal) {
         if (portal.getPrice() > 0D) {
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(portal.getPrice(), portal.getCurrency()));
+            this.player.sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(portal.getPrice(), portal.getCurrency()));
         } else if (portal.getPrice() < 0D) {
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(-portal.getPrice(), portal.getCurrency()));
+            this.player.sendMessage("Price: " + ChatColor.GREEN + plugin.getCore().getEconomist().formatPrice(-portal.getPrice(), portal.getCurrency()));
         } else {
-            getPlayerFromName().sendMessage("Price: " + ChatColor.GREEN + "FREE!");
+            this.player.sendMessage("Price: " + ChatColor.GREEN + "FREE!");
         }
     }
 
@@ -293,7 +288,7 @@ public class PortalPlayerSession {
     public boolean checkAndSendCooldownMessage() {
         long cooldownMs = this.getRemainingTeleportCooldown();
         if (cooldownMs > 0) {
-            this.getPlayerFromName().sendMessage(this.getCooldownMessage(cooldownMs));
+            this.player.sendMessage(this.getCooldownMessage(cooldownMs));
             return true;
         }
 
