@@ -57,16 +57,23 @@ public class CreateCommand extends PortalCommand {
         if (r == null) {
             return;
         }
-        MVPortal portal = this.plugin.getPortalManager().getPortal(args.get(0));
+
+        String portalName = args.get(0);
+        if (!MVPortal.PORTAL_NAME_PATTERN.matcher(portalName).matches()) {
+            sender.sendMessage(String.format("%sInvalid portal name. It must not contain dot or special characters.", ChatColor.RED));
+            return;
+        }
+
+        MVPortal portal = this.plugin.getPortalManager().getPortal(portalName);
         PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
-        if (this.plugin.getPortalManager().addPortal(world, args.get(0), p.getName(), location)) {
-            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") created and selected!");
+        if (this.plugin.getPortalManager().addPortal(world, portalName, p.getName(), location)) {
+            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + ") created and selected!");
             // If the portal did not exist, ie: we're creating it.
             // we have to re select it, because it would be null
-            portal = this.plugin.getPortalManager().getPortal(args.get(0));
+            portal = this.plugin.getPortalManager().getPortal(portalName);
 
         } else {
-            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + args.get(0) + ChatColor.WHITE + ") was NOT created!");
+            sender.sendMessage("New portal (" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + ") was NOT created!");
             sender.sendMessage("It already existed and has been selected.");
         }
 

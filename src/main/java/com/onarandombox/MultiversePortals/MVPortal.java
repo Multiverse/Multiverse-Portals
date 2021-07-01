@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
@@ -55,6 +56,8 @@ public class MVPortal {
 
     private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
             Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
+
+    public static final Pattern PORTAL_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
 
     public static boolean isPortalInterior(Material material) {
         return INTERIOR_MATERIALS.contains(material);
