@@ -203,13 +203,23 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.getServer().getPluginManager().recalculatePermissionDefaults(all);
     }
 
+    /**
+     * Gets a PortalSession for a give player. A new instance is created if not present.
+     *
+     * @param p Target player to get PortalSession.
+     * @return The player's {@link PortalPlayerSession}
+     */
     public PortalPlayerSession getPortalSession(Player p) {
-        if (this.portalSessions.containsKey(p.getName())) {
-            return this.portalSessions.get(p.getName());
-        }
-        PortalPlayerSession session = new PortalPlayerSession(this, p);
-        this.portalSessions.put(p.getName(), session);
-        return session;
+        return this.portalSessions.computeIfAbsent(p.getName(), s -> new PortalPlayerSession(this, p));
+    }
+
+    /**
+     * Removes a {@link PortalPlayerSession} instance for a player.
+     *
+     * @param p Target player to remove.
+     */
+    public void destroyPortalSession(Player p) {
+        this.portalSessions.remove(p.getName());
     }
 
     private void loadPortals() {
