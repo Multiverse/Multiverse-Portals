@@ -18,7 +18,7 @@
         </repository>
         <repository>
             <id>OnARandomBox</id>
-            <url>http://repo.onarandombox.com/content/groups/public</url>
+            <url>https://repo.onarandombox.com/content/groups/public</url>
         </repository>
         <repository>
             <id>spigot</id>
@@ -26,7 +26,7 @@
         </repository>
         <repository>
             <id>world-edit</id>
-            <url>http://maven.sk89q.com/repo/</url>
+            <url>https://maven.sk89q.com/repo/</url>
          </repository>
         <repository>
             <id>rlf-mvn-repo</id>
