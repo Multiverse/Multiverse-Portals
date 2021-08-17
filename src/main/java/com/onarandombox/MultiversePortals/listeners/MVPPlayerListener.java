@@ -258,9 +258,14 @@ public class MVPPlayerListener implements Listener {
                 }
 
                 event.setTo(destLocation);
-                if (portalDest.useSafeTeleporter()) {
+                if (portal.useSafeTeleporter()) {
                     SafeTTeleporter teleporter = this.plugin.getCore().getSafeTTeleporter();
-                    event.setTo(teleporter.getSafeLocation(event.getPlayer(), portalDest));
+                    Location safeLocation = teleporter.getSafeLocation(event.getPlayer(), portalDest);
+                    if (safeLocation == null) {
+                        Logging.fine("Player denied teleportation as no safe location is found.");
+                        return;
+                    }
+                    event.setTo(safeLocation);
                 }
 
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());

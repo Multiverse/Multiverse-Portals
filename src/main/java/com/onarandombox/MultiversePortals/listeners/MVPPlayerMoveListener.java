@@ -7,12 +7,8 @@
 
 package com.onarandombox.MultiversePortals.listeners;
 
-import java.util.Date;
-import java.util.logging.Level;
-
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.api.MVDestination;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.destination.InvalidDestination;
 import com.onarandombox.MultiverseCore.utils.MVEconomist;
 import com.onarandombox.MultiversePortals.MVPortal;
@@ -93,11 +89,13 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
 
+            Logging.warning("Getting location...");
             Location destLocation = d.getLocation(p);
             if (destLocation == null) {
                 Logging.fine("Unable to teleport player because destination is null!");
                 return;
             }
+            Logging.warning("Got location.");
 
             if (!this.plugin.getCore().getMVWorldManager().isMVWorld(destLocation.getWorld())) {
                 Logging.fine("Unable to teleport player because the destination world is not managed by Multiverse!");
@@ -112,7 +110,7 @@ public class MVPPlayerMoveListener implements Listener {
                     try {
                         if (helper.scriptPortal(event.getPlayer(), d, portal, ps)) {
                             // Portal handled by script
-                            helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                            helper.performTeleport(ps, d);
                         }
                         return;
                     } catch (IllegalStateException ignore) {
@@ -152,7 +150,7 @@ public class MVPPlayerMoveListener implements Listener {
                                 price > 0D ? "been charged" : "earned",
                                 economist.formatPrice(price, currency),
                                 portal.getName()));
-                        helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                        helper.performTeleport(ps, d);
                     }
                 } else {
                     p.sendMessage(economist.getNSFMessage(currency,
@@ -164,7 +162,7 @@ public class MVPPlayerMoveListener implements Listener {
                 MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), agent, portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (!portalEvent.isCancelled()) {
-                    helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                    helper.performTeleport(ps, d);
                 }
             }
         }

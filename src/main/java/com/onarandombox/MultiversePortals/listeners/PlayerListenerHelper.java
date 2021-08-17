@@ -2,13 +2,11 @@ package com.onarandombox.MultiversePortals.listeners;
 
 import java.io.File;
 import java.util.Date;
-import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
+import com.google.common.base.Strings;
 import com.onarandombox.MultiverseCore.api.MVDestination;
 import com.onarandombox.MultiverseCore.api.SafeTTeleporter;
-import com.onarandombox.MultiverseCore.enums.TeleportResult;
-import com.onarandombox.MultiverseCore.utils.MVTravelAgent;
 import com.onarandombox.MultiversePortals.MVPortal;
 import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
@@ -37,17 +35,28 @@ public class PlayerListenerHelper {
                 playerName, portalName));
     }
 
-    void performTeleport(Player player, Location to, PortalPlayerSession ps, MVDestination d) {
-        if (!plugin.getCore().getMVConfig().getEnforceAccess() || (d.getRequiredPermission() == null)
-                || (d.getRequiredPermission().length() == 0) || player.hasPermission(d.getRequiredPermission())) {
-            SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
-            TeleportResult result = playerTeleporter.safelyTeleport(player, player, d);
-            if (result == TeleportResult.SUCCESS) {
-                ps.playerDidTeleport(to);
-                ps.setTeleportTime(new Date());
-                this.stateSuccess(player.getDisplayName(), d.getName());
+    void performTeleport(PortalPlayerSession ps, MVDestination d) {
+        Player player = ps.getPlayer();
+        if (!plugin.getCore().getMVConfig().getEnforceAccess()
+                || Strings.isNullOrEmpty(d.getRequiredPermission())
+                || player.hasPermission(d.getRequiredPermission())) {
+
+            Location targetLocation = d.getLocation(player);
+            if (ps.getStandingInPortal().useSafeTeleporter()) {
+                SafeTTeleporter playerTeleporter = this.plugin.getCore().getSafeTTeleporter();
+                targetLocation = playerTeleporter.getSafeLocation(player, d);
+            }
+
+            if (targetLocation == null) {
+                this.stateFailure(player.getDisplayName(), d.getName());
                 return;
             }
+
+            player.teleport(targetLocation);
+            ps.playerDidTeleport(targetLocation);
+            ps.setTeleportTime(new Date());
+            this.stateSuccess(player.getDisplayName(), d.getName());
+            return;
         }
         this.stateFailure(player.getDisplayName(), d.getName());
     }

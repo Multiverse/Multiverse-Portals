@@ -371,7 +371,6 @@ public class MVPortal {
             return this.setDestination(value);
         }
 
-
         if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
             return this.setCurrency(Material.matchMaterial(value));
         }
@@ -387,25 +386,33 @@ public class MVPortal {
         if (property.equalsIgnoreCase("owner")) {
             return this.setOwner(value);
         }
+
         if (property.equalsIgnoreCase("safe")) {
             try {
                 this.setUseSafeTeleporter(Boolean.parseBoolean(value));
                 return true;
-            } catch (Exception e) {
-
+            } catch (Exception ignored) {
             }
         }
+
         if (property.equalsIgnoreCase("telenonplayers")) {
             try {
                 this.setTeleportNonPlayers(Boolean.parseBoolean(value));
                 return true;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
+
         if (property.equalsIgnoreCase("handlerscript")) {
             this.setHandlerScript(value);
             return true;
         }
+
+        if (property.equalsIgnoreCase("safeteleport")) {
+            this.setUseSafeTeleporter(Boolean.parseBoolean(value));
+            return true;
+        }
+
         return false;
     }
 
