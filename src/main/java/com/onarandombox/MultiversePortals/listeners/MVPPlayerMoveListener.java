@@ -20,6 +20,7 @@ import com.onarandombox.MultiversePortals.MultiversePortals;
 import com.onarandombox.MultiversePortals.PortalPlayerSession;
 import com.onarandombox.MultiversePortals.enums.MoveType;
 import com.onarandombox.MultiversePortals.event.MVPortalEvent;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -104,7 +105,7 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
             if (!portal.isFrameValid(loc)) {
-                //event.getPlayer().sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
+                p.sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
                 return;
             }
             if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
