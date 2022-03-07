@@ -93,6 +93,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static boolean WandEnabled = true;
     public static boolean ClearOnRemove = false;
     public static boolean TeleportVehicles = true;
+    public static boolean NetherAnimation = true;
 
     // Restricts the materials that can be used for the frames of portals.
     // An empty or null list means all materials are okay.
@@ -278,6 +279,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
         MultiversePortals.TeleportVehicles = this.MVPConfig.getBoolean("teleportvehicles", true);
+        MultiversePortals.NetherAnimation = this.MVPConfig.getBoolean("netheranimation", true);
         MultiversePortals.FrameMaterials = migrateFrameMaterials(this.MVPConfig);
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
