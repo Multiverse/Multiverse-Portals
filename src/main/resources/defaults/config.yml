@@ -12,5 +12,6 @@ enforceportalaccess: true
 portalcooldown: 1000
 clearonremove: false
 teleportvehicles: true
+netheranimation: true
 framematerials: []
 version: 2.7

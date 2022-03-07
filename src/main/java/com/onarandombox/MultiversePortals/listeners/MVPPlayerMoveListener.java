@@ -81,7 +81,11 @@ public class MVPPlayerMoveListener implements Listener {
         MVPortal portal = ps.getStandingInPortal();
         // If the portal is not null, and it's a legacy portal,
         // and we didn't show debug info (the debug is meant to toggle), do the stuff.
-        if (portal != null && portal.isLegacyPortal() && ps.doTeleportPlayer(MoveType.PLAYER_MOVE) && !ps.showDebugInfo()) {
+        if (portal != null
+                && (!MultiversePortals.NetherAnimation || portal.isLegacyPortal())
+                && ps.doTeleportPlayer(MoveType.PLAYER_MOVE)
+                && !ps.showDebugInfo()) {
+
             MVDestination d = portal.getDestination();
             if (d == null) {
                 return;
