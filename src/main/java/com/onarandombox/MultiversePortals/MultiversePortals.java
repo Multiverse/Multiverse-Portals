@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
 import com.onarandombox.MultiverseCore.utils.MaterialConverter;
-import com.onarandombox.MultiversePortals.listeners.MVPPlayerMoveListener;
 import com.onarandombox.MultiversePortals.listeners.PlayerListenerHelper;
+import com.onarandombox.MultiversePortals.runnables.PortalPollTask;
 import com.onarandombox.MultiversePortals.utils.DisplayUtils;
 import com.onarandombox.commandhandler.CommandHandler;
 import org.bukkit.Material;
@@ -40,11 +40,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -69,7 +66,6 @@ import com.onarandombox.MultiversePortals.listeners.MVPBlockListener;
 import com.onarandombox.MultiversePortals.listeners.MVPCoreListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPlayerListener;
 import com.onarandombox.MultiversePortals.listeners.MVPPluginListener;
-import com.onarandombox.MultiversePortals.listeners.MVPVehicleListener;
 import com.onarandombox.MultiversePortals.utils.PortalManager;
 
 public class MultiversePortals extends JavaPlugin implements MVPlugin {
@@ -92,7 +88,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
     public static boolean ClearOnRemove = false;
-    public static boolean TeleportVehicles = true;
+    public static boolean TeleportEntities = true;
     public static boolean NetherAnimation = true;
 
     // Restricts the materials that can be used for the frames of portals.
@@ -165,11 +161,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         pm.registerEvents(pluginListener, this);
         pm.registerEvents(playerListener, this);
         pm.registerEvents(blockListener, this);
-        if (MultiversePortals.TeleportVehicles) {
-            pm.registerEvents(new MVPVehicleListener(this), this);
-        }
         if (MultiversePortals.UseOnMove) {
-            pm.registerEvents(new MVPPlayerMoveListener(this, playerListenerHelper), this);
+            new PortalPollTask(this).runTaskTimer(this, 10L, 10L);
         }
         pm.registerEvents(coreListener, this);
     }
@@ -278,7 +271,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
-        MultiversePortals.TeleportVehicles = this.MVPConfig.getBoolean("teleportvehicles", true);
+        MultiversePortals.TeleportEntities = this.MVPConfig.getBoolean("teleportentities", true);
         MultiversePortals.NetherAnimation = this.MVPConfig.getBoolean("netheranimation", true);
         MultiversePortals.FrameMaterials = migrateFrameMaterials(this.MVPConfig);
         // Migrate useportalaccess -> enforceportalaccess
@@ -302,11 +295,18 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             Logging.info("Migrating portal_cooldown -> portalcooldown...");
         }
 
+        if (this.MVPConfig.get("teleportvehicles") != null) {
+            this.MVPConfig.set("teleportentities", this.MVPConfig.getBoolean("teleportvehicles", true));
+            this.log(Level.INFO, "Migrating teleportvehicles -> teleportentities...");
+        }
+
         // Remove old properties
         this.MVPConfig.set("mvportals_default_to_nether", null);
         this.MVPConfig.set("useportalaccess", null);
         this.MVPConfig.set("use_onmove", null);
         this.MVPConfig.set("portal_cooldown", null);
+        this.MVPConfig.set("teleportvehicles", null);
+
         // Update the version
         if (portalsDefaults != null) {
             this.MVPConfig.set("version", portalsDefaults.get("version"));
@@ -438,26 +438,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
             this.loadPortals();
         }
 
-        PluginManager pm = this.getServer().getPluginManager();
-        boolean previousTeleportVehicles = MultiversePortals.TeleportVehicles;
         boolean previousUseOnMove = MultiversePortals.UseOnMove;
-
         this.loadConfig();
-
-        if (MultiversePortals.TeleportVehicles != previousTeleportVehicles) {
-            if (MultiversePortals.TeleportVehicles) {
-                pm.registerEvents(new MVPVehicleListener(this), this);
-            } else {
-                VehicleMoveEvent.getHandlerList().unregister(this);
-            }
-        }
 
         if (MultiversePortals.UseOnMove != previousUseOnMove) {
             if (MultiversePortals.UseOnMove) {
-                pm.registerEvents(new MVPPlayerMoveListener(this, new PlayerListenerHelper(this)), this);
+                new PortalPollTask(this).runTaskTimer(this, 10L, 10L);
             } else {
-                BlockFromToEvent.getHandlerList().unregister(this);
-                PlayerMoveEvent.getHandlerList().unregister(this);
+                this.getServer().getScheduler().cancelTasks(this);
             }
         }
     }

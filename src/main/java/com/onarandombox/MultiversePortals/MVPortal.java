@@ -84,7 +84,7 @@ public class MVPortal {
         this.setCurrency(MaterialConverter.convertConfigType(this.config, this.portalConfigString + ".entryfee.currency"));
         this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
         this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
-        this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
+        this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", true));
         this.setHandlerScript(this.config.getString(this.portalConfigString + ".handlerscript", ""));
         this.permission = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.name);
         if (this.permission == null) {
