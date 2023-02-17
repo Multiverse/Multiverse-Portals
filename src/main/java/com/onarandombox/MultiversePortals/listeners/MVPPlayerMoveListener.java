@@ -105,7 +105,7 @@ public class MVPPlayerMoveListener implements Listener {
                 return;
             }
             if (!portal.isFrameValid(loc)) {
-                p.sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
+                p.sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material. You should exit it now.");
                 return;
             }
             if (portal.getHandlerScript() != null && !portal.getHandlerScript().isEmpty()) {
