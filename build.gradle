@@ -90,16 +90,6 @@ publishing {
 }
 
 
-task prepareSource(type: Sync) {
-
-    from sourceSets.main.java
-    into "$buildDir/src"
-}
-
-compileJava {
-    source = prepareSource.outputs
-}
-
 processResources {
     def props = [version: "${project.version}"]
     inputs.properties props
