@@ -101,6 +101,11 @@ public class MVPPlayerListener implements Listener {
             return;
         }
 
+        if (!MultiversePortals.bucketFilling) {
+            Logging.fine("The bucket filling functionality has been disabled in config, doing nothing");
+            return;
+        }
+
         Location translatedLocation = this.getTranslatedLocation(event.getBlockClicked(), event.getBlockFace());
         Logging.finer("Fill: ");
         Logging.finer("Block Clicked: " + event.getBlockClicked() + ":" + event.getBlockClicked().getType());
