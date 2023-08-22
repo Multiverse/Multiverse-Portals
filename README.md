@@ -24,7 +24,7 @@ Now it's time to create your very own server with Multiverse Portals, do check o
 With just [Multiverse Core](https://github.com/multiverse/multiverse) and any of the below plugins, you can access all of these other related features in the Multiverse ecosystem.
 
 * [Multiverse-NetherPortals](https://github.com/Multiverse/Multiverse-NetherPortals) -> Have separate nether and end worlds for each of your overworlds!
-* [Multiverse-Portals](https://github.com/Multiverse/Multiverse-Portals) -> Make custom portals to go to any destination!
+* [Multiverse-Inventories](https://github.com/Multiverse/Multiverse-Inventories) -> Have separated players stats and inventories per world or per group of worlds.
 * [Multiverse-SignPortals](https://github.com/Multiverse/Multiverse-SignPortals) -> Signs as teleporters!
 
 ## Building
