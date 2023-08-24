@@ -44,7 +44,7 @@ jobs:
       dbo_project_relations: >
         [
           {"slug": "multiverse-core", "type": "requiredDependency"},
-          {"slug": "worldedit", "type": "optionalDependency"},
+          {"slug": "worldedit", "type": "optionalDependency"}
         ]
 
       hangar_slug: Multiverse-Portals
