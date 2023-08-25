@@ -1,0 +1,11 @@
+name: 'PR: Test'
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    uses: Multiverse/Multiverse-Core/.github/workflows/generic.test.yml@main
+    with:
+      plugin_name: multiverse-portals

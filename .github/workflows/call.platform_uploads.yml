@@ -1,0 +1,66 @@
+name: 'Call: Platform Uploads'
+
+on:
+  workflow_call:
+    inputs:
+      target_tag:
+        description: 'Version to upload'
+        required: true
+        type: string
+      upload_modrinth:
+        description: 'Upload to modrinth.com'
+        required: true
+        type: string
+      upload_dbo:
+        description: 'Upload to dev.bukkit.org'
+        required: true
+        type: string
+      upload_hangar:
+        description: 'Upload to hangar.papermc.io'
+        required: true
+        type: string
+    secrets:
+      MODRINTH_TOKEN:
+        required: true
+      DBO_UPLOAD_API_TOKEN:
+        required: true
+      HANGAR_UPLOAD_TOKEN:
+        required: true
+
+jobs:
+  platform_uploads:
+    uses: Multiverse/Multiverse-Core/.github/workflows/generic.platform_uploads.yml@main
+    secrets: inherit
+    with:
+      plugin_name: multiverse-portals
+
+      modrinth_project_id: 8VMk6P0I
+      modrinth_dependencies: >
+        [
+          {"project_id": "3wmN97b8", "dependency_type": "required"}
+        ]
+
+      dbo_project_id: 30781
+      dbo_project_relations: >
+        [
+          {"slug": "multiverse-core", "type": "requiredDependency"},
+          {"slug": "worldedit", "type": "optionalDependency"}
+        ]
+
+      hangar_slug: Multiverse-Portals
+      hangar_plugin_dependencies: >
+        { "PAPER": [
+          {
+            "name": "Multiverse-Core",
+            "required": true,
+            "namespace": {
+              "owner": "Multiverse",
+              "slug": "Multiverse-Core"
+            }
+          }
+        ]}
+
+      target_tag: ${{ inputs.target_tag }}
+      upload_modrinth: ${{ inputs.upload_modrinth }}
+      upload_dbo: ${{ inputs.upload_dbo }}
+      upload_hangar: ${{ inputs.upload_hangar }}
