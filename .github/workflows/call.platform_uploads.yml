@@ -53,10 +53,7 @@ jobs:
           {
             "name": "Multiverse-Core",
             "required": true,
-            "namespace": {
-              "owner": "Multiverse",
-              "slug": "Multiverse-Core"
-            }
+            "platforms": ["PAPER"]
           }
         ]}
 
