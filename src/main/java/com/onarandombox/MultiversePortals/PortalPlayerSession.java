@@ -335,4 +335,8 @@ public class PortalPlayerSession {
 
         return (cooldownMs / 1000) + "s";
     }
+
+    public Player getPlayer() {
+        return player;
+    }
 }
