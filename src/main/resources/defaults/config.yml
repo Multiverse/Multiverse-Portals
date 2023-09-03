@@ -7,6 +7,7 @@
 
 wand: 271
 useonmove: true
+bucketfilling: true
 portalsdefaulttonether: false
 enforceportalaccess: true
 portalcooldown: 1000

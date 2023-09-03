@@ -57,8 +57,8 @@ public class MVPPlayerMoveListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        // If something is trying to flow out, stop that too.
-        if (plugin.getPortalManager().isPortal(event.getBlock().getLocation())) {
+        // If something is trying to flow out, stop that too, unless bucketFilling has been disabled
+        if (plugin.getPortalManager().isPortal(event.getBlock().getLocation()) && MultiversePortals.bucketFilling) {
             event.setCancelled(true);
         }
     }
