@@ -89,6 +89,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private long portalCooldown = 0;
     private final static int requiresProtocol = 24;
     public static boolean UseOnMove = true;
+    public static boolean bucketFilling = true;
     public static boolean EnforcePortalAccess = true;
     public static boolean WandEnabled = true;
     public static boolean ClearOnRemove = false;
@@ -275,12 +276,14 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.MVPConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 
         MultiversePortals.UseOnMove = this.MVPConfig.getBoolean("useonmove", true);
+        MultiversePortals.bucketFilling = this.MVPConfig.getBoolean("bucketfilling", true);
         MultiversePortals.EnforcePortalAccess = this.MVPConfig.getBoolean("enforceportalaccess", true);
         this.portalCooldown = this.MVPConfig.getInt("portalcooldown", 1000);
         MultiversePortals.ClearOnRemove = this.MVPConfig.getBoolean("clearonremove", false);
         MultiversePortals.TeleportVehicles = this.MVPConfig.getBoolean("teleportvehicles", true);
         MultiversePortals.NetherAnimation = this.MVPConfig.getBoolean("netheranimation", true);
         MultiversePortals.FrameMaterials = migrateFrameMaterials(this.MVPConfig);
+
         // Migrate useportalaccess -> enforceportalaccess
         if (this.MVPConfig.get("useportalaccess") != null) {
             this.MVPConfig.set("enforceportalaccess", this.MVPConfig.getBoolean("useportalaccess", true));
@@ -519,6 +522,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
                 + "[Multiverse-Portals] Dumping Portal Values: (version " + this.getMainConfig().getDouble("version", -1) + ')' + '\n' 
                 + "[Multiverse-Portals]   wand: " + this.getMainConfig().get("wand", "NOT SET") + '\n'
                 + "[Multiverse-Portals]   useonmove: " + this.getMainConfig().get("useonmove", "NOT SET") + '\n'
+                + "[Multiverse-Portals]   bucketfilling: " + this.getMainConfig().get("bucketfilling", "NOT SET") + '\n'
                 + "[Multiverse-Portals]   portalsdefaulttonether: " + this.getMainConfig().get("portalsdefaulttonether", "NOT SET") + '\n'
                 + "[Multiverse-Portals]   enforceportalaccess: " + this.getMainConfig().get("enforceportalaccess", "NOT SET") + '\n'
                 + "[Multiverse-Portals]   portalcooldown: " + this.getMainConfig().get("portalcooldown", "NOT SET") + '\n'
