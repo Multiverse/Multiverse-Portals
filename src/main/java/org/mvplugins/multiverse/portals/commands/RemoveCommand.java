@@ -30,7 +30,7 @@ public class RemoveCommand extends PortalsCommand {
     @CommandAlias("mvpremove|mvpr")
     @Subcommand("remove")
     @CommandPermission("multiverse.portal.remove")
-    @CommandCompletion("@empty") // todo: @mvportals CommandCompletion
+    @CommandCompletion("@mvportals")
     @Syntax("<portal-name>")
     @Description("Removes a existing portal.")
     void onRemoveCommand(

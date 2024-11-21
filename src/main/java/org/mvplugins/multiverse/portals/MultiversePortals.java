@@ -35,6 +35,8 @@ import org.mvplugins.multiverse.external.jakarta.inject.Provider;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.commands.PortalsCommand;
+import org.mvplugins.multiverse.portals.commandtools.PortalsCommandCompletions;
+import org.mvplugins.multiverse.portals.commandtools.PortalsCommandContexts;
 import org.mvplugins.multiverse.portals.destination.PortalDestination;
 import org.mvplugins.multiverse.portals.destination.RandomPortalDestination;
 import org.mvplugins.multiverse.portals.listeners.*;
@@ -70,6 +72,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private Provider<DestinationsProvider> destinationsProvider;
     @Inject
     private Provider<MVCommandManager> commandManager;
+    @Inject
+    private Provider<PortalsCommandCompletions> portalsCommandCompletions;
+    @Inject
+    private  Provider<PortalsCommandContexts> portalsCommandContexts;
     @Inject
     private Provider<MVCoreConfig> mvCoreConfig;
 
@@ -320,7 +326,6 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     private List<Material> migrateFrameMaterials(ConfigurationSection config) {
-        //todo (MV5 migrate): re-add MaterialConverter
         return config.getList("framematerials", Collections.emptyList()).stream()
                 .map(Object::toString)
                 .map(MaterialConverter::stringToMaterial)
@@ -355,6 +360,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
     private void registerCommands() {
         Try.of(() -> commandManager.get())
+                .andThenTry(commandManager -> portalsCommandCompletions.get().registerCompletions(commandManager.getCommandCompletions()))
+                .andThenTry(commandManager -> portalsCommandContexts.get().registerContexts(commandManager.getCommandContexts()))
                 .andThenTry(commandManager -> serviceLocator.getAllServices(PortalsCommand.class)
                         .forEach(commandManager::registerCommand))
                 .onFailure(e -> {
