@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.MultiverseCore;
 import org.mvplugins.multiverse.core.api.MVPlugin;
+import org.mvplugins.multiverse.core.commandtools.MVCommandManager;
 import org.mvplugins.multiverse.core.config.MVCoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
@@ -33,6 +34,7 @@ import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jakarta.inject.Provider;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.external.vavr.control.Try;
+import org.mvplugins.multiverse.portals.commands.PortalsCommand;
 import org.mvplugins.multiverse.portals.destination.PortalDestination;
 import org.mvplugins.multiverse.portals.destination.RandomPortalDestination;
 import org.mvplugins.multiverse.portals.listeners.*;
@@ -66,6 +68,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     private Provider<PortalManager> portalManager;
     @Inject
     private Provider<DestinationsProvider> destinationsProvider;
+    @Inject
+    private Provider<MVCommandManager> commandManager;
+    @Inject
+    private Provider<MVCoreConfig> mvCoreConfig;
 
     private FileConfiguration MVPPortalConfig;
     private FileConfiguration MVPConfig;
@@ -115,7 +121,7 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         initializeDependencyInjection();
 
-        Logging.setDebugLevel(serviceLocator.getActiveService(MVCoreConfig.class).getGlobalDebug());
+        Logging.setDebugLevel(mvCoreConfig.get().getGlobalDebug());
 
         // Register ourselves with Core
         this.core.incrementPluginCount();
@@ -124,10 +130,10 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         this.registerCommands();
 
         // Ensure permissions are created
-        this.createDefaultPerms();
+        // todo: Should we still have this? Luckperms does the wildcards for us now
+        // this.createDefaultPerms();
 
-        this.portalSessions = new HashMap<String, PortalPlayerSession>();
-
+        this.portalSessions = new HashMap<>();
 
         this.destinationsProvider.get().registerDestination(this.serviceLocator.getService(PortalDestination.class));
         this.destinationsProvider.get().registerDestination(this.serviceLocator.getService(RandomPortalDestination.class));
@@ -348,7 +354,13 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
     /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
     private void registerCommands() {
-        //todo (MV5 migrate): commands
+        Try.of(() -> commandManager.get())
+                .andThenTry(commandManager -> serviceLocator.getAllServices(PortalsCommand.class)
+                        .forEach(commandManager::registerCommand))
+                .onFailure(e -> {
+                    Logging.severe("Failed to register commands");
+                    e.printStackTrace();
+                });
     }
 
     /**
@@ -369,9 +381,12 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return authors.substring(2);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PluginServiceLocator getServiceLocator() {
-        return null;
+        return serviceLocator;
     }
 
     /**

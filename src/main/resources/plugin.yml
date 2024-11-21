@@ -1,44 +1,7 @@
 name: Multiverse-Portals
-main: com.onarandombox.MultiversePortals.MultiversePortals
-authors: ['Rigby', 'fernferret']
+main: org.mvplugins.multiverse.portals.MultiversePortals
+authors: ['Rigby', 'fernferret', 'benwoo1110']
 version: ${version}
 api-version: 1.13
 depend: ['Multiverse-Core']
 softdepend: ['WorldEdit']
-commands:
-  mvp:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpc:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpcreate:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpl:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvplist:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpm:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpmodify:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpms:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvps:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpselect:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpr:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>
-  mvpremove:
-    description: Generic Multiverse-Portals Command
-    usage: /<command>

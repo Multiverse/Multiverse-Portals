@@ -284,11 +284,16 @@ public class MVPortal {
     }
 
     public boolean setDestination(String destinationString) {
-        this.destination = this.destinationsProvider.parseDestination(destinationString).getOrNull();
-        if (this.destination == null) {
+        DestinationInstance<?, ?> newDestination = this.destinationsProvider.parseDestination(destinationString).getOrNull();
+        return setDestination(newDestination);
+    }
+
+    public boolean setDestination(DestinationInstance<?, ?> newDestination) {
+        if (newDestination == null) {
             Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
+        this.destination = newDestination;
         this.config.set(this.portalConfigString + ".destination", this.destination.toString());
         saveConfig();
         return true;

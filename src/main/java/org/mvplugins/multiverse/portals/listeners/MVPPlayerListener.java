@@ -32,7 +32,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -43,7 +42,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 @Service
-public class MVPPlayerListener implements Listener {
+public class MVPPlayerListener implements PortalsListener {
 
     private final MultiversePortals plugin;
     private final PortalFiller filler;
@@ -213,7 +212,7 @@ public class MVPPlayerListener implements Listener {
         // Also return if this isn't the player's main hand
         WorldEditConnection worldEdit = plugin.getWorldEditConnection();
         if ((worldEdit != null && worldEdit.isConnected())
-                || event.getPlayer().getItemInHand().getType() != itemType
+                || event.getPlayer().getInventory().getItemInMainHand().getType() != itemType
                 || !event.getPlayer().hasPermission("multiverse.portal.create")
                 || event.getHand() != EquipmentSlot.HAND) {
             return;
