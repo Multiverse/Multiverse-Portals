@@ -44,7 +44,7 @@ public class PortalsCommandContexts {
         }
 
         String portalName = context.getFirstArg();
-        MVPortal portal = this.portalManager.getPortal(portalName);
+        MVPortal portal = this.portalManager.getPortal(portalName, context.getSender());
 
         if (resolve.equals("issuerAware")) {
             if (portal != null) {
@@ -57,7 +57,7 @@ public class PortalsCommandContexts {
             if (context.isOptional()) {
                 return null;
             }
-            throw new InvalidCommandArgument("Either this command can only be used by a player that has selected a portal with `/mvp select` or the portal '" + portalName + "' does not exist.");
+            throw new InvalidCommandArgument("The portal '" + portalName + "' doesn't exist or you're not allowed to use it!");
         }
 
         if (portal != null) {
@@ -67,6 +67,6 @@ public class PortalsCommandContexts {
         if (context.isOptional()) {
             return null;
         }
-        throw new InvalidCommandArgument("Portal '" + portalName + "' does not exist.");
+        throw new InvalidCommandArgument("The portal '" + portalName + "' doesn't exist or you're not allowed to use it!");
     }
 }
