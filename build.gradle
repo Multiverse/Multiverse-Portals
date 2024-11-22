@@ -126,8 +126,8 @@ javadoc {
 project.configurations.api.canBeResolved = true
 
 shadowJar {
-    relocate 'com.dumptruckman.minecraft.util.Logging', 'com.onarandombox.multiverseportals.util.MVPLogging'
-    relocate 'com.dumptruckman.minecraft.util.DebugLog', 'com.onarandombox.multiverseportals.util.DebugFileLogger'
+    relocate 'com.dumptruckman.minecraft.util.Logging', 'org.mvplugins.multiverse.portals.util.MVPLogging'
+    relocate 'com.dumptruckman.minecraft.util.DebugLog', 'org.mvplugins.multiverse.portals.util.DebugFileLogger'
 
     configurations = [project.configurations.api]
 
