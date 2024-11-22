@@ -41,6 +41,7 @@ dependencies {
     }
 
     // Core
+    // TODO update to correct version once we have it published
     implementation 'org.mvplugins.multiverse.core:multiverse-core:local'
 
     //WorldEdit
