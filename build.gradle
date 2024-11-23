@@ -32,6 +32,12 @@ repositories {
         name = 'enginehub'
         url = uri('https://maven.enginehub.org/repo/')
     }
+
+    maven {
+        // todo: remove before mv5 release
+        name = 'benwoo1110'
+        url = uri('https://repo.c0ding.party/multiverse-beta')
+    }
 }
 
 dependencies {
@@ -41,8 +47,7 @@ dependencies {
     }
 
     // Core
-    // TODO update to correct version once we have it published
-    implementation 'org.mvplugins.multiverse.core:multiverse-core:local'
+    implementation 'org.mvplugins.multiverse.core:multiverse-core:5.0.0-SNAPSHOT'
 
     //WorldEdit
     implementation('com.sk89q.worldedit:worldedit-bukkit:7.2.9') {
