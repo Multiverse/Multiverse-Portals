@@ -13,8 +13,8 @@ import com.dumptruckman.minecraft.util.Logging;
 import org.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.event.MVConfigReloadEvent;
 import org.mvplugins.multiverse.core.event.MVDebugModeEvent;
+import org.mvplugins.multiverse.core.event.MVDumpsDebugInfoEvent;
 import org.mvplugins.multiverse.core.event.MVPlayerTouchedPortalEvent;
-import org.mvplugins.multiverse.core.event.MVVersionEvent;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
@@ -40,13 +40,14 @@ public class MVPCoreListener implements PortalsListener {
      * @param event The Version event.
      */
     @EventHandler
-    public void versionRequest(MVVersionEvent event) {
-        event.appendVersionInfo(this.plugin.getVersionInfo());
+    public void dumpsDebugInfoRequest(MVDumpsDebugInfoEvent event) {
+        event.appendDebugInfo(this.plugin.getVersionInfo());
         File configFile = new File(this.plugin.getDataFolder(), "config.yml");
         File portalsFile = new File(this.plugin.getDataFolder(), "portals.yml");
-        event.putDetailedVersionInfo("multiverse-portals/config.yml", configFile);
-        event.putDetailedVersionInfo("multiverse-portals/portals.yml", portalsFile);
+        event.putDetailedDebugInfo("multiverse-portals/config.yml", configFile);
+        event.putDetailedDebugInfo("multiverse-portals/portals.yml", portalsFile);
     }
+
     /**
      * This method is called when Multiverse-Core wants to reload the configs.
      * @param event The Config Reload event.
