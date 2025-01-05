@@ -279,10 +279,17 @@ public class MVPPlayerListener implements PortalsListener {
                     return;
                 }
 
-                event.setTo(destLocation);
                 if (portalDest.checkTeleportSafety()) {
-                    event.setTo(blockSafety.getSafeLocation(portalDest.getLocation(event.getPlayer()).getOrNull()));
+                    Location safeLocation = blockSafety.getSafeLocation(portalDest.getLocation(event.getPlayer()).getOrNull());
+                    if (safeLocation == null) {
+                        event.setCancelled(true);
+                        Logging.warning("Portal " + portal.getName() + " destination is not safe!");
+                        event.getPlayer().sendMessage(ChatColor.RED + "Portal " + portal.getName() + " destination is not safe!");
+                        return;
+                    }
+                    destLocation = safeLocation;
                 }
+                event.setTo(destLocation);
 
                 PortalPlayerSession ps = this.plugin.getPortalSession(event.getPlayer());
 
