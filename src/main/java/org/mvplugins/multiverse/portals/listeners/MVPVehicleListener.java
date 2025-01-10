@@ -146,7 +146,7 @@ public class MVPVehicleListener implements Listener {
                 return teleportVehicleSeperately(p, v, d, ps);
             }
 
-            this.safetyTeleporter.teleportSafely(p, v, d)
+            this.safetyTeleporter.to(d).by(p).teleport(v)
                     .onSuccess(() -> {
                         ps.playerDidTeleport(to);
                         ps.setTeleportTime(new Date());
@@ -168,7 +168,7 @@ public class MVPVehicleListener implements Listener {
         // Add an offset to ensure the player is 1 higher than where the cart was.
         playerToLocation.add(0, 0.5, 0);
 
-        safetyTeleporter.teleportSafely(player, player, destination)
+        safetyTeleporter.to(destination).teleport(player)
                 .onSuccess(() -> {
                     // Now create a new vehicle:
                     Vehicle newVehicle = vehicleToLocation.getWorld().spawn(vehicleToLocation, vehicle.getClass());

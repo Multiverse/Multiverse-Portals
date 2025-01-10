@@ -35,7 +35,7 @@ public class PlayerListenerHelper {
     }
 
     void performTeleport(Player player, Location to, PortalPlayerSession ps, DestinationInstance<?, ?> destination) {
-        safetyTeleporter.teleportSafely(player, destination)
+        safetyTeleporter.to(destination).teleport(player)
                 .onSuccess(() -> {
                     ps.playerDidTeleport(to);
                     ps.setTeleportTime(new Date());
