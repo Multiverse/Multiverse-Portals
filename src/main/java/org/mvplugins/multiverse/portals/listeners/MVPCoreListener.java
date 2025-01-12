@@ -10,7 +10,7 @@ package org.mvplugins.multiverse.portals.listeners;
 import java.io.File;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.jetbrains.annotations.NotNull;
+import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.event.MVConfigReloadEvent;
 import org.mvplugins.multiverse.core.event.MVDebugModeEvent;
 import org.mvplugins.multiverse.core.event.MVDumpsDebugInfoEvent;
