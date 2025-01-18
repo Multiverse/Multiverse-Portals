@@ -9,7 +9,7 @@ package org.mvplugins.multiverse.portals.utils;
 
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.api.world.LoadedMultiverseWorld;
 
 /**
  * This is a placeholder of good things to come...

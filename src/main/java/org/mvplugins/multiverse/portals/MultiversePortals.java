@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.MultiverseCore;
-import org.mvplugins.multiverse.core.api.MVPlugin;
+import org.mvplugins.multiverse.core.api.config.MVCoreConfig;
+import org.mvplugins.multiverse.core.api.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.commandtools.MVCommandManager;
-import org.mvplugins.multiverse.core.config.MVCoreConfig;
-import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
+import org.mvplugins.multiverse.core.submodules.MVPlugin;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jakarta.inject.Provider;

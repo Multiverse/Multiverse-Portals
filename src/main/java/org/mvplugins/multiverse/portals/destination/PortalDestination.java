@@ -1,7 +1,8 @@
 package org.mvplugins.multiverse.portals.destination;
 
-import org.mvplugins.multiverse.core.api.LocationManipulation;
-import org.mvplugins.multiverse.core.destination.Destination;
+import org.mvplugins.multiverse.core.api.destination.Destination;
+import org.mvplugins.multiverse.core.api.destination.DestinationSuggestionPacket;
+import org.mvplugins.multiverse.core.api.teleportation.LocationManipulation;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandIssuer;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class PortalDestination implements Destination<PortalDestination, PortalDestinationInstance> {
@@ -49,7 +51,9 @@ public class PortalDestination implements Destination<PortalDestination, PortalD
     }
 
     @Override
-    public @NotNull Collection<String> suggestDestinations(@NotNull BukkitCommandIssuer bukkitCommandIssuer, @Nullable String s) {
-        return portalManager.getAllPortals().stream().map(MVPortal::getName).toList();
+    public @NotNull Collection<DestinationSuggestionPacket> suggestDestinations(@NotNull BukkitCommandIssuer bukkitCommandIssuer, @Nullable String s) {
+        return portalManager.getAllPortals().stream()
+                .map(p -> new DestinationSuggestionPacket(p.getName(), p.getName()))
+                .toList();
     }
 }

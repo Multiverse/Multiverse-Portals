@@ -16,7 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 
-import org.mvplugins.multiverse.core.api.LocationManipulation;
+import org.mvplugins.multiverse.core.api.teleportation.LocationManipulation;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;

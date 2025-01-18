@@ -2,9 +2,9 @@ package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.mvplugins.multiverse.core.api.destination.DestinationInstance;
+import org.mvplugins.multiverse.core.api.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.commandtools.MVCommandManager;
-import org.mvplugins.multiverse.core.destination.DestinationInstance;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;

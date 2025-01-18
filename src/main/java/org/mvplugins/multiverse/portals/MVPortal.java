@@ -16,13 +16,13 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.mvplugins.multiverse.core.api.BlockSafety;
-import org.mvplugins.multiverse.core.destination.DestinationInstance;
-import org.mvplugins.multiverse.core.destination.DestinationsProvider;
+import org.mvplugins.multiverse.core.api.destination.DestinationInstance;
+import org.mvplugins.multiverse.core.api.destination.DestinationsProvider;
+import org.mvplugins.multiverse.core.api.teleportation.BlockSafety;
+import org.mvplugins.multiverse.core.api.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.api.world.MultiverseWorld;
+import org.mvplugins.multiverse.core.api.world.WorldManager;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
-import org.mvplugins.multiverse.core.world.MultiverseWorld;
-import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.enums.PortalType;
 import org.bukkit.Location;
@@ -334,7 +334,7 @@ public class MVPortal {
         // If this class exists, then this Multiverse-Core MUST exist!
         // TODO there really ought to be a better way!
         for (int i = y; i < yMax; i++) {
-            if (blockSafety.playerCanSpawnHereSafely(w, finalX, i, finalZ)) {
+            if (blockSafety.canSpawnAtLocationSafely(new Location(w, finalX, i, finalZ))) {
                 return i;
             }
         }
