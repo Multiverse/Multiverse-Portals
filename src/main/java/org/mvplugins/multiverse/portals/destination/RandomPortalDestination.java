@@ -1,7 +1,8 @@
 package org.mvplugins.multiverse.portals.destination;
 
-import org.mvplugins.multiverse.core.api.destination.Destination;
-import org.mvplugins.multiverse.core.api.destination.DestinationSuggestionPacket;
+import org.bukkit.command.CommandSender;
+import org.mvplugins.multiverse.core.destination.Destination;
+import org.mvplugins.multiverse.core.destination.DestinationSuggestionPacket;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandIssuer;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public class RandomPortalDestination implements Destination<RandomPortalDestinat
     }
 
     @Override
-    public @NotNull Collection<DestinationSuggestionPacket> suggestDestinations(@NotNull BukkitCommandIssuer bukkitCommandIssuer, @Nullable String s) {
+    public @NotNull Collection<DestinationSuggestionPacket> suggestDestinations(@NotNull CommandSender sender, @Nullable String s) {
         // todo: suggest all the portal names comma seperated
         return List.of();
     }

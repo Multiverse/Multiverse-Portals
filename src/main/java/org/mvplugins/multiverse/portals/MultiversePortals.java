@@ -24,12 +24,16 @@ import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.MultiverseCore;
-import org.mvplugins.multiverse.core.api.config.MVCoreConfig;
-import org.mvplugins.multiverse.core.api.destination.DestinationsProvider;
+import org.mvplugins.multiverse.core.MultiverseCoreApi;
+import org.mvplugins.multiverse.core.MultiversePlugin;
+import org.mvplugins.multiverse.core.config.MVCoreConfig;
+import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.commandtools.MVCommandManager;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
-import org.mvplugins.multiverse.core.submodules.MVPlugin;
+import org.mvplugins.multiverse.core.inject.PluginServiceLocatorFactory;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
+import org.mvplugins.multiverse.core.utils.StringFormatter;
+import org.mvplugins.multiverse.external.glassfish.hk2.api.ServiceLocatorFactory;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jakarta.inject.Provider;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
@@ -61,9 +65,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
-public class MultiversePortals extends JavaPlugin implements MVPlugin {
+public class MultiversePortals extends MultiversePlugin {
 
-    private MultiverseCore core;
+    private MultiverseCoreApi core;
     private PluginServiceLocator serviceLocator;
 
     @Inject
@@ -102,35 +106,18 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     public static List<Material> FrameMaterials = null;
 
     public void onLoad() {
+        super.onLoad();
         getDataFolder().mkdirs();
     }
 
     public void onEnable() {
+        super.onEnable();
         Logging.init(this);
-        this.core = (MultiverseCore) getServer().getPluginManager().getPlugin("Multiverse-Core");
-
-        // Test if the Core was found, if not we'll disable this plugin.
-        if (this.core == null) {
-            Logging.info("Multiverse-Core not found, will keep looking.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        if (this.core.getProtocolVersion() < requiresProtocol) {
-            Logging.severe("Your Multiverse-Core is OUT OF DATE");
-            Logging.severe("This version of Multiverse Portals requires Protocol Level: " + requiresProtocol);
-            Logging.severe("Your of Core Protocol Level is: " + this.core.getProtocolVersion());
-            Logging.severe("Grab an updated copy at: ");
-            Logging.severe("http://ci.onarandombox.com/view/Multiverse/job/Multiverse-Core/");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        this.core = MultiverseCoreApi.get();
 
         initializeDependencyInjection();
 
         Logging.setDebugLevel(mvCoreConfig.get().getGlobalDebug());
-
-        // Register ourselves with Core
-        this.core.incrementPluginCount();
 
         // Register our commands
         this.registerCommands();
@@ -152,11 +139,11 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
 
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
 
-        Logging.log(true, Level.INFO, " Enabled - By %s", getAuthors());
+        Logging.log(true, Level.INFO, " Enabled - By %s", StringFormatter.joinAnd(getDescription().getAuthors()));
     }
 
     private void initializeDependencyInjection() {
-        serviceLocator = core.getServiceLocatorFactory()
+        serviceLocator = PluginServiceLocatorFactory.get()
                 .registerPlugin(new MultiversePortalsPluginBinder(this), core.getServiceLocator())
                 .flatMap(PluginServiceLocator::enable)
                 .getOrElseThrow(exception -> {
@@ -371,29 +358,16 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
     }
 
     /**
-     * Parse the Authors Array into a readable String with ',' and 'and'.
-     *
-     * @return String containing all the authors formatted correctly with ',' and 'and'.
-     */
-    @Override
-    public String getAuthors() {
-        String authors = "";
-        for (int i = 0; i < this.getDescription().getAuthors().size(); i++) {
-            if (i == this.getDescription().getAuthors().size() - 1) {
-                authors += " and " + this.getDescription().getAuthors().get(i);
-            } else {
-                authors += ", " + this.getDescription().getAuthors().get(i);
-            }
-        }
-        return authors.substring(2);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public PluginServiceLocator getServiceLocator() {
         return serviceLocator;
+    }
+
+    @Override
+    public int getTargetCoreProtocolVersion() {
+        return requiresProtocol;
     }
 
     /**
@@ -405,21 +379,8 @@ public class MultiversePortals extends JavaPlugin implements MVPlugin {
         return worldEditConnection;
     }
 
-    public MultiverseCore getCore() {
-        return this.core;
-    }
-
     public FileConfiguration getPortalsConfig() {
         return this.MVPPortalConfig;
-    }
-
-    public void setCore(MultiverseCore multiverseCore) {
-        this.core = multiverseCore;
-    }
-
-    @Override
-    public int getProtocolVersion() {
-        return 1;
     }
 
     public FileConfiguration getMainConfig() {

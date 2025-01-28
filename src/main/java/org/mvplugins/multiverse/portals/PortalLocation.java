@@ -14,7 +14,7 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.util.Vector;
 
-import org.mvplugins.multiverse.core.api.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 public class PortalLocation {

@@ -11,8 +11,8 @@ import java.util.Date;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.economy.MVEconomist;
-import org.mvplugins.multiverse.core.api.world.LoadedMultiverseWorld;
-import org.mvplugins.multiverse.core.api.world.WorldManager;
+import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.portals.enums.MoveType;
 import org.mvplugins.multiverse.portals.utils.DisplayUtils;
 import org.bukkit.ChatColor;
