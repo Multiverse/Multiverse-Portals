@@ -6,6 +6,6 @@ on:
 
 jobs:
   test:
-    uses: Multiverse/Multiverse-Core/.github/workflows/generic.test.yml@main
+    uses: Multiverse/Multiverse-Core/.github/workflows/generic.test.yml@MV5 # todo: Change back to main before release
     with:
       plugin_name: multiverse-portals
