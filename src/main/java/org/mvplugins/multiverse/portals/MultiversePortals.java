@@ -23,17 +23,15 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.mvplugins.multiverse.core.MultiverseCore;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.MultiversePlugin;
-import org.mvplugins.multiverse.core.config.MVCoreConfig;
+import org.mvplugins.multiverse.core.config.CoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.commandtools.MVCommandManager;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocatorFactory;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
 import org.mvplugins.multiverse.core.utils.StringFormatter;
-import org.mvplugins.multiverse.external.glassfish.hk2.api.ServiceLocatorFactory;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jakarta.inject.Provider;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
@@ -81,7 +79,7 @@ public class MultiversePortals extends MultiversePlugin {
     @Inject
     private  Provider<PortalsCommandContexts> portalsCommandContexts;
     @Inject
-    private Provider<MVCoreConfig> mvCoreConfig;
+    private Provider<CoreConfig> coreConfig;
 
     private FileConfiguration MVPPortalConfig;
     private FileConfiguration MVPConfig;
@@ -117,7 +115,7 @@ public class MultiversePortals extends MultiversePlugin {
 
         initializeDependencyInjection();
 
-        Logging.setDebugLevel(mvCoreConfig.get().getGlobalDebug());
+        Logging.setDebugLevel(coreConfig.get().getGlobalDebug());
 
         // Register our commands
         this.registerCommands();
