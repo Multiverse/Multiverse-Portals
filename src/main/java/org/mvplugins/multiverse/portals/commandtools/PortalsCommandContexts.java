@@ -1,6 +1,6 @@
-package org.mvplugins.multiverse.portals.commandtools;
+package org.mvplugins.multiverse.portals.command;
 
-import org.mvplugins.multiverse.core.commandtools.MVCommandContexts;
+import org.mvplugins.multiverse.core.command.MVCommandContexts;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandExecutionContext;
 import org.mvplugins.multiverse.external.acf.commands.InvalidCommandArgument;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;

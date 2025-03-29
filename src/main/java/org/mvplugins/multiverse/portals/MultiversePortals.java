@@ -27,7 +27,7 @@ import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.MultiversePlugin;
 import org.mvplugins.multiverse.core.config.CoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
-import org.mvplugins.multiverse.core.commandtools.MVCommandManager;
+import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocatorFactory;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
@@ -37,8 +37,8 @@ import org.mvplugins.multiverse.external.jakarta.inject.Provider;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.commands.PortalsCommand;
-import org.mvplugins.multiverse.portals.commandtools.PortalsCommandCompletions;
-import org.mvplugins.multiverse.portals.commandtools.PortalsCommandContexts;
+import org.mvplugins.multiverse.portals.command.PortalsCommandCompletions;
+import org.mvplugins.multiverse.portals.command.PortalsCommandContexts;
 import org.mvplugins.multiverse.portals.destination.PortalDestination;
 import org.mvplugins.multiverse.portals.destination.RandomPortalDestination;
 import org.mvplugins.multiverse.portals.listeners.*;
@@ -58,12 +58,13 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
 public class MultiversePortals extends MultiversePlugin {
+
+    private static final double TARGET_CORE_API_VERSION = 5.0;
 
     private MultiverseCoreApi core;
     private PluginServiceLocator serviceLocator;
@@ -90,7 +91,6 @@ public class MultiversePortals extends MultiversePlugin {
 
     private static final Material DEFAULT_WAND = Material.WOODEN_AXE;
     private long portalCooldown = 0;
-    private final static int requiresProtocol = 50;
     public static boolean UseOnMove = true;
     public static boolean bucketFilling = true;
     public static boolean EnforcePortalAccess = true;
@@ -364,8 +364,8 @@ public class MultiversePortals extends MultiversePlugin {
     }
 
     @Override
-    public int getTargetCoreProtocolVersion() {
-        return requiresProtocol;
+    public double getTargetCoreVersion() {
+        return TARGET_CORE_API_VERSION;
     }
 
     /**

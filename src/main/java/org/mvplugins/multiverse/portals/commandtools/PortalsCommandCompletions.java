@@ -1,6 +1,6 @@
-package org.mvplugins.multiverse.portals.commandtools;
+package org.mvplugins.multiverse.portals.command;
 
-import org.mvplugins.multiverse.core.commandtools.MVCommandCompletions;
+import org.mvplugins.multiverse.core.command.MVCommandCompletions;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandCompletionContext;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;

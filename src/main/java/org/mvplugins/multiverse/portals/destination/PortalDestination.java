@@ -52,7 +52,7 @@ public class PortalDestination implements Destination<PortalDestination, PortalD
     @Override
     public @NotNull Collection<DestinationSuggestionPacket> suggestDestinations(@NotNull CommandSender sender, @Nullable String s) {
         return portalManager.getAllPortals().stream()
-                .map(p -> new DestinationSuggestionPacket(p.getName(), p.getName()))
+                .map(p -> new DestinationSuggestionPacket(this, p.getName(), p.getName()))
                 .toList();
     }
 }
