@@ -2,6 +2,8 @@ package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.C;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
@@ -23,7 +25,6 @@ import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
-@CommandAlias("mvp")
 class CreateCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -35,7 +36,6 @@ class CreateCommand extends PortalsCommand {
         this.portalManager = portalManager;
     }
 
-    @CommandAlias("mvpcreate|mvpc")
     @Subcommand("create")
     @CommandPermission("multiverse.portal.create")
     @CommandCompletion("@empty @mvworlds|@destinations")
@@ -85,5 +85,19 @@ class CreateCommand extends PortalsCommand {
 
         // todo: Automatically get exact destination from player location
         // todo: Automatically get portal destination from player location
+    }
+
+    @Service
+    private final static class LegacyAlias extends CreateCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin, PortalManager portalManager) {
+            super(plugin, portalManager);
+        }
+
+        @Override
+        @CommandAlias("mvpcreate|mvpc")
+        void onCreateCommand(Player player, LoadedMultiverseWorld world, String portalName, DestinationInstance<?, ?> destination) {
+            super.onCreateCommand(player, world, portalName, destination);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
@@ -18,7 +19,6 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.enums.PortalConfigProperty;
 
 @Service
-@CommandAlias("mvp")
 class ConfigCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -28,7 +28,6 @@ class ConfigCommand extends PortalsCommand {
         this.plugin = plugin;
     }
 
-    @CommandAlias("mvpconfig|mvpconf")
     @Subcommand("config|conf")
     @CommandPermission("multiverse.portal.config")
     @CommandCompletion("@portalconfigproperty @empty")
@@ -92,6 +91,20 @@ class ConfigCommand extends PortalsCommand {
             this.plugin.reloadConfigs(false);
         } else {
             issuer.sendMessage(ChatColor.RED + "FAIL!" + ChatColor.WHITE + " Check your console for details!");
+        }
+    }
+
+    @Service
+    private final static class LegacyAlias extends ConfigCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin) {
+            super(plugin);
+        }
+
+        @Override
+        @CommandAlias("mvpconfig|mvpconf")
+        void onConfigCommand(MVCommandIssuer issuer, PortalConfigProperty property, String value) {
+            super.onConfigCommand(issuer, property, value);
         }
     }
 }

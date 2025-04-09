@@ -3,7 +3,7 @@ package org.mvplugins.multiverse.portals.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -20,7 +20,6 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.WorldEditConnection;
 
 @Service
-@CommandAlias("mvp")
 class WandCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -30,7 +29,6 @@ class WandCommand extends PortalsCommand {
         this.plugin = plugin;
     }
 
-    @CommandAlias("mvpwand|mvpw")
     @Subcommand("wand")
     @CommandPermission("multiverse.portal.givewand")
     @CommandCompletion("enable|disable|toggle")
@@ -77,6 +75,20 @@ class WandCommand extends PortalsCommand {
                 player.sendMessage("Your Inventory is full. A " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")" + ChatColor.WHITE + " has been placed dropped nearby.");
                 player.getWorld().dropItemNaturally(player.getLocation(), wand);
             }
+        }
+    }
+
+    @Service
+    private final static class LegacyAlias extends WandCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin) {
+            super(plugin);
+        }
+
+        @Override
+        @CommandAlias("mvpwand|mvpw")
+        void onWandCommand(Player player, String action) {
+            super.onWandCommand(player, action);
         }
     }
 }

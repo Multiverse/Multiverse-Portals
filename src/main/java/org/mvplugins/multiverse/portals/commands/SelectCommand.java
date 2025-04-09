@@ -2,6 +2,7 @@ package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
@@ -18,7 +19,6 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 
 @Service
-@CommandAlias("mvp")
 class SelectCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -28,7 +28,6 @@ class SelectCommand extends PortalsCommand {
         this.plugin = plugin;
     }
 
-    @CommandAlias("mvpselect|mvps")
     @Subcommand("select")
     @CommandPermission("multiverse.portal.select,multiverse.portal.create")
     @CommandCompletion("@mvportals")
@@ -56,5 +55,19 @@ class SelectCommand extends PortalsCommand {
 
         this.plugin.getPortalSession(player).selectPortal(portal);
         player.sendMessage("Portal: " + ChatColor.DARK_AQUA + portal.getName() + ChatColor.WHITE + " has been selected.");
+    }
+
+    @Service
+    private final static class LegacyAlias extends SelectCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin) {
+            super(plugin);
+        }
+
+        @Override
+        @CommandAlias("mvpselect|mvps")
+        void onSelectCommand(Player player, MVPortal portal) {
+            super.onSelectCommand(player, portal);
+        }
     }
 }

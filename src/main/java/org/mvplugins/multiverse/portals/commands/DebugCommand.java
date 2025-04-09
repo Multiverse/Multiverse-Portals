@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.entity.Player;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
@@ -18,7 +19,6 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
 
 @Service
-@CommandAlias("mvp")
 class DebugCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -28,7 +28,6 @@ class DebugCommand extends PortalsCommand {
         this.plugin = plugin;
     }
 
-    @CommandAlias("mvpdebug|mvpd")
     @Subcommand("debug")
     @CommandPermission("multiverse.portal.debug")
     @CommandCompletion("on|off")
@@ -49,5 +48,19 @@ class DebugCommand extends PortalsCommand {
             return;
         }
         ps.setDebugMode(!ps.isDebugModeOn());
+    }
+
+    @Service
+    private final static class LegacyAlias extends DebugCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin) {
+            super(plugin);
+        }
+
+        @Override
+        @CommandAlias("mvpdebug|mvpd")
+        void onDebugCommand(Player player, String toggle) {
+            super.onDebugCommand(player, toggle);
+        }
     }
 }

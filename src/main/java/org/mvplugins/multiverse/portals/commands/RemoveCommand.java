@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
@@ -16,7 +17,6 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
-@CommandAlias("mvp")
 class RemoveCommand extends PortalsCommand {
 
     private final PortalManager portalManager;
@@ -26,7 +26,6 @@ class RemoveCommand extends PortalsCommand {
         this.portalManager = portalManager;
     }
 
-    @CommandAlias("mvpremove|mvpr")
     @Subcommand("remove")
     @CommandPermission("multiverse.portal.remove")
     @CommandCompletion("@mvportals")
@@ -46,5 +45,19 @@ class RemoveCommand extends PortalsCommand {
 
         MVPortal portal = this.portalManager.removePortal(portalName, true);
         issuer.sendMessage("Portal " + ChatColor.DARK_AQUA + portal.getName() + ChatColor.WHITE + " was removed successfully!");
+    }
+
+    @Service
+    private final static class LegacyAlias extends RemoveCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(PortalManager portalManager) {
+            super(portalManager);
+        }
+
+        @Override
+        @CommandAlias("mvpremove|mvpr")
+        void onRemoveCommand(MVCommandIssuer issuer, String portalName) {
+            super.onRemoveCommand(issuer, portalName);
+        }
     }
 }

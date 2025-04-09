@@ -3,6 +3,7 @@ package org.mvplugins.multiverse.portals.commands;
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
@@ -25,7 +26,6 @@ import org.mvplugins.multiverse.portals.enums.SetProperties;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 @Service
-@CommandAlias("mvp")
 class ModifyCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -37,7 +37,6 @@ class ModifyCommand extends PortalsCommand {
         this.worldManager = worldManager;
     }
 
-    @CommandAlias("mvpmodify|mvpm")
     @Subcommand("modify")
     @CommandPermission("multiverse.portal.modify")
     @CommandCompletion("@mvportals @setproperties @empty")
@@ -93,6 +92,20 @@ class ModifyCommand extends PortalsCommand {
             PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
             selectedPortal.setPortalLocation(location);
             player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");
+        }
+    }
+
+    @Service
+    private final static class LegacyAlias extends ModifyCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin, WorldManager worldManager) {
+            super(plugin, worldManager);
+        }
+
+        @Override
+        @CommandAlias("mvpmodify|mvpm")
+        public void onModifyCommand(MVCommandIssuer issuer, MVPortal portal, SetProperties property, String value) {
+            super.onModifyCommand(issuer, portal, property, value);
         }
     }
 }

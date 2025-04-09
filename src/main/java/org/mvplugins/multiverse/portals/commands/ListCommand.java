@@ -2,6 +2,7 @@ package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@CommandAlias("mvp")
 class ListCommand extends PortalsCommand {
 
     private static final int ITEMS_PER_PAGE = 9;
@@ -37,7 +37,6 @@ class ListCommand extends PortalsCommand {
         this.worldManager = worldManager;
     }
 
-    @CommandAlias("mvplist|mvpl")
     @Subcommand("list")
     @CommandPermission("multiverse.portal.list")
     @CommandCompletion("@empty @empty")
@@ -65,8 +64,8 @@ class ListCommand extends PortalsCommand {
 
         List<String> portals = new ArrayList<>(getPortals(sender, world, filter, page));
 
-        if(portals.isEmpty() && filter == null) {
-            page = (int) Math.ceil(1F*getPortals(sender, world, filter).size()/ITEMS_PER_PAGE);
+        if (portals.isEmpty() && filter == null) {
+            page = (int) Math.ceil(1F * getPortals(sender, world, filter).size() / ITEMS_PER_PAGE);
             portals.addAll(getPortals(sender, world, filter, page));
         }
 
@@ -78,10 +77,10 @@ class ListCommand extends PortalsCommand {
             titleString += ChatColor.GOLD + " [" + filter + "]";
         }
 
-        titleString += ChatColor.GOLD + " - Page " + page + "/" + (int) Math.ceil(1F*getPortals(sender, world, filter).size()/ITEMS_PER_PAGE);
+        titleString += ChatColor.GOLD + " - Page " + page + "/" + (int) Math.ceil(1F * getPortals(sender, world, filter).size() / ITEMS_PER_PAGE);
         sender.sendMessage(ChatColor.AQUA + "--- " + titleString + ChatColor.AQUA + " ---");
 
-        for(String portal : portals) {
+        for (String portal : portals) {
             sender.sendMessage(portal);
         }
     }
@@ -93,10 +92,10 @@ class ListCommand extends PortalsCommand {
         }
         for (MVPortal portal : (world == null) ? this.portalManager.getPortals(sender) : this.portalManager.getPortals(sender, world)) {
             String destination = "";
-            if(portal.getDestination() != null) {
+            if (portal.getDestination() != null) {
                 destination = portal.getDestination().toString();
                 String destType = portal.getDestination().getIdentifier();
-                if(destType.equals("w")) {
+                if (destType.equals("w")) {
                     MultiverseWorld destWorld = this.worldManager.getLoadedWorld(destination).getOrNull();
                     if (destWorld != null) {
                         destination = "(World) " + ChatColor.DARK_AQUA + destination;
@@ -116,18 +115,18 @@ class ListCommand extends PortalsCommand {
                         x = (int) Double.parseDouble(locParts[0]);
                         y = (int) Double.parseDouble(locParts[1]);
                         z = (int) Double.parseDouble(locParts[2]);
-                    } catch(NumberFormatException e) {
+                    } catch (NumberFormatException e) {
                         e.printStackTrace();
                         continue;
                     }
-                    if(destType.equals("i")) {
+                    if (destType.equals("i")) {
                         destination = ChatColor.RED + "Invalid destination";
                     }
                     destination = "(Location) " + ChatColor.DARK_AQUA + destinationWorld + ", " + x + ", " + y + ", " + z;
                 }
             }
 
-            if (portal.getName().toLowerCase().contains(filter.toLowerCase()) || ( portal.getDestination() != null && destination.toLowerCase().contains(filter.toLowerCase()))) {
+            if (portal.getName().toLowerCase().contains(filter.toLowerCase()) || (portal.getDestination() != null && destination.toLowerCase().contains(filter.toLowerCase()))) {
                 portals.add(ChatColor.YELLOW + portal.getName() + ((portal.getDestination() != null) ? (ChatColor.AQUA + " -> " + ChatColor.GOLD + destination) : ""));
             }
         }
@@ -137,11 +136,25 @@ class ListCommand extends PortalsCommand {
 
     private List<String> getPortals(CommandSender sender, MultiverseWorld world, String filter, int page) {
         List<String> portals = new ArrayList<>();
-        for(int i = 0; i < getPortals(sender, world, filter).size(); i++) {
-            if((i >= (page* ITEMS_PER_PAGE)- ITEMS_PER_PAGE && i <= (page* ITEMS_PER_PAGE)-1)) {
+        for (int i = 0; i < getPortals(sender, world, filter).size(); i++) {
+            if ((i >= (page * ITEMS_PER_PAGE) - ITEMS_PER_PAGE && i <= (page * ITEMS_PER_PAGE) - 1)) {
                 portals.add(getPortals(sender, world, filter).get(i));
             }
         }
         return portals;
+    }
+
+    @Service
+    private final static class LegacyAlias extends ListCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(PortalManager portalManager, WorldManager worldManager) {
+            super(portalManager, worldManager);
+        }
+
+        @Override
+        @CommandAlias("mvplist|mvpl")
+        void onListCommand(CommandSender sender, String filterOrWorld, int page) {
+            super.onListCommand(sender, filterOrWorld, page);
+        }
     }
 }

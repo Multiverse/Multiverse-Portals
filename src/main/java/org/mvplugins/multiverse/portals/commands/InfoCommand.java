@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.entity.Player;
+import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
@@ -18,7 +19,6 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.utils.DisplayUtils;
 
 @Service
-@CommandAlias("mvp")
 class InfoCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
@@ -30,7 +30,6 @@ class InfoCommand extends PortalsCommand {
         this.displayUtils = displayUtils;
     }
 
-    @CommandAlias("mvpinfo|mvpi")
     @Subcommand("info")
     @CommandPermission("multiverse.portal.info")
     @CommandCompletion("@mvportals")
@@ -49,6 +48,20 @@ class InfoCommand extends PortalsCommand {
             this.plugin.getPortalSession(p).showDebugInfo(portal);
         } else {
             displayUtils.showStaticInfo(issuer.getIssuer(), portal, "Portal Info: ");
+        }
+    }
+
+    @Service
+    private final static class LegacyAlias extends InfoCommand implements LegacyAliasCommand {
+        @Inject
+        LegacyAlias(MultiversePortals plugin, DisplayUtils displayUtils) {
+            super(plugin, displayUtils);
+        }
+
+        @Override
+        @CommandAlias("mvpinfo|mvpi")
+        void onInfoCommand(MVCommandIssuer issuer, MVPortal portal) {
+            super.onInfoCommand(issuer, portal);
         }
     }
 }
