@@ -19,13 +19,12 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 
 @Service
 @CommandAlias("mvp")
-public class SelectCommand extends PortalsCommand {
+class SelectCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
 
     @Inject
-    SelectCommand(@NotNull MVCommandManager commandManager, @NotNull MultiversePortals plugin) {
-        super(commandManager);
+    SelectCommand(@NotNull MultiversePortals plugin) {
         this.plugin = plugin;
     }
 

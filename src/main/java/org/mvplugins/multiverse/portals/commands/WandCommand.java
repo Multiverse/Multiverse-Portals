@@ -21,13 +21,12 @@ import org.mvplugins.multiverse.portals.WorldEditConnection;
 
 @Service
 @CommandAlias("mvp")
-public class WandCommand extends PortalsCommand {
+class WandCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
 
     @Inject
-    protected WandCommand(@NotNull MVCommandManager commandManager, @NotNull MultiversePortals plugin) {
-        super(commandManager);
+    WandCommand(@NotNull MultiversePortals plugin) {
         this.plugin = plugin;
     }
 

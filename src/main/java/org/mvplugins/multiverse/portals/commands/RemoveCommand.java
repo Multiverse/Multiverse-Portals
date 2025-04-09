@@ -17,13 +17,12 @@ import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
 @CommandAlias("mvp")
-public class RemoveCommand extends PortalsCommand {
+class RemoveCommand extends PortalsCommand {
 
     private final PortalManager portalManager;
 
     @Inject
-    protected RemoveCommand(@NotNull MVCommandManager commandManager, @NotNull PortalManager portalManager) {
-        super(commandManager);
+    RemoveCommand(@NotNull PortalManager portalManager) {
         this.portalManager = portalManager;
     }
 

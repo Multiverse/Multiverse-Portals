@@ -24,17 +24,13 @@ import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
 @CommandAlias("mvp")
-public class CreateCommand extends PortalsCommand {
+class CreateCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
     private final PortalManager portalManager;
 
     @Inject
-    protected CreateCommand(
-            @NotNull MVCommandManager commandManager,
-            @NotNull MultiversePortals plugin,
-            @NotNull PortalManager portalManager) {
-        super(commandManager);
+    CreateCommand(@NotNull MultiversePortals plugin, @NotNull PortalManager portalManager) {
         this.plugin = plugin;
         this.portalManager = portalManager;
     }

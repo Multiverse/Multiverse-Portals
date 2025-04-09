@@ -19,13 +19,12 @@ import org.mvplugins.multiverse.portals.PortalPlayerSession;
 
 @Service
 @CommandAlias("mvp")
-public class DebugCommand extends PortalsCommand {
+class DebugCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
 
     @Inject
-    DebugCommand(@NotNull MVCommandManager commandManager, @NotNull MultiversePortals plugin) {
-        super(commandManager);
+    DebugCommand(@NotNull MultiversePortals plugin) {
         this.plugin = plugin;
     }
 

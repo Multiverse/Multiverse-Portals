@@ -24,7 +24,7 @@ import java.util.List;
 
 @Service
 @CommandAlias("mvp")
-public class ListCommand extends PortalsCommand {
+class ListCommand extends PortalsCommand {
 
     private static final int ITEMS_PER_PAGE = 9;
 
@@ -32,8 +32,7 @@ public class ListCommand extends PortalsCommand {
     private final WorldManager worldManager;
 
     @Inject
-    ListCommand(MVCommandManager commandManager, PortalManager portalManager, WorldManager worldManager) {
-        super(commandManager);
+    ListCommand(@NotNull PortalManager portalManager, @NotNull WorldManager worldManager) {
         this.portalManager = portalManager;
         this.worldManager = worldManager;
     }

@@ -19,13 +19,12 @@ import org.mvplugins.multiverse.portals.enums.PortalConfigProperty;
 
 @Service
 @CommandAlias("mvp")
-public class ConfigCommand extends PortalsCommand {
+class ConfigCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
 
     @Inject
-    ConfigCommand(@NotNull MVCommandManager commandManager, @NotNull MultiversePortals plugin) {
-        super(commandManager);
+    ConfigCommand(@NotNull MultiversePortals plugin) {
         this.plugin = plugin;
     }
 

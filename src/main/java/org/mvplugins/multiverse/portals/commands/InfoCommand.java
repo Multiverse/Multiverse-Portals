@@ -19,18 +19,13 @@ import org.mvplugins.multiverse.portals.utils.DisplayUtils;
 
 @Service
 @CommandAlias("mvp")
-public class InfoCommand extends PortalsCommand {
+class InfoCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
     private final DisplayUtils displayUtils;
 
     @Inject
-    InfoCommand(
-            @NotNull MVCommandManager commandManager,
-            @NotNull MultiversePortals plugin,
-            @NotNull DisplayUtils displayUtils
-    ) {
-        super(commandManager);
+    InfoCommand(@NotNull MultiversePortals plugin, @NotNull DisplayUtils displayUtils) {
         this.plugin = plugin;
         this.displayUtils = displayUtils;
     }

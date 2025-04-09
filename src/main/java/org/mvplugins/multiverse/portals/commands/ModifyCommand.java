@@ -26,17 +26,13 @@ import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 @Service
 @CommandAlias("mvp")
-public class ModifyCommand extends PortalsCommand {
+class ModifyCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
     private final WorldManager worldManager;
 
     @Inject
-    protected ModifyCommand(
-            @NotNull MVCommandManager commandManager,
-            @NotNull MultiversePortals plugin,
-            @NotNull WorldManager worldManager) {
-        super(commandManager);
+    ModifyCommand(@NotNull MultiversePortals plugin, @NotNull WorldManager worldManager) {
         this.plugin = plugin;
         this.worldManager = worldManager;
     }
