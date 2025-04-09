@@ -11,6 +11,5 @@ import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Contract;
 @Contract
 public abstract class PortalsCommand extends MultiverseCommand {
     protected PortalsCommand(@NotNull MVCommandManager commandManager) {
-        super(commandManager, "mvp");
     }
 }

@@ -3,7 +3,9 @@ package org.mvplugins.multiverse.portals.destination;
 import org.bukkit.command.CommandSender;
 import org.mvplugins.multiverse.core.destination.Destination;
 import org.mvplugins.multiverse.core.destination.DestinationSuggestionPacket;
-import org.mvplugins.multiverse.external.acf.commands.BukkitCommandIssuer;
+import org.mvplugins.multiverse.core.utils.StringFormatter;
+import org.mvplugins.multiverse.core.utils.result.Attempt;
+import org.mvplugins.multiverse.core.utils.result.FailureReason;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jetbrains.annotations.Nullable;
@@ -15,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-public class RandomPortalDestination implements Destination<RandomPortalDestination, RandomPortalDestinationInstance> {
+public class RandomPortalDestination implements Destination<RandomPortalDestination, RandomPortalDestinationInstance, FailureReason> {
 
     private final PortalManager portalManager;
 
@@ -30,9 +32,9 @@ public class RandomPortalDestination implements Destination<RandomPortalDestinat
     }
 
     @Override
-    public @Nullable RandomPortalDestinationInstance getDestinationInstance(@Nullable String destinationParams) {
+    public @Nullable Attempt<RandomPortalDestinationInstance, FailureReason> getDestinationInstance(@Nullable String destinationParams) {
         List<String> portalNames = Arrays.stream(destinationParams.split(",")).toList();
-        return new RandomPortalDestinationInstance(this, portalManager, portalNames);
+        return Attempt.success(new RandomPortalDestinationInstance(this, portalManager, portalNames));
     }
 
     @Override
