@@ -10,6 +10,7 @@ import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jetbrains.annotations.Nullable;
 import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
+import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 import java.util.Arrays;
@@ -38,8 +39,13 @@ public class RandomPortalDestination implements Destination<RandomPortalDestinat
     }
 
     @Override
-    public @NotNull Collection<DestinationSuggestionPacket> suggestDestinations(@NotNull CommandSender sender, @Nullable String s) {
-        // todo: suggest all the portal names comma seperated
-        return List.of();
+    public @NotNull Collection<DestinationSuggestionPacket> suggestDestinations(@NotNull CommandSender sender, @Nullable String input) {
+        Collection<String> strings = StringFormatter.addonToCommaSeperated(input, portalManager.getAllPortals().stream()
+                .map(MVPortal::getName)
+                .toList());
+
+        return strings.stream()
+                .map(s -> new DestinationSuggestionPacket(this, s, null))
+                .toList();
     }
 }
