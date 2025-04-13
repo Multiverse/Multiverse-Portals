@@ -23,12 +23,9 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.config.CoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
-import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
-import org.mvplugins.multiverse.core.inject.PluginServiceLocatorFactory;
 import org.mvplugins.multiverse.core.module.MultiverseModule;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
 import org.mvplugins.multiverse.core.utils.StringFormatter;
@@ -324,7 +321,7 @@ public class MultiversePortals extends MultiverseModule {
     }
 
     public void onDisable() {
-
+        shutdownDependencyInjection();
     }
 
     /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
