@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.command;
 
 import org.mvplugins.multiverse.core.command.MVCommandCompletions;
+import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandCompletionContext;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
@@ -18,11 +19,12 @@ public class PortalsCommandCompletions {
     private final PortalManager portalManager;
 
     @Inject
-    PortalsCommandCompletions(@NotNull PortalManager portalManager) {
+    PortalsCommandCompletions(@NotNull PortalManager portalManager, @NotNull MVCommandManager commandManager) {
         this.portalManager = portalManager;
+        registerCompletions(commandManager.getCommandCompletions());
     }
 
-    public void registerCompletions(MVCommandCompletions commandCompletions) {
+    private void registerCompletions(MVCommandCompletions commandCompletions) {
         commandCompletions.registerAsyncCompletion("mvportals", this::suggestPortals);
         commandCompletions.registerStaticCompletion("setproperties", commandCompletions.suggestEnums(SetProperties.class));
         commandCompletions.registerStaticCompletion("portalconfigproperty", commandCompletions.suggestEnums(PortalConfigProperty.class));

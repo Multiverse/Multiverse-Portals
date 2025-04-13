@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.command;
 
 import org.mvplugins.multiverse.core.command.MVCommandContexts;
+import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandExecutionContext;
 import org.mvplugins.multiverse.external.acf.commands.InvalidCommandArgument;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
@@ -17,12 +18,13 @@ public class PortalsCommandContexts {
     private final PortalManager portalManager;
 
     @Inject
-    PortalsCommandContexts(@NotNull MultiversePortals plugin, @NotNull PortalManager portalManager) {
+    PortalsCommandContexts(@NotNull MultiversePortals plugin, @NotNull PortalManager portalManager, @NotNull MVCommandManager commandManager) {
         this.plugin = plugin;
         this.portalManager = portalManager;
+        registerContexts(commandManager.getCommandContexts());
     }
 
-    public void registerContexts(MVCommandContexts commandContexts) {
+    private void registerContexts(MVCommandContexts commandContexts) {
         commandContexts.registerIssuerAwareContext(MVPortal.class, this::parseMVPortal);
     }
 

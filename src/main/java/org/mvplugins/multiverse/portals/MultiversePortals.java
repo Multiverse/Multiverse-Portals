@@ -24,12 +24,12 @@ import java.util.stream.Collectors;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
-import org.mvplugins.multiverse.core.MultiversePlugin;
 import org.mvplugins.multiverse.core.config.CoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocatorFactory;
+import org.mvplugins.multiverse.core.module.MultiverseModule;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
 import org.mvplugins.multiverse.core.utils.StringFormatter;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
@@ -62,12 +62,9 @@ import org.bukkit.plugin.PluginManager;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
-public class MultiversePortals extends MultiversePlugin {
+public class MultiversePortals extends MultiverseModule {
 
     private static final double TARGET_CORE_API_VERSION = 5.0;
-
-    private MultiverseCoreApi core;
-    private PluginServiceLocator serviceLocator;
 
     @Inject
     private Provider<PortalManager> portalManager;
@@ -111,9 +108,8 @@ public class MultiversePortals extends MultiversePlugin {
     public void onEnable() {
         super.onEnable();
         Logging.init(this);
-        this.core = MultiverseCoreApi.get();
 
-        initializeDependencyInjection();
+        initializeDependencyInjection(new MultiversePortalsPluginBinder(this));
 
         Logging.setDebugLevel(coreConfig.get().getGlobalDebug());
 
@@ -138,17 +134,6 @@ public class MultiversePortals extends MultiversePlugin {
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
 
         Logging.log(true, Level.INFO, " Enabled - By %s", StringFormatter.joinAnd(getDescription().getAuthors()));
-    }
-
-    private void initializeDependencyInjection() {
-        serviceLocator = PluginServiceLocatorFactory.get()
-                .registerPlugin(new MultiversePortalsPluginBinder(this), core.getServiceLocator())
-                .flatMap(PluginServiceLocator::enable)
-                .getOrElseThrow(exception -> {
-                    Logging.severe("Failed to initialize dependency injection!");
-                    getServer().getPluginManager().disablePlugin(this);
-                    return new RuntimeException(exception);
-                });
     }
 
     private void registerEvents() {
@@ -344,23 +329,13 @@ public class MultiversePortals extends MultiversePlugin {
 
     /** Register commands to Multiverse's CommandHandler so we get a super sexy single menu */
     private void registerCommands() {
-        Try.of(() -> commandManager.get())
-                .andThenTry(commandManager -> portalsCommandCompletions.get().registerCompletions(commandManager.getCommandCompletions()))
-                .andThenTry(commandManager -> portalsCommandContexts.get().registerContexts(commandManager.getCommandContexts()))
-                .andThenTry(commandManager -> serviceLocator.getAllServices(PortalsCommand.class)
-                        .forEach(commandManager::registerCommand))
-                .onFailure(e -> {
-                    Logging.severe("Failed to register commands");
-                    e.printStackTrace();
-                });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PluginServiceLocator getServiceLocator() {
-        return serviceLocator;
+        Try.run(() -> {
+            portalsCommandCompletions.get();
+            portalsCommandContexts.get();
+        }).onFailure(e -> {
+            Logging.severe("Failed to register command tools: %s", e.getMessage());
+        });
+        registerCommands(PortalsCommand.class);
     }
 
     @Override
