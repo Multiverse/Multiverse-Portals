@@ -17,7 +17,7 @@
 
 [Multiverse Portals](https://dev.bukkit.org/projects/Multiverse-Portals) is an add-on Plugin for [Multiverse core](https://dev.bukkit.org/projects/multiverse-core) that allows you to create Portals that can teleport players to Multiverse destinations (worlds, anchors or even exact positions), With [Multiverse Command Destination](https://www.spigotmc.org/resources/multiverse-commanddestination.90232/) you can even make portals run commands
 
-Now it's time to create your very own server with Multiverse Portals, do check out our [Wiki](https://github.com/Multiverse/Multiverse-Core/wiki/Home-(Inventories)) and [Usage Guide](https://github.com/Multiverse/Multiverse-Core/wiki/Basics-(Inventories)) to get started. Feel free to hop onto our [Discord](https://discord.gg/NZtfKky) if you have any questions or just want to have a chat with us!
+Now it's time to create your very own server with Multiverse Portals, do check out our [Wiki](https://github.com/Multiverse/Multiverse-Core/wiki/Home-(Portals)) and [Usage Guide](https://github.com/Multiverse/Multiverse-Core/wiki/Basics-(Portals)) to get started. Feel free to hop onto our [Discord](https://discord.gg/NZtfKky) if you have any questions or just want to have a chat with us!
 
 ## Our other amazing sub-modules:
 
