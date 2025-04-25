@@ -2,16 +2,15 @@ package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.C;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Description;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Flags;
+import org.mvplugins.multiverse.external.acf.commands.annotation.Optional;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Subcommand;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Syntax;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
@@ -39,7 +38,7 @@ class CreateCommand extends PortalsCommand {
     @Subcommand("create")
     @CommandPermission("multiverse.portal.create")
     @CommandCompletion("@empty @mvworlds|@destinations")
-    @Syntax("<portal-name> <destination>")
+    @Syntax("<portal-name> [destination]")
     @Description("Creates a new portal, assuming you have a region selected.")
     void onCreateCommand(
             @Flags("resolve=issuerOnly")
@@ -51,7 +50,8 @@ class CreateCommand extends PortalsCommand {
             @Syntax("<portal-name>")
             String portalName,
 
-            @Syntax("<destination>")
+            @Optional
+            @Syntax("[destination]")
             DestinationInstance<?, ?> destination
     ) {
         // todo: maybe make a CommandContext for PortalPlayerSession
@@ -81,7 +81,11 @@ class CreateCommand extends PortalsCommand {
         }
 
         ps.selectPortal(portal);
-        portal.setDestination(destination);
+        if (destination != null) {
+            portal.setDestination(destination);
+        } else {
+            player.sendMessage(ChatColor.RED + "Portal destination not set. Use " + ChatColor.DARK_AQUA + "/mvp modify destination <value>" + ChatColor.RED + " to set one.");
+        }
 
         // todo: Automatically get exact destination from player location
         // todo: Automatically get portal destination from player location
