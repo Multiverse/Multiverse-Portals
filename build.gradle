@@ -1,33 +1,12 @@
 plugins {
-    id 'java-library'
-    id 'maven-publish'
     id 'checkstyle'
-    id 'com.gradleup.shadow' version '8.3.5'
+    id 'org.mvplugins.multiverse-plugin' version '1.2.0'
 }
 
-version = System.getenv('GITHUB_VERSION') ?: 'local'
 group = 'org.mvplugins.multiverse.portals'
 description = 'Multiverse-Portals'
 
-compileJava {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
 repositories {
-    mavenLocal()
-    mavenCentral()
-
-    maven {
-        name = 'spigotmc'
-        url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
-    }
-
-    maven {
-        name = 'onarandombox'
-        url = uri('https://repo.onarandombox.com/content/groups/public')
-    }
-
     maven {
         name = 'enginehub'
         url = uri('https://maven.enginehub.org/repo/')
@@ -40,54 +19,39 @@ repositories {
     }
 }
 
+configure(apiDependencies) {
+    serverApiVersion = '1.18.2-R0.1-SNAPSHOT'
+    mockBukkitServerApiVersion = '1.21'
+    mockBukkitVersion = '4.31.1'
+}
+
 dependencies {
-    // Spigot
-    implementation('org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT') {
-        exclude group: 'junit', module: 'junit'
-    }
+    // Multiverse
+    externalPlugin 'org.mvplugins.multiverse.core:multiverse-core:5.0.0-SNAPSHOT'
 
-    // Core
-    implementation 'org.mvplugins.multiverse.core:multiverse-core:5.0.0-SNAPSHOT'
-
-    //WorldEdit
-    implementation('com.sk89q.worldedit:worldedit-bukkit:7.2.9') {
+    // WorldEdit
+    externalPlugin('com.sk89q.worldedit:worldedit-bukkit:7.2.9') {
         exclude group: 'org.bukkit', module: 'bukkit'
     }
 
     // Utils
-    api('com.dumptruckman.minecraft:Logging:1.1.1') {
-        exclude group: 'org.bukkit', module: 'bukkit'
+    shadowed('com.dumptruckman.minecraft:Logging:1.1.1') {
+        exclude group: 'junit', module: 'junit'
     }
 }
 
-
-java {
-    withSourcesJar()
-    withJavadocJar()
+checkstyle {
+    toolVersion = '6.1.1'
+    configFile file('config/mv_checks.xml')
+    ignoreFailures = true
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-tasks.withType(Javadoc).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-
-configurations {
-    [apiElements, runtimeElements].each {
-        it.outgoing.artifacts.removeIf { it.buildDependencies.getDependencies(null).contains(jar) }
-        it.outgoing.artifact(shadowJar)
-    }
+shadowJar {
+    relocate 'com.dumptruckman.minecraft.util.Logging', 'org.mvplugins.multiverse.portals.util.MVPLogging'
+    relocate 'com.dumptruckman.minecraft.util.DebugLog', 'org.mvplugins.multiverse.portals.util.DebugFileLogger'
 }
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
-        }
-    }
     repositories {
         maven {
             name = "GitHubPackages"
@@ -106,57 +70,3 @@ publishing {
         }
     }
 }
-
-
-processResources {
-    def props = [version: "${project.version}"]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
-        expand props
-    }
-
-    // This task should never be skipped. The tests depend on this having been run but we want the new version number
-    // that is created after tests are run and before we run again to publish.
-    outputs.upToDateWhen { false }
-}
-
-
-checkstyle {
-    toolVersion = '6.1.1'
-    configFile file('config/mv_checks.xml')
-    ignoreFailures = true
-}
-
-
-javadoc {
-    source = sourceSets.main.allJava
-    classpath = configurations.compileClasspath
-}
-
-
-project.configurations.api.canBeResolved = true
-
-shadowJar {
-    relocate 'com.dumptruckman.minecraft.util.Logging', 'org.mvplugins.multiverse.portals.util.MVPLogging'
-    relocate 'com.dumptruckman.minecraft.util.DebugLog', 'org.mvplugins.multiverse.portals.util.DebugFileLogger'
-
-    configurations = [project.configurations.api]
-
-    archiveClassifier.set('')
-}
-
-build.dependsOn shadowJar
-jar.enabled = false
-
-
-tasks.register('runHabitatGenerator', JavaExec) {
-    classpath = configurations["compileClasspath"]
-    mainClass.set('org.mvplugins.multiverse.external.jvnet.hk2.generator.HabitatGenerator')
-
-    args = [
-            '--file', "build/libs/multiverse-portals-$version" + ".jar",
-            '--locator', 'Multiverse-Portals',
-    ]
-}
-tasks.named("build") { finalizedBy("runHabitatGenerator") }
