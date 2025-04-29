@@ -11,12 +11,6 @@ repositories {
         name = 'enginehub'
         url = uri('https://maven.enginehub.org/repo/')
     }
-
-    maven {
-        // todo: remove before mv5 release
-        name = 'benwoo1110'
-        url = uri('https://repo.c0ding.party/multiverse-beta')
-    }
 }
 
 configure(apiDependencies) {
@@ -60,13 +54,6 @@ publishing {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
-        }
-
-        maven {
-            // todo: remove before mv5 release
-            name = "multiverseBeta"
-            url = "https://repo.c0ding.party/multiverse-beta"
-            credentials(PasswordCredentials)
         }
     }
 }
