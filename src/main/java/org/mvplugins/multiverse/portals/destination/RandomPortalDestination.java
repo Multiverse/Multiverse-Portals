@@ -1,6 +1,7 @@
 package org.mvplugins.multiverse.portals.destination;
 
 import org.bukkit.command.CommandSender;
+import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.core.destination.Destination;
 import org.mvplugins.multiverse.core.destination.DestinationSuggestionPacket;
 import org.mvplugins.multiverse.core.utils.StringFormatter;
@@ -9,7 +10,6 @@ import org.mvplugins.multiverse.core.utils.result.FailureReason;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jetbrains.annotations.Nullable;
-import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
