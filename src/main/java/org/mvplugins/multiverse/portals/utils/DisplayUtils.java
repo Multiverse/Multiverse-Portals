@@ -13,16 +13,13 @@ import org.bukkit.command.CommandSender;
 @Service
 public class DisplayUtils {
 
-    private final PortalManager portalManager;
     private final WorldManager worldManager;
     private final MVEconomist economist;
 
     @Inject
     DisplayUtils(
-            @NotNull PortalManager portalManager,
             @NotNull WorldManager worldManager,
             @NotNull MVEconomist economist) {
-        this.portalManager = portalManager;
         this.worldManager = worldManager;
         this.economist = economist;
     }
