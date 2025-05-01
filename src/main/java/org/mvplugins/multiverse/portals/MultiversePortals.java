@@ -31,7 +31,7 @@ import org.mvplugins.multiverse.core.utils.MaterialConverter;
 import org.mvplugins.multiverse.core.utils.StringFormatter;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jakarta.inject.Provider;
-import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
+import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.commands.PortalsCommand;
 import org.mvplugins.multiverse.portals.command.PortalsCommandCompletions;

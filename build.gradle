@@ -32,6 +32,13 @@ dependencies {
     shadowed('com.dumptruckman.minecraft:Logging:1.1.1') {
         exclude group: 'junit', module: 'junit'
     }
+
+    // hk2 for annotation processing only
+    compileOnly('org.glassfish.hk2:hk2-api:3.0.3') {
+        exclude group: '*', module: '*'
+    }
+    annotationProcessor 'org.glassfish.hk2:hk2-metadata-generator:3.0.3'
+    testAnnotationProcessor 'org.glassfish.hk2:hk2-metadata-generator:3.0.3'
 }
 
 checkstyle {

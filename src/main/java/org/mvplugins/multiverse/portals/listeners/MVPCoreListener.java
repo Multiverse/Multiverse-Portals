@@ -16,7 +16,7 @@ import org.mvplugins.multiverse.core.event.MVDumpsDebugInfoEvent;
 import org.mvplugins.multiverse.core.event.MVPlayerTouchedPortalEvent;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
-import org.mvplugins.multiverse.external.jvnet.hk2.annotations.Service;
+import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
