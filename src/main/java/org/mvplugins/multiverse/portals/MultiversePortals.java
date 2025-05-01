@@ -127,8 +127,9 @@ public class MultiversePortals extends MultiverseModule {
 
         // Register our events AFTER the config.
         this.registerEvents();
-
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
+
+        MultiversePortalsApi.init(this.serviceLocator);
 
         Logging.log(true, Level.INFO, " Enabled - By %s", StringFormatter.joinAnd(getDescription().getAuthors()));
     }
@@ -321,6 +322,7 @@ public class MultiversePortals extends MultiverseModule {
     }
 
     public void onDisable() {
+        MultiversePortalsApi.shutdown();
         shutdownDependencyInjection();
     }
 
