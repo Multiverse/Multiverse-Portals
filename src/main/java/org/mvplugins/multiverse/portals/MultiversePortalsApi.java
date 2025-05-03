@@ -1,5 +1,7 @@
 package org.mvplugins.multiverse.portals;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.ServicePriority;
 import org.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
 import org.mvplugins.multiverse.portals.utils.PortalFiller;
@@ -11,14 +13,16 @@ public class MultiversePortalsApi {
 
     private static MultiversePortalsApi instance;
 
-    static void init(@NotNull PluginServiceLocator serviceLocator) {
+    static void init(@NotNull MultiversePortals multiversePortals) {
         if (instance != null) {
             throw new IllegalStateException("MultiversePortalsApi has already been initialized!");
         }
-        instance = new MultiversePortalsApi(serviceLocator);
+        instance = new MultiversePortalsApi(multiversePortals.getServiceLocator());
+        Bukkit.getServicesManager().register(MultiversePortalsApi.class, instance, multiversePortals, ServicePriority.Normal);
     }
 
     static void shutdown() {
+        Bukkit.getServicesManager().unregister(instance);
         instance = null;
     }
 

@@ -129,7 +129,7 @@ public class MultiversePortals extends MultiverseModule {
         this.registerEvents();
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
 
-        MultiversePortalsApi.init(this.serviceLocator);
+        MultiversePortalsApi.init(this);
 
         Logging.log(true, Level.INFO, " Enabled - By %s", StringFormatter.joinAnd(getDescription().getAuthors()));
     }
