@@ -8,8 +8,11 @@
 package org.mvplugins.multiverse.portals.listeners;
 
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import com.dumptruckman.minecraft.util.Logging;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.teleportation.LocationManipulation;
@@ -17,6 +20,7 @@ import org.mvplugins.multiverse.core.teleportation.AsyncSafetyTeleporter;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
+import org.mvplugins.multiverse.external.paperlib.PaperLib;
 import org.mvplugins.multiverse.portals.destination.PortalDestinationInstance;
 import org.mvplugins.multiverse.portals.enums.MoveType;
 import org.bukkit.Location;
@@ -53,6 +57,7 @@ public class MVPVehicleListener implements Listener {
 
     @EventHandler
     public void vehicleMove(VehicleMoveEvent event) {
+        // todo: add support for multiple passengers, e.g. boats
         if (event.getVehicle().getPassenger() instanceof Player) {
             Vehicle v = event.getVehicle();
             Player p = (Player) v.getPassenger();
@@ -64,7 +69,9 @@ public class MVPVehicleListener implements Listener {
             }
 
             // Teleport the Player
-            teleportVehicle(p, v, event.getTo());
+            if (!teleportVehicle(p, v, event.getTo())) {
+                Logging.warning("Failed to teleport vehicle: " + event.getVehicle());
+            }
         } else {
             MVPortal portal = this.portalManager.getPortal(event.getFrom());
             if ((portal != null) && (portal.getTeleportNonPlayers())) {
@@ -77,6 +84,12 @@ public class MVPVehicleListener implements Listener {
                     return;
                 }
 
+                Class<? extends Entity> vehicleClass = event.getVehicle().getType().getEntityClass();
+                if (vehicleClass == null) {
+                    Logging.warning("No vehicle class found for vehicle: " + event.getVehicle());
+                    return;
+                }
+
                 Vector vehicleVec = event.getVehicle().getVelocity();
                 Location target = dest.getLocation(event.getVehicle()).getOrNull();
                 if (dest instanceof PortalDestinationInstance pd) {
@@ -86,19 +99,20 @@ public class MVPVehicleListener implements Listener {
 
                 this.setVehicleVelocity(vehicleVec, dest, event.getVehicle());
 
-                Entity formerPassenger = event.getVehicle().getPassenger();
+                List<Entity> formerPassengers = event.getVehicle().getPassengers();
                 event.getVehicle().eject();
 
-                Vehicle newVehicle = target.getWorld().spawn(target, event.getVehicle().getClass());
-
-                if (formerPassenger != null) {
-                    formerPassenger.teleport(target);
-                    newVehicle.setPassenger(formerPassenger);
-                }
-
-                this.setVehicleVelocity(vehicleVec, dest, newVehicle);
-
-                // remove the old one
+                Entity newVehicle = target.getWorld().spawn(target, vehicleClass);
+                Vector finalVehicleVec = vehicleVec;
+                CompletableFuture.allOf(formerPassengers.stream()
+                        .map(passenger -> PaperLib.teleportAsync(passenger, target))
+                        .toArray(CompletableFuture[]::new))
+                        .thenRun(() -> {
+                            Bukkit.getScheduler().runTask(plugin, () -> {
+                                formerPassengers.forEach(newVehicle::addPassenger);
+                                this.setVehicleVelocity(finalVehicleVec, dest, newVehicle);
+                            });
+                        });
                 event.getVehicle().remove();
             }
         }
@@ -168,16 +182,28 @@ public class MVPVehicleListener implements Listener {
         // Add an offset to ensure the player is 1 higher than where the cart was.
         playerToLocation.add(0, 0.5, 0);
 
+        Class<? extends Entity> vehicleClass = vehicle.getType().getEntityClass();
+        if (vehicleClass == null) {
+            Logging.warning("No vehicle class found for vehicle: " + vehicle);
+            return false;
+        }
+        // Now create a new vehicle:
+        Vehicle newVehicle = (Vehicle) vehicleToLocation.getWorld().spawn(vehicleToLocation, vehicleClass);
+
         safetyTeleporter.to(destination).teleport(player)
                 .onSuccess(() -> {
-                    // Now create a new vehicle:
-                    Vehicle newVehicle = vehicleToLocation.getWorld().spawn(vehicleToLocation, vehicle.getClass());
-                    // Set the vehicle's velocity to ours.
-                    this.setVehicleVelocity(vehicle.getVelocity(), destination, newVehicle);
-                    // Set the new player
-                    newVehicle.addPassenger(player);
-                    // They did teleport. Let's delete the old vehicle.
-                    vehicle.remove();
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        // Set the new player
+                        if (newVehicle.addPassenger(player)) {
+                            Logging.finer("Added passenger to new vehicle: " + newVehicle);
+                        } else {
+                            Logging.warning("Failed to add passenger to new vehicle: " + newVehicle);
+                        }
+                        // Set the vehicle's velocity to ours.
+                        this.setVehicleVelocity(vehicle.getVelocity(), destination, newVehicle);
+                        // They did teleport. Let's delete the old vehicle.
+                        vehicle.remove();
+                    });
                 })
                 .onFailure(reason -> {
                     Logging.fine("Failed to teleport player '%s' to destination '%s'. Reason: %s", player.getDisplayName(), destination, reason);
@@ -187,7 +213,7 @@ public class MVPVehicleListener implements Listener {
         return true;
     }
 
-    private void setVehicleVelocity(Vector calculated, DestinationInstance<?, ?> to, Vehicle newVehicle) {
+    private void setVehicleVelocity(Vector calculated, DestinationInstance<?, ?> to, Entity newVehicle) {
         // If the destination has a non-zero velocity, use that,
         // otherwise use the existing velocity, because velocities
         // are preserved through portals... duh.
