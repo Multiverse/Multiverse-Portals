@@ -70,7 +70,8 @@ public class MVPVehicleListener implements Listener {
 
             // Teleport the Player
             if (!teleportVehicle(p, v, event.getTo())) {
-                Logging.warning("Failed to teleport vehicle: " + event.getVehicle());
+                // todo: revamp vehicle teleport in 5.1
+                // Logging.warning("Failed to teleport vehicle: " + event.getVehicle());
             }
         } else {
             MVPortal portal = this.portalManager.getPortal(event.getFrom());
