@@ -75,6 +75,8 @@ public class MultiversePortals extends MultiverseModule {
     private  Provider<PortalsCommandContexts> portalsCommandContexts;
     @Inject
     private Provider<CoreConfig> coreConfig;
+    @Inject
+    private Provider<BstatsMetricsConfigurator> metricsConfiguratorProvider;
 
     private FileConfiguration MVPPortalConfig;
     private FileConfiguration MVPConfig;
@@ -124,11 +126,11 @@ public class MultiversePortals extends MultiverseModule {
 
         this.loadPortals();
         this.loadConfig();
+        this.setupMetrics();
 
         // Register our events AFTER the config.
         this.registerEvents();
         getServer().getPluginManager().registerEvents(new WorldEditPluginListener(), this);
-
         MultiversePortalsApi.init(this);
 
         Logging.log(true, Level.INFO, " Enabled - By %s", StringFormatter.joinAnd(getDescription().getAuthors()));
@@ -148,6 +150,17 @@ public class MultiversePortals extends MultiverseModule {
         if (MultiversePortals.UseOnMove) {
             pluginManager.registerEvents(serviceLocator.getService(MVPPlayerMoveListener.class), this);
         }
+    }
+
+    /**
+     * Setup bstats Metrics.
+     */
+    private void setupMetrics() {
+        Try.of(() -> metricsConfiguratorProvider.get())
+                .onFailure(e -> {
+                    Logging.severe("Failed to setup metrics");
+                    e.printStackTrace();
+                });
     }
 
     /** Create the higher level permissions so we can add finer ones to them. */
