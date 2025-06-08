@@ -18,6 +18,7 @@ import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.MoveType;
 import org.mvplugins.multiverse.portals.event.MVPortalEvent;
 import org.bukkit.ChatColor;
@@ -34,6 +35,7 @@ import org.mvplugins.multiverse.portals.utils.PortalManager;
 public class MVPPlayerMoveListener implements Listener {
 
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
     private final PlayerListenerHelper helper;
     private final PortalManager portalManager;
     private final WorldManager worldManager;
@@ -42,11 +44,13 @@ public class MVPPlayerMoveListener implements Listener {
     @Inject
     MVPPlayerMoveListener(
             @NotNull MultiversePortals plugin,
+            @NotNull PortalsConfig portalsConfig,
             @NotNull PlayerListenerHelper helper,
             @NotNull PortalManager portalManager,
             @NotNull WorldManager worldManager,
             @NotNull MVEconomist economist) {
         this.plugin = plugin;
+        this.portalsConfig = portalsConfig;
         this.helper = helper;
         this.portalManager = portalManager;
         this.worldManager = worldManager;
@@ -71,7 +75,7 @@ public class MVPPlayerMoveListener implements Listener {
             return;
         }
         // If something is trying to flow out, stop that too, unless bucketFilling has been disabled
-        if (portalManager.isPortal(event.getBlock().getLocation()) && MultiversePortals.bucketFilling) {
+        if (portalManager.isPortal(event.getBlock().getLocation()) && portalsConfig.getBucketFilling()) {
             event.setCancelled(true);
         }
     }
@@ -96,7 +100,7 @@ public class MVPPlayerMoveListener implements Listener {
         // If the portal is not null, and it's a legacy portal,
         // and we didn't show debug info (the debug is meant to toggle), do the stuff.
         if (portal != null
-                && (!MultiversePortals.NetherAnimation || portal.isLegacyPortal())
+                && (!portalsConfig.getNetherAnimation() || portal.isLegacyPortal())
                 && ps.doTeleportPlayer(MoveType.PLAYER_MOVE)
                 && !ps.showDebugInfo()) {
 
@@ -126,7 +130,7 @@ public class MVPPlayerMoveListener implements Listener {
             }
             // If they're using Access and they don't have permission and they're NOT excempt, return, they're not allowed to tp.
             // No longer checking exemption status
-            if (MultiversePortals.EnforcePortalAccess && !event.getPlayer().hasPermission(portal.getPermission())) {
+            if (portalsConfig.getEnforcePortalAccess() && !event.getPlayer().hasPermission(portal.getPermission())) {
                 this.helper.stateFailure(p.getDisplayName(), portal.getName());
                 return;
             }

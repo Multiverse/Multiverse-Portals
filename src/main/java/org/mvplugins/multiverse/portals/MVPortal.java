@@ -24,6 +24,7 @@ import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.utils.MaterialConverter;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.PortalType;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,6 +39,7 @@ import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 public class MVPortal {
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
     private final WorldManager worldManager;
     private final DestinationsProvider destinationsProvider;
     private final BlockSafety blockSafety;
@@ -94,6 +96,7 @@ public class MVPortal {
         this.allowSave = false;
 
         this.plugin = plugin;
+        this.portalsConfig = this.plugin.getServiceLocator().getService(PortalsConfig.class);
         this.worldManager = this.plugin.getServiceLocator().getService(WorldManager.class);
         this.destinationsProvider = this.plugin.getServiceLocator().getService(DestinationsProvider.class);
         this.blockSafety = this.plugin.getServiceLocator().getService(BlockSafety.class);
@@ -510,7 +513,7 @@ public class MVPortal {
      * @return true if the frame around the location is valid; false otherwise
      */
     public boolean isFrameValid(Location l) {
-        List<Material> validMaterials = MultiversePortals.FrameMaterials;
+        List<Material> validMaterials = portalsConfig.getFrameMaterials();
         if (validMaterials == null || validMaterials.isEmpty()) {
             // All frame materials are valid.
             return true;
@@ -629,7 +632,7 @@ public class MVPortal {
         }
         Logging.finer(String.format("frame has common material %s", commonMaterial));
 
-        return MultiversePortals.FrameMaterials.contains(commonMaterial);
+        return portalsConfig.getFrameMaterials().contains(commonMaterial);
     }
 
     @Deprecated
