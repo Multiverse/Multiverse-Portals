@@ -18,15 +18,18 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.WorldEditConnection;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 
 @Service
 class WandCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
 
     @Inject
-    WandCommand(@NotNull MultiversePortals plugin) {
+    WandCommand(@NotNull MultiversePortals plugin, @NotNull PortalsConfig portalsConfig) {
         this.plugin = plugin;
+        this.portalsConfig = portalsConfig;
     }
 
     @Subcommand("wand")
@@ -63,7 +66,7 @@ class WandCommand extends PortalsCommand {
             player.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit wand " + ChatColor.WHITE + "to perform portal selections!");
             return;
         }
-        ItemStack wand = new ItemStack(plugin.getWandMaterial(), 1);
+        ItemStack wand = new ItemStack(portalsConfig.getWandMaterial(), 1);
 
         if (player.getInventory().getItemInMainHand().getAmount() == 0) {
             player.getInventory().setItemInMainHand(wand);
@@ -81,8 +84,8 @@ class WandCommand extends PortalsCommand {
     @Service
     private final static class LegacyAlias extends WandCommand implements LegacyAliasCommand {
         @Inject
-        LegacyAlias(MultiversePortals plugin) {
-            super(plugin);
+        LegacyAlias(MultiversePortals plugin, PortalsConfig portalsConfig) {
+            super(plugin, portalsConfig);
         }
 
         @Override
