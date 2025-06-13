@@ -117,6 +117,7 @@ public class MultiversePortals extends MultiverseModule {
 
     @Override
     public void onDisable() {
+        this.savePortalsConfig();
         MultiversePortalsApi.shutdown();
         shutdownDependencyInjection();
     }
@@ -190,21 +191,14 @@ public class MultiversePortals extends MultiverseModule {
             }
             Logging.info(keys.size() + " - Portals(s) loaded");
         }
-
-        // Now Resolve destinations
-        for (MVPortal portal : this.portalManager.get().getAllPortals()) {
-            String dest = this.MVPPortalConfig.getString("portals." + portal.getName() + ".destination", "");
-            if (!dest.equals("")) {
-                portal.setDestination(dest);
-            }
-        }
-
         this.savePortalsConfig();
-
     }
 
     public boolean savePortalsConfig() {
         try {
+            for (MVPortal portal : this.portalManager.get().getAllPortals()) {
+                this.MVPPortalConfig.set("portals." + portal.getName(), portal.save());
+            }
             this.MVPPortalConfig.save(new File(this.getDataFolder(), "portals.yml"));
             return true;
         } catch (IOException e) {

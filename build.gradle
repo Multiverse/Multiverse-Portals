@@ -11,6 +11,10 @@ repositories {
         name = 'enginehub'
         url = uri('https://maven.enginehub.org/repo/')
     }
+    maven {
+        name = 'benthecat'
+        url = uri('https://repo.c0ding.party/multiverse-beta')
+    }
 }
 
 configure(apiDependencies) {
@@ -21,7 +25,7 @@ configure(apiDependencies) {
 
 dependencies {
     // Multiverse
-    externalPlugin 'org.mvplugins.multiverse.core:multiverse-core:5.0.0-SNAPSHOT'
+    externalPlugin 'org.mvplugins.multiverse.core:multiverse-core:5.1.0-SNAPSHOT'
 
     // WorldEdit
     externalPlugin('com.sk89q.worldedit:worldedit-bukkit:7.2.9') {

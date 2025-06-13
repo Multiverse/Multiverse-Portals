@@ -162,6 +162,7 @@ public class PortalManager {
     // Add a portal whose name is already known to be unique.
     private void addUniquePortal(MultiverseWorld world, String name, MVPortal portal) {
         this.portals.put(name, portal);
+        this.plugin.savePortalsConfig();
         addToWorldChunkPortals(world, portal);
     }
 
