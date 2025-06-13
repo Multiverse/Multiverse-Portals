@@ -1,0 +1,91 @@
+package org.mvplugins.multiverse.portals;
+
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.mvplugins.multiverse.core.MultiverseCoreApi;
+import org.mvplugins.multiverse.core.config.node.ConfigNode;
+import org.mvplugins.multiverse.core.config.node.Node;
+import org.mvplugins.multiverse.core.config.node.NodeGroup;
+import org.mvplugins.multiverse.core.config.node.functions.SenderNodeSuggester;
+import org.mvplugins.multiverse.core.destination.DestinationsProvider;
+import org.mvplugins.multiverse.core.destination.core.WorldDestination;
+
+import java.util.Collection;
+import java.util.Objects;
+
+final class MVPortalNodes {
+
+    private final NodeGroup nodes = new NodeGroup();
+
+    private MVPortal portal;
+    private final DestinationsProvider destinationsProvider;
+
+    MVPortalNodes(MVPortal portal) {
+        this.portal = portal;
+        this.destinationsProvider = MultiverseCoreApi.get().getDestinationsProvider();
+    }
+
+    NodeGroup getNodes() {
+        return nodes;
+    }
+
+    private <N extends Node> N node(N node) {
+        nodes.add(node);
+        return node;
+    }
+
+    final ConfigNode<Material> currency = node(ConfigNode.builder("currency", Material.class)
+            .defaultValue(Material.AIR)
+            .build());
+
+    final ConfigNode<Double> price = node(ConfigNode.builder("price", Double.class)
+            .defaultValue(0.0)
+            .build());
+
+    final ConfigNode<Boolean> safeTeleport = node(ConfigNode.builder("safe-teleport", Boolean.class)
+            .defaultValue(true)
+            .build());
+
+    final ConfigNode<Boolean> teleportNonPlayers = node(ConfigNode.builder("teleport-non-players", Boolean.class)
+            .defaultValue(false)
+            .build());
+
+    final ConfigNode<String> owner = node(ConfigNode.builder("owner", String.class)
+            .defaultValue("")
+            .build());
+
+    final ConfigNode<String> location = node(ConfigNode.builder("location", String.class)
+            .defaultValue("")
+            .hidden()
+            .build());
+
+    final ConfigNode<String> world = node(ConfigNode.builder("world", String.class)
+            .defaultValue("")
+            .hidden()
+            .build());
+
+    final ConfigNode<String> destination = node(ConfigNode.builder("destination", String.class)
+            .defaultValue("")
+            .suggester((SenderNodeSuggester) this::suggestDestinations)
+            .onSetValue((oldValue, newValue) -> {
+                if (!Objects.equals(oldValue, newValue)) {
+                    portal.setDestination(newValue);
+                }
+            })
+            .build());
+
+    final ConfigNode<Double> version = node(ConfigNode.builder("version", Double.class)
+            .defaultValue(0.0)
+            .hidden()
+            .build());
+
+    private Collection<String> suggestDestinations(CommandSender sender, String input) {
+        return destinationsProvider.getDestinations().stream()
+                .flatMap(destination -> destination.suggestDestinations(sender, input)
+                        .stream()
+                        .map(packet -> destination instanceof WorldDestination
+                                ? packet.destinationString()
+                                : destination.getIdentifier() + ":" + packet.destinationString()))
+                .toList();
+    }
+}

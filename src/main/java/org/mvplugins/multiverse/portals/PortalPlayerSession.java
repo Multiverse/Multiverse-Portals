@@ -13,6 +13,7 @@ import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.economy.MVEconomist;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.MoveType;
 import org.mvplugins.multiverse.portals.utils.DisplayUtils;
 import org.bukkit.ChatColor;
@@ -25,6 +26,7 @@ import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 public class PortalPlayerSession {
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
     private final PortalManager portalManager;
     private final WorldManager worldManager;
     private final DisplayUtils displayUtils;
@@ -45,13 +47,14 @@ public class PortalPlayerSession {
 
     public PortalPlayerSession(MultiversePortals plugin, Player p) {
         this.plugin = plugin;
+        this.portalsConfig = plugin.getServiceLocator().getService(PortalsConfig.class);
         this.portalManager = plugin.getServiceLocator().getService(PortalManager.class);
         this.worldManager = plugin.getServiceLocator().getService(WorldManager.class);
         this.displayUtils = plugin.getServiceLocator().getService(DisplayUtils.class);
         this.economist = plugin.getServiceLocator().getService(MVEconomist.class);
         this.player = p;
         this.setLocation(p.getLocation());
-        this.lastTeleportTime = new Date(new Date().getTime() - this.plugin.getCooldownTime());
+        this.lastTeleportTime = new Date(new Date().getTime() - this.portalsConfig.getPortalCooldown());
     }
 
     public boolean selectPortal(MVPortal portal) {
@@ -288,7 +291,7 @@ public class PortalPlayerSession {
      *         negative value may be returned if the cooldown is no longer in effect.
      */
     private long getRemainingTeleportCooldown() {
-        long cooldownEndMs = this.lastTeleportTime.getTime() + this.plugin.getCooldownTime();
+        long cooldownEndMs = this.lastTeleportTime.getTime() + this.portalsConfig.getPortalCooldown();
         long timeMs = (new Date()).getTime();
         return cooldownEndMs - timeMs;
     }

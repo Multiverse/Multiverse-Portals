@@ -39,7 +39,7 @@ class ModifyCommand extends PortalsCommand {
 
     @Subcommand("modify")
     @CommandPermission("multiverse.portal.modify")
-    @CommandCompletion("@mvportals @setproperties @empty")
+    @CommandCompletion("@mvportals @portalpropertynames @portalpropertyvalues")
     @Syntax("[portal] <property> <value>")
     @Description("Allows you to modify all values that can be set.")
     public void onModifyCommand(
@@ -52,7 +52,7 @@ class ModifyCommand extends PortalsCommand {
 
             @Syntax("<property>")
             @Description("The property to modify.")
-            SetProperties property,
+            String property,
 
             @Single
             @Syntax("<value>")
@@ -60,30 +60,17 @@ class ModifyCommand extends PortalsCommand {
             String value
     ) {
         Logging.info("Modifying portal: " + portal.getName() + " property: " + property + " value: " + value);
-        // Simply chop off the rest, if they have loc, that's good enough!
-        if (property == SetProperties.loc || property == SetProperties.location) {
-            if (!issuer.isPlayer()) {
-                issuer.sendMessage("You must be a player to use location property!");
-                return;
-            }
-            this.setLocation(portal, issuer.getPlayer());
-            return;
-        }
-        String propertyString = property.toString().toLowerCase();
-        if (this.setProperty(portal, propertyString, value)) {
-            issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value);
-        } else {
-            issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + value);
-            if (propertyString.equalsIgnoreCase("dest") || propertyString.equalsIgnoreCase("destination")) {
-                issuer.sendMessage("Multiverse could not find the destination: " + ChatColor.GOLD + value);
-            }
-        }
+        // todo: set location property
+        portal.getStringPropertyHandle().setPropertyString(property, value)
+                .onSuccess(ignore -> {
+                    this.plugin.savePortalsConfig();
+                    issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value);
+                }).onFailure(failure -> {
+                    issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + value);
+                });
     }
 
-    private boolean setProperty(MVPortal selectedPortal, String property, String value) {
-        return selectedPortal.setProperty(property, value);
-    }
-
+    // todo: set location property
     private void setLocation(MVPortal selectedPortal, Player player) {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);
         MultiverseRegion r = ps.getSelectedRegion();
@@ -104,7 +91,7 @@ class ModifyCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpmodify|mvpm")
-        public void onModifyCommand(MVCommandIssuer issuer, MVPortal portal, SetProperties property, String value) {
+        public void onModifyCommand(MVCommandIssuer issuer, MVPortal portal, String property, String value) {
             super.onModifyCommand(issuer, portal, property, value);
         }
     }

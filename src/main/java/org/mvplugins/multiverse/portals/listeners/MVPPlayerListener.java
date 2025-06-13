@@ -21,6 +21,7 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
 import org.mvplugins.multiverse.portals.WorldEditConnection;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.event.MVPortalEvent;
 import org.mvplugins.multiverse.portals.utils.PortalFiller;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
@@ -45,6 +46,7 @@ import org.bukkit.inventory.EquipmentSlot;
 public class MVPPlayerListener implements PortalsListener {
 
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
     private final PortalFiller filler;
     private final PortalManager portalManager;
     private final PlayerListenerHelper helper;
@@ -56,6 +58,7 @@ public class MVPPlayerListener implements PortalsListener {
     @Inject
     MVPPlayerListener(
             @NotNull MultiversePortals plugin,
+            @NotNull PortalsConfig portalsConfig,
             @NotNull PlayerListenerHelper helper,
             @NotNull PortalManager portalManager,
             @NotNull PortalFiller filler,
@@ -64,6 +67,7 @@ public class MVPPlayerListener implements PortalsListener {
             @NotNull BlockSafety blockSafety,
             @NotNull MVEconomist economist) {
         this.plugin = plugin;
+        this.portalsConfig = portalsConfig;
         this.helper = helper;
         this.portalManager = portalManager;
         this.filler = filler;
@@ -119,7 +123,7 @@ public class MVPPlayerListener implements PortalsListener {
             return;
         }
 
-        if (!MultiversePortals.bucketFilling) {
+        if (!portalsConfig.getBucketFilling()) {
             Logging.fine("The bucket filling functionality has been disabled in config, doing nothing");
             return;
         }
@@ -205,7 +209,7 @@ public class MVPPlayerListener implements PortalsListener {
             return;
         }
 
-        Material itemType = plugin.getWandMaterial();
+        Material itemType = portalsConfig.getWandMaterial();
         // If we Found WorldEdit, return, we're not needed here.
         // If the item is not the Wand we've setup we're not needed either
         // If the player doesn't have the perms, return also.
@@ -299,7 +303,7 @@ public class MVPPlayerListener implements PortalsListener {
                 }
                 // If they're using Access and they don't have permission and they're NOT exempt, return, they're not allowed to tp.
                 // No longer checking exemption status
-                if (MultiversePortals.EnforcePortalAccess && !event.getPlayer().hasPermission(portal.getPermission())) {
+                if (portalsConfig.getEnforcePortalAccess() && !event.getPlayer().hasPermission(portal.getPermission())) {
                     this.helper.stateFailure(p.getDisplayName(), portal.getName());
                     return;
                 }
@@ -337,7 +341,7 @@ public class MVPPlayerListener implements PortalsListener {
                 }
 
                 event.getPlayer().teleport(event.getTo());
-            } else if (!this.plugin.getMainConfig().getBoolean("portalsdefaulttonether", false)) {
+            } else if (!portalsConfig.getPortalsDefaultToNether()) {
                 // If portals should not default to the nether, cancel the event
                 event.getPlayer().sendMessage(String.format(
                         "This portal %sdoesn't go anywhere. You should exit it now.", ChatColor.RED));
