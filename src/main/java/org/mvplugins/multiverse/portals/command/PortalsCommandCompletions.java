@@ -10,8 +10,6 @@ import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
-import org.mvplugins.multiverse.portals.enums.PortalConfigProperty;
-import org.mvplugins.multiverse.portals.enums.SetProperties;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 import java.util.Collection;
@@ -34,9 +32,11 @@ public class PortalsCommandCompletions {
 
     private void registerCompletions(MVCommandCompletions commandCompletions) {
         commandCompletions.registerAsyncCompletion("mvportals", this::suggestPortals);
-        commandCompletions.registerStaticCompletion("setproperties", commandCompletions.suggestEnums(SetProperties.class));
         commandCompletions.registerStaticCompletion("portalconfigproperties", portalsConfig.getStringPropertyHandle().getAllPropertyNames());
         commandCompletions.registerAsyncCompletion("portalconfigvalues", this::suggestPortalConfigValues);
+        commandCompletions.registerAsyncCompletion("portalproperties", this::suggestPortalPropertyNames);
+        commandCompletions.registerAsyncCompletion("portalpropertynames", this::suggestPortalPropertyNames);
+        commandCompletions.registerAsyncCompletion("portalpropertyvalues", this::suggestPortalPropertyValues);
 
         commandCompletions.setDefaultCompletion("mvportals", MVPortal.class);
     }
@@ -52,5 +52,24 @@ public class PortalsCommandCompletions {
         return this.portalManager.getPortals(context.getSender()).stream()
                 .map(MVPortal::getName)
                 .toList();
+    }
+
+    private Collection<String> suggestPortalPropertyNames(BukkitCommandCompletionContext context) {
+        return Try.of(() -> context.getContextValue(MVPortal.class))
+                .map(portal -> portal.getStringPropertyHandle().getAllPropertyNames())
+                .getOrElse(Collections.emptyList());
+    }
+
+    private Collection<String> suggestPortalPropertyValues(BukkitCommandCompletionContext context) {
+        return Try.of(() -> {
+            MVPortal portal = context.getContextValue(MVPortal.class);
+            String propertyName = context.getContextValue(String.class);
+            return portal.getStringPropertyHandle().getSuggestedPropertyValue(
+                    propertyName,
+                    context.getInput(),
+                    PropertyModifyAction.SET,
+                    context.getSender()
+            );
+        }).getOrElse(Collections.emptyList());
     }
 }
