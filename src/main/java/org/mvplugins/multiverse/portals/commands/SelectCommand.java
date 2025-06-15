@@ -3,7 +3,6 @@ package org.mvplugins.multiverse.portals.commands;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -17,15 +16,18 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 
 @Service
 class SelectCommand extends PortalsCommand {
 
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
 
     @Inject
-    SelectCommand(@NotNull MultiversePortals plugin) {
+    SelectCommand(@NotNull MultiversePortals plugin, @NotNull PortalsConfig portalsConfig) {
         this.plugin = plugin;
+        this.portalsConfig = portalsConfig;
     }
 
     @Subcommand("select")
@@ -46,7 +48,7 @@ class SelectCommand extends PortalsCommand {
             MVPortal selected = this.plugin.getPortalSession(player).getSelectedPortal();
             if (this.plugin.getPortalSession(player).getSelectedPortal() == null) {
                 player.sendMessage("You have not selected a portal yet!");
-                player.sendMessage("Use a " + ChatColor.GREEN + plugin.getWandMaterial() + ChatColor.WHITE + " to do so!");
+                player.sendMessage("Use a " + ChatColor.GREEN + portalsConfig.getWandMaterial() + ChatColor.WHITE + " to do so!");
                 return;
             }
             player.sendMessage("You have selected: " + ChatColor.DARK_AQUA + selected.getName());
@@ -60,8 +62,8 @@ class SelectCommand extends PortalsCommand {
     @Service
     private final static class LegacyAlias extends SelectCommand implements LegacyAliasCommand {
         @Inject
-        LegacyAlias(MultiversePortals plugin) {
-            super(plugin);
+        LegacyAlias(MultiversePortals plugin, PortalsConfig portalsConfig) {
+            super(plugin, portalsConfig);
         }
 
         @Override

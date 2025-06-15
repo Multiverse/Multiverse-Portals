@@ -83,6 +83,7 @@ class CreateCommand extends PortalsCommand {
         ps.selectPortal(portal);
         if (destination != null) {
             portal.setDestination(destination);
+            this.plugin.savePortalsConfig();
         } else {
             player.sendMessage(ChatColor.RED + "Portal destination not set. Use " + ChatColor.DARK_AQUA + "/mvp modify destination <value>" + ChatColor.RED + " to set one.");
         }

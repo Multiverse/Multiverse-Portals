@@ -1,109 +1,91 @@
 package org.mvplugins.multiverse.portals.commands;
 
-import org.bukkit.ChatColor;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
+import org.mvplugins.multiverse.core.locale.MVCorei18n;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Description;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Optional;
-import org.mvplugins.multiverse.external.acf.commands.annotation.Single;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Subcommand;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Syntax;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
-import org.mvplugins.multiverse.portals.MultiversePortals;
-import org.mvplugins.multiverse.portals.enums.PortalConfigProperty;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 
 @Service
 class ConfigCommand extends PortalsCommand {
 
-    private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
 
     @Inject
-    ConfigCommand(@NotNull MultiversePortals plugin) {
-        this.plugin = plugin;
+    ConfigCommand(@NotNull PortalsConfig portalsConfig) {
+        this.portalsConfig = portalsConfig;
     }
 
-    @Subcommand("config|conf")
+    @Subcommand("config")
     @CommandPermission("multiverse.portal.config")
-    @CommandCompletion("@portalconfigproperty @empty")
-    @Syntax("<property> <value>")
+    @CommandCompletion("@portalconfigproperties @portalconfigvalues")
+    @Syntax("<property> [value]")
     @Description("Allows you to set Global MV Portals Variables.")
     void onConfigCommand(
             @NotNull MVCommandIssuer issuer,
 
             @Optional
             @Syntax("<property>")
-            @Description("The property to set.")
-            PortalConfigProperty property,
+            @Description("The property to set or get info of.")
+            String property,
 
             @Optional
-            @Single
-            @Syntax("<value>")
+            @Syntax("[value]")
             @Description("The value to set.")
             String value
     ) {
-        if (property == null) {
-            String[] allProps = PortalConfigProperty.getAllValues().split(" ");
-            StringBuilder currentvals = new StringBuilder();
-            for (String prop : allProps) {
-                currentvals.append(ChatColor.GREEN);
-                currentvals.append(prop);
-                currentvals.append(ChatColor.WHITE);
-                currentvals.append(" = ");
-                currentvals.append(ChatColor.GOLD);
-                currentvals.append(this.plugin.getMainConfig().get(prop, "NOT SET"));
-                currentvals.append(ChatColor.WHITE);
-                currentvals.append(", ");
-            }
-            issuer.sendMessage(currentvals.substring(0,currentvals.length() - 2));
-            return;
-        }
-
         if (value == null) {
-            issuer.sendMessage(ChatColor.AQUA + property.name() + ChatColor.WHITE + " has value "
-                    + ChatColor.GREEN + this.plugin.getMainConfig().get(property.name().toLowerCase()));
+            showConfigValue(issuer, property);
             return;
         }
+        updateConfigValue(issuer, property, value);
+    }
 
-        if (property.equals(PortalConfigProperty.wand) || property.equals(PortalConfigProperty.portalcooldown)) {
-            try {
-                this.plugin.getMainConfig().set(property.name(), Integer.parseInt(value));
-            } catch (NumberFormatException e) {
-                issuer.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + property.name() + ChatColor.WHITE + " must be an integer!");
-                return;
-            }
-        } else {
-            try {
-                this.plugin.getMainConfig().set(property.name().toLowerCase(), Boolean.parseBoolean(value));
-            } catch (Exception e) {
-                issuer.sendMessage(ChatColor.RED + "Sorry, " + ChatColor.AQUA + property.name() + ChatColor.WHITE + " must be true or false!");
-                return;
-            }
-        }
+    private void showConfigValue(MVCommandIssuer issuer, String name) {
+        portalsConfig.getStringPropertyHandle().getProperty(name)
+                .onSuccess(value -> issuer.sendMessage(MVCorei18n.CONFIG_SHOW_SUCCESS,
+                        MessageReplacement.Replace.NAME.with(name),
+                        MessageReplacement.Replace.VALUE.with(value)))
+                .onFailure(e -> issuer.sendMessage(MVCorei18n.CONFIG_SHOW_ERROR,
+                        MessageReplacement.Replace.NAME.with(name),
+                        MessageReplacement.Replace.ERROR.with(e)));
+    }
 
-        if (this.plugin.saveMainConfig()) {
-            issuer.sendMessage(ChatColor.GREEN + "SUCCESS!" + ChatColor.WHITE + " Values were updated successfully!");
-            this.plugin.reloadConfigs(false);
-        } else {
-            issuer.sendMessage(ChatColor.RED + "FAIL!" + ChatColor.WHITE + " Check your console for details!");
-        }
+    private void updateConfigValue(MVCommandIssuer issuer, String name, String value) {
+        portalsConfig.getStringPropertyHandle().setPropertyString(name, value)
+                .onSuccess(ignore -> {
+                    portalsConfig.save();
+                    issuer.sendMessage(MVCorei18n.CONFIG_SET_SUCCESS,
+                            MessageReplacement.Replace.NAME.with(name),
+                            MessageReplacement.Replace.VALUE.with(value));
+                })
+                .onFailure(e -> issuer.sendMessage(MVCorei18n.CONFIG_SET_ERROR,
+                        MessageReplacement.Replace.NAME.with(name),
+                        MessageReplacement.Replace.VALUE.with(value),
+                        MessageReplacement.Replace.ERROR.with(e)));
     }
 
     @Service
     private final static class LegacyAlias extends ConfigCommand implements LegacyAliasCommand {
         @Inject
-        LegacyAlias(MultiversePortals plugin) {
-            super(plugin);
+        LegacyAlias(PortalsConfig portalsConfig) {
+            super(portalsConfig);
         }
 
         @Override
         @CommandAlias("mvpconfig|mvpconf")
-        void onConfigCommand(MVCommandIssuer issuer, PortalConfigProperty property, String value) {
+        @Subcommand("conf")
+        void onConfigCommand(MVCommandIssuer issuer, String property, String value) {
             super.onConfigCommand(issuer, property, value);
         }
     }

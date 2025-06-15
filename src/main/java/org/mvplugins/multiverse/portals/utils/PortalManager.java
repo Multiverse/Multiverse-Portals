@@ -31,6 +31,7 @@ import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalLocation;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 
 
 /**
@@ -42,6 +43,7 @@ import org.mvplugins.multiverse.portals.PortalLocation;
 public class PortalManager {
     private final MultiversePortals plugin;
     private final WorldManager worldManager;
+    private final PortalsConfig portalsConfig;
     private final Map<String, MVPortal> portals;
 
     // For each world, keep a map of chunk hashes (see hashChunk()) to lists of
@@ -52,9 +54,12 @@ public class PortalManager {
     private static final Collection<MVPortal> emptyPortalSet = new ArrayList<MVPortal>();
 
     @Inject
-    PortalManager(@NotNull MultiversePortals plugin, @NotNull WorldManager worldManager) {
+    PortalManager(@NotNull MultiversePortals plugin,
+                  @NotNull WorldManager worldManager,
+                  @NotNull PortalsConfig portalsConfig) {
         this.plugin = plugin;
         this.worldManager = worldManager;
+        this.portalsConfig = portalsConfig;
         this.portals = new HashMap<>();
         this.worldChunkPortals = new HashMap<>();
     }
@@ -90,7 +95,7 @@ public class PortalManager {
         for (MVPortal portal : getNearbyPortals(world, l)) {
 
             // Ignore portals the player can't use.
-            if (!checkPermission || !MultiversePortals.EnforcePortalAccess || portal.playerCanEnterPortal(sender)) {
+            if (!checkPermission || !portalsConfig.getEnforcePortalAccess() || portal.playerCanEnterPortal(sender)) {
                 PortalLocation portalLoc = portal.getLocation();
                 if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
                     return portal;
@@ -157,6 +162,7 @@ public class PortalManager {
     // Add a portal whose name is already known to be unique.
     private void addUniquePortal(MultiverseWorld world, String name, MVPortal portal) {
         this.portals.put(name, portal);
+        this.plugin.savePortalsConfig();
         addToWorldChunkPortals(world, portal);
     }
 
@@ -196,7 +202,7 @@ public class PortalManager {
             recalculatePermissions();
         }
 
-        if (MultiversePortals.ClearOnRemove) {
+        if (portalsConfig.getClearOnRemove()) {
             // Replace portal blocks in the portal with air. This keeps us from
             // leaving behind portal blocks (which would take an unsuspecting
             // player to the nether instead of their expected destination).
@@ -228,7 +234,7 @@ public class PortalManager {
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        if (MultiversePortals.EnforcePortalAccess) {
+        if (portalsConfig.getEnforcePortalAccess()) {
             for (MVPortal p : all) {
                 if (p.playerCanEnterPortal((Player) sender)) {
                     validItems.add(p);
@@ -258,7 +264,7 @@ public class PortalManager {
         }
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
-        if (MultiversePortals.EnforcePortalAccess) {
+        if (portalsConfig.getEnforcePortalAccess()) {
             for (MVPortal p : all) {
                 if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
                         p.playerCanEnterPortal((Player) sender)) {
