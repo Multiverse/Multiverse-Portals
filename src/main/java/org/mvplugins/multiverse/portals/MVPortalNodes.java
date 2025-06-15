@@ -1,16 +1,12 @@
 package org.mvplugins.multiverse.portals;
 
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.config.node.ConfigNode;
 import org.mvplugins.multiverse.core.config.node.Node;
 import org.mvplugins.multiverse.core.config.node.NodeGroup;
-import org.mvplugins.multiverse.core.config.node.functions.SenderNodeSuggester;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
-import org.mvplugins.multiverse.core.destination.core.WorldDestination;
 
-import java.util.Collection;
 import java.util.Objects;
 
 final class MVPortalNodes {
@@ -18,7 +14,7 @@ final class MVPortalNodes {
     private final NodeGroup nodes = new NodeGroup();
 
     private MVPortal portal;
-    private final DestinationsProvider destinationsProvider;
+    private DestinationsProvider destinationsProvider;
 
     MVPortalNodes(MVPortal portal) {
         this.portal = portal;
@@ -66,7 +62,7 @@ final class MVPortalNodes {
 
     final ConfigNode<String> destination = node(ConfigNode.builder("destination", String.class)
             .defaultValue("")
-            .suggester((SenderNodeSuggester) this::suggestDestinations)
+            .suggester((sender, input) -> destinationsProvider.suggestDestinationStrings(sender, input))
             .onSetValue((oldValue, newValue) -> {
                 if (!Objects.equals(oldValue, newValue)) {
                     portal.setDestination(newValue);
@@ -78,14 +74,4 @@ final class MVPortalNodes {
             .defaultValue(0.0)
             .hidden()
             .build());
-
-    private Collection<String> suggestDestinations(CommandSender sender, String input) {
-        return destinationsProvider.getDestinations().stream()
-                .flatMap(destination -> destination.suggestDestinations(sender, input)
-                        .stream()
-                        .map(packet -> destination instanceof WorldDestination
-                                ? packet.destinationString()
-                                : destination.getIdentifier() + ":" + packet.destinationString()))
-                .toList();
-    }
 }
