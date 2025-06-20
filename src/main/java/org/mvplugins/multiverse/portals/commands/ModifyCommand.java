@@ -1,13 +1,12 @@
 package org.mvplugins.multiverse.portals.commands;
 
-import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
-import org.mvplugins.multiverse.core.command.MVCommandManager;import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
+import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Description;
@@ -22,7 +21,6 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalLocation;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
-import org.mvplugins.multiverse.portals.enums.SetProperties;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 @Service
@@ -59,9 +57,8 @@ class ModifyCommand extends PortalsCommand {
             @Description("The value to set.")
             String value
     ) {
-        Logging.info("Modifying portal: " + portal.getName() + " property: " + property + " value: " + value);
         // todo: set location property
-        portal.getStringPropertyHandle().setPropertyString(property, value)
+        portal.getStringPropertyHandle().setPropertyString(issuer.getIssuer(), property, value)
                 .onSuccess(ignore -> {
                     this.plugin.savePortalsConfig();
                     issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value);

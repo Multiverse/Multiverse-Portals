@@ -59,7 +59,6 @@ public class MVPortal {
     private final StringPropertyHandle stringPropertyHandle;
 
     private PortalLocation location;
-    private DestinationInstance<?, ?> destination;
 
     private Permission permission;
     private Permission fillPermission;
@@ -235,8 +234,11 @@ public class MVPortal {
             Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
-        this.destination = newDestination;
         return this.configHandle.set(configNodes.destination, newDestination.toString()).isSuccess();
+    }
+
+    public DestinationInstance<?, ?> getDestination() {
+        return this.destinationsProvider.parseDestination(this.configHandle.get(configNodes.destination)).getOrNull();
     }
 
     public String getName() {
@@ -327,13 +329,6 @@ public class MVPortal {
 
     public boolean playerCanFillPortal(Player player) {
         return player.hasPermission(this.fillPermission);
-    }
-
-    public DestinationInstance<?, ?> getDestination() {
-        if (this.destination == null) {
-            setDestination(this.configHandle.get(configNodes.destination));
-        }
-        return this.destination;
     }
 
     @Nullable

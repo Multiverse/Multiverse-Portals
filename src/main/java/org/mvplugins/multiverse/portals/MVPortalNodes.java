@@ -5,9 +5,8 @@ import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.config.node.ConfigNode;
 import org.mvplugins.multiverse.core.config.node.Node;
 import org.mvplugins.multiverse.core.config.node.NodeGroup;
+import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
-
-import java.util.Objects;
 
 final class MVPortalNodes {
 
@@ -68,11 +67,9 @@ final class MVPortalNodes {
             .defaultValue("")
             .aliases("dest")
             .suggester((sender, input) -> destinationsProvider.suggestDestinationStrings(sender, input))
-            .onSetValue((oldValue, newValue) -> {
-                if (!Objects.equals(oldValue, newValue)) {
-                    portal.setDestination(newValue);
-                }
-            })
+            .stringParser((sender, input, type) -> destinationsProvider.parseDestination(sender, input)
+                    .map(DestinationInstance::toString)
+                    .toTry())
             .build());
 
     final ConfigNode<Double> version = node(ConfigNode.builder("version", Double.class)
