@@ -2,12 +2,11 @@ package org.mvplugins.multiverse.portals.commands;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.locale.message.LocalizableMessage;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
-import org.mvplugins.multiverse.core.command.MVCommandManager;import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
+import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Description;
@@ -20,10 +19,6 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
-import org.mvplugins.multiverse.portals.PortalLocation;
-import org.mvplugins.multiverse.portals.PortalPlayerSession;
-import org.mvplugins.multiverse.portals.enums.SetProperties;
-import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 @Service
 class ModifyCommand extends PortalsCommand {
@@ -59,27 +54,33 @@ class ModifyCommand extends PortalsCommand {
             @Description("The value to set.")
             String value
     ) {
-        Logging.info("Modifying portal: " + portal.getName() + " property: " + property + " value: " + value);
-        // todo: set location property
-        portal.getStringPropertyHandle().setPropertyString(property, value)
+        //todo: remove this in 6.0
+        if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
+            if (value.equalsIgnoreCase("here") && !worldManager.isWorld("here")) {
+                Logging.warning("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                issuer.sendError("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                value = "e:@here";
+            }
+        }
+
+        String finalValue = value;
+        var stringPropertyHandle = portal.getStringPropertyHandle();
+        stringPropertyHandle.setPropertyString(issuer.getIssuer(), property, value)
                 .onSuccess(ignore -> {
                     this.plugin.savePortalsConfig();
-                    issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value);
+                    issuer.sendMessage(ChatColor.GREEN + "Property " + ChatColor.AQUA + property + ChatColor.GREEN
+                            + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to "
+                            + ChatColor.AQUA + stringPropertyHandle.getProperty(property).getOrNull());
                 }).onFailure(failure -> {
-                    issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + value);
+                    issuer.sendError("Property " + ChatColor.AQUA + property + ChatColor.RED + " of Portal "
+                            + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to "
+                            + ChatColor.AQUA + finalValue);
+                    if (failure instanceof LocalizableMessage localizableMessage) {
+                        issuer.sendError(localizableMessage.getLocalizableMessage());
+                    } else {
+                        issuer.sendError(failure.getMessage());
+                    }
                 });
-    }
-
-    // todo: set location property
-    private void setLocation(MVPortal selectedPortal, Player player) {
-        PortalPlayerSession ps = this.plugin.getPortalSession(player);
-        MultiverseRegion r = ps.getSelectedRegion();
-        if (r != null) {
-            LoadedMultiverseWorld world = this.worldManager.getLoadedWorld(player.getWorld().getName()).getOrNull();
-            PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
-            selectedPortal.setPortalLocation(location);
-            player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");
-        }
     }
 
     @Service

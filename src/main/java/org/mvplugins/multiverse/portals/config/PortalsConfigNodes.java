@@ -103,6 +103,7 @@ final class PortalsConfigNodes {
             .comment("This keeps us from leaving behind portal blocks (which would take an unsuspecting player to the nether when trying to use the mvportal)")
             .defaultValue(false)
             .name("clear-on-remove")
+            .aliases("clearonremove")
             .onSetValue((oldValue, newValue) -> MultiversePortals.ClearOnRemove = newValue)
             .build());
 
@@ -116,6 +117,7 @@ final class PortalsConfigNodes {
             .comment("The permission node is: `multiverse.portal.access.PORTALNAME`")
             .defaultValue(true)
             .name("enforce-portal-access")
+            .aliases("enforceportalaccess")
             .onSetValue((oldValue, newValue) -> MultiversePortals.EnforcePortalAccess = newValue)
             .build());
 
@@ -124,6 +126,7 @@ final class PortalsConfigNodes {
             .comment("The number of seconds a player must wait between using a mvportal.")
             .defaultValue(1000)
             .name("portal-cooldown")
+            .aliases("portalcooldown")
             .build());
 
     final ConfigNode<Boolean> portalsDefaultToNether = node(ConfigNode.builder("portal-usage.portals-default-to-nether", Boolean.class)
@@ -132,6 +135,7 @@ final class PortalsConfigNodes {
             .comment("will fallback and behave as a normal nether portal teleporting between the nether world.")
             .defaultValue(false)
             .name("portals-default-to-nether")
+            .aliases("portalsdefaulttonether")
             .build());
 
     final ConfigNode<Boolean> netherAnimation = node(ConfigNode.builder("portal-usage.nether-animation", Boolean.class)
@@ -149,6 +153,7 @@ final class PortalsConfigNodes {
             .comment("Vehicles are usually boats, minecarts, pigs and horses.")
             .defaultValue(false)
             .name("teleport-vehicles")
+            .aliases("teleportvehicles")
             .onSetValue((oldValue, newValue) -> MultiversePortals.TeleportVehicles = newValue)
             .build());
 
@@ -158,6 +163,7 @@ final class PortalsConfigNodes {
             .comment("Disabling this will cause mvportals without nether or end fill to not work.")
             .defaultValue(true)
             .name("use-on-move")
+            .aliases("useonmove")
             .onSetValue((oldValue, newValue) -> MultiversePortals.UseOnMove = newValue)
             .build());
 

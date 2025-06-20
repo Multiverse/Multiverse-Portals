@@ -62,7 +62,7 @@ class ConfigCommand extends PortalsCommand {
     }
 
     private void updateConfigValue(MVCommandIssuer issuer, String name, String value) {
-        portalsConfig.getStringPropertyHandle().setPropertyString(name, value)
+        portalsConfig.getStringPropertyHandle().setPropertyString(issuer.getIssuer(), name, value)
                 .onSuccess(ignore -> {
                     portalsConfig.save();
                     issuer.sendMessage(MVCorei18n.CONFIG_SET_SUCCESS,
@@ -84,7 +84,7 @@ class ConfigCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpconfig|mvpconf")
-        @Subcommand("conf")
+        @Subcommand("config|conf")
         void onConfigCommand(MVCommandIssuer issuer, String property, String value) {
             super.onConfigCommand(issuer, property, value);
         }
