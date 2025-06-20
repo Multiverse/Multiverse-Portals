@@ -84,7 +84,7 @@ class ConfigCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpconfig|mvpconf")
-        @Subcommand("conf")
+        @Subcommand("config|conf")
         void onConfigCommand(MVCommandIssuer issuer, String property, String value) {
             super.onConfigCommand(issuer, property, value);
         }
