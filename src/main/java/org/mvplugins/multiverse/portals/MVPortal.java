@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.mvplugins.multiverse.core.config.handle.MemoryConfigurationHandle;
@@ -29,16 +28,12 @@ import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.teleportation.BlockSafety;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
-import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
-import org.mvplugins.multiverse.core.utils.MaterialConverter;
-import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.PortalType;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -97,7 +92,7 @@ public class MVPortal {
         this.name = name;
 
         var config = this.plugin.getPortalsConfig();
-        this.configNodes = new MVPortalNodes(this);
+        this.configNodes = new MVPortalNodes(plugin, this);
         var portalSection = config.getConfigurationSection("portals." + this.name);
         if (portalSection == null) {
             portalSection = config.createSection("portals." + this.name);
@@ -107,6 +102,16 @@ public class MVPortal {
                         .addVersionMigrator(VersionMigrator.builder(1.0)
                                 .addAction(MoveMigratorAction.of("safeteleport", "safe-teleport"))
                                 .addAction(MoveMigratorAction.of("teleportnonplayers", "teleport-non-players"))
+                                .build())
+                        .addVersionMigrator(VersionMigrator.builder(1.1)
+                                .addAction(configSection -> {
+                                    // combine world and location into 1 string
+                                    var world = configSection.getString("world");
+                                    var location = configSection.getString("location");
+                                    if (world != null && location != null) {
+                                        configSection.set("location", world + ":" + location);
+                                    }
+                                })
                                 .build())
                         .build())
                 .build();
@@ -198,25 +203,35 @@ public class MVPortal {
         return this.setPortalLocation(locationString, world);
     }
 
+    /**
+     *
+     * @param locationString
+     * @return
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public boolean setPortalLocation(String locationString) {
+        return this.setPortalLocation(PortalLocation.parseLocation(locationString));
+    }
+
     public boolean setPortalLocation(String locationString, LoadedMultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
 
     public boolean setPortalLocation(PortalLocation location) {
+        if (!setPortalLocationInternal(location)) {
+            return false;
+        }
+        return configHandle.set(configNodes.location, this.location.toString()).isSuccess();
+    }
+
+    boolean setPortalLocationInternal(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
             Logging.warning("Portal " + this.name + " has an invalid LOCATION!");
             return false;
         }
-        configHandle.set(configNodes.location, this.location.toString());
-
-        MultiverseWorld world = this.location.getMVWorld();
-        if (world == null) {
-            Logging.warning("Portal " + this.name + " has an invalid WORLD");
-            return false;
-        }
-
-        configHandle.set(configNodes.world, this.location.getMVWorld().getName());
         return true;
     }
 
@@ -247,11 +262,7 @@ public class MVPortal {
 
     public PortalLocation getLocation() {
         if (this.location == null) {
-            this.location = PortalLocation.parseLocation(
-                    this.configHandle.get(configNodes.location),
-                    this.worldManager.getLoadedWorld(this.configHandle.get(configNodes.world)).getOrNull(),
-                    this.name
-            );
+            this.location = PortalLocation.parseLocation(this.configHandle.get(configNodes.location));
         }
         return this.location;
     }

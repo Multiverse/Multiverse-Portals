@@ -2,11 +2,8 @@ package org.mvplugins.multiverse.portals.commands;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.locale.message.LocalizableMessage;
-import org.mvplugins.multiverse.core.locale.message.Message;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
@@ -22,9 +19,6 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
-import org.mvplugins.multiverse.portals.PortalLocation;
-import org.mvplugins.multiverse.portals.PortalPlayerSession;
-import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 @Service
 class ModifyCommand extends PortalsCommand {
@@ -62,14 +56,13 @@ class ModifyCommand extends PortalsCommand {
     ) {
         //todo: remove this in 6.0
         if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
-            if (value.equalsIgnoreCase("here")) {
+            if (value.equalsIgnoreCase("here") && !worldManager.isWorld("here")) {
                 Logging.warning("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
                 issuer.sendError("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
                 value = "e:@here";
             }
         }
 
-        // todo: set location property
         String finalValue = value;
         var stringPropertyHandle = portal.getStringPropertyHandle();
         stringPropertyHandle.setPropertyString(issuer.getIssuer(), property, value)
@@ -88,18 +81,6 @@ class ModifyCommand extends PortalsCommand {
                         issuer.sendError(failure.getMessage());
                     }
                 });
-    }
-
-    // todo: set location property
-    private void setLocation(MVPortal selectedPortal, Player player) {
-        PortalPlayerSession ps = this.plugin.getPortalSession(player);
-        MultiverseRegion r = ps.getSelectedRegion();
-        if (r != null) {
-            LoadedMultiverseWorld world = this.worldManager.getLoadedWorld(player.getWorld().getName()).getOrNull();
-            PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
-            selectedPortal.setPortalLocation(location);
-            player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");
-        }
     }
 
     @Service
