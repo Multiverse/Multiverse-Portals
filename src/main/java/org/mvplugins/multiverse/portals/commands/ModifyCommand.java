@@ -1,8 +1,11 @@
 package org.mvplugins.multiverse.portals.commands;
 
+import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
+import org.mvplugins.multiverse.core.locale.message.LocalizableMessage;
+import org.mvplugins.multiverse.core.locale.message.Message;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
@@ -57,13 +60,33 @@ class ModifyCommand extends PortalsCommand {
             @Description("The value to set.")
             String value
     ) {
+        //todo: remove this in 6.0
+        if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
+            if (value.equalsIgnoreCase("here")) {
+                Logging.warning("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                issuer.sendError("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                value = "e:@here";
+            }
+        }
+
         // todo: set location property
-        portal.getStringPropertyHandle().setPropertyString(issuer.getIssuer(), property, value)
+        String finalValue = value;
+        var stringPropertyHandle = portal.getStringPropertyHandle();
+        stringPropertyHandle.setPropertyString(issuer.getIssuer(), property, value)
                 .onSuccess(ignore -> {
                     this.plugin.savePortalsConfig();
-                    issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value);
+                    issuer.sendMessage(ChatColor.GREEN + "Property " + ChatColor.AQUA + property + ChatColor.GREEN
+                            + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to "
+                            + ChatColor.AQUA + stringPropertyHandle.getProperty(property).getOrNull());
                 }).onFailure(failure -> {
-                    issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + value);
+                    issuer.sendError("Property " + ChatColor.AQUA + property + ChatColor.RED + " of Portal "
+                            + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to "
+                            + ChatColor.AQUA + finalValue);
+                    if (failure instanceof LocalizableMessage localizableMessage) {
+                        issuer.sendError(localizableMessage.getLocalizableMessage());
+                    } else {
+                        issuer.sendError(failure.getMessage());
+                    }
                 });
     }
 
