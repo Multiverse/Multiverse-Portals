@@ -32,6 +32,7 @@ final class MVPortalNodes {
 
     final ConfigNode<Material> currency = node(ConfigNode.builder("currency", Material.class)
             .defaultValue(Material.AIR)
+            .aliases("curr")
             .build());
 
     final ConfigNode<Double> price = node(ConfigNode.builder("price", Double.class)
@@ -40,10 +41,12 @@ final class MVPortalNodes {
 
     final ConfigNode<Boolean> safeTeleport = node(ConfigNode.builder("safe-teleport", Boolean.class)
             .defaultValue(true)
+            .aliases("safe")
             .build());
 
     final ConfigNode<Boolean> teleportNonPlayers = node(ConfigNode.builder("teleport-non-players", Boolean.class)
             .defaultValue(false)
+            .aliases("telenonplayers")
             .build());
 
     final ConfigNode<String> owner = node(ConfigNode.builder("owner", String.class)
@@ -53,6 +56,7 @@ final class MVPortalNodes {
     final ConfigNode<String> location = node(ConfigNode.builder("location", String.class)
             .defaultValue("")
             .hidden()
+            .aliases("loc")
             .build());
 
     final ConfigNode<String> world = node(ConfigNode.builder("world", String.class)
@@ -62,6 +66,7 @@ final class MVPortalNodes {
 
     final ConfigNode<String> destination = node(ConfigNode.builder("destination", String.class)
             .defaultValue("")
+            .aliases("dest")
             .suggester((sender, input) -> destinationsProvider.suggestDestinationStrings(sender, input))
             .onSetValue((oldValue, newValue) -> {
                 if (!Objects.equals(oldValue, newValue)) {
