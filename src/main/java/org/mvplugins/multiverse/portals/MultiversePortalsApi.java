@@ -2,14 +2,16 @@ package org.mvplugins.multiverse.portals;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.utils.PortalFiller;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 import java.util.Objects;
 
-public class MultiversePortalsApi {
+public final class MultiversePortalsApi {
 
     private static MultiversePortalsApi instance;
 
@@ -60,6 +62,18 @@ public class MultiversePortalsApi {
      */
     public @NotNull PortalManager getPortalManager() {
         return Objects.requireNonNull(serviceLocator.getService(PortalManager.class));
+    }
+
+    /**
+     * Gets the instance of the PortalsConfig.
+     *
+     * @return The PortalsConfig instance
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince( "5.1")
+    public @NotNull PortalsConfig getPortalsConfig() {
+        return Objects.requireNonNull(serviceLocator.getService(PortalsConfig.class));
     }
 
     /**
