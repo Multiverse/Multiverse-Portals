@@ -52,7 +52,7 @@ import org.mvplugins.multiverse.portals.utils.PortalManager;
 @Service
 public class MultiversePortals extends MultiverseModule {
 
-    private static final double TARGET_CORE_API_VERSION = 5.0;
+    private static final double TARGET_CORE_API_VERSION = 5.1;
 
     @Inject
     private Provider<PortalManager> portalManager;
