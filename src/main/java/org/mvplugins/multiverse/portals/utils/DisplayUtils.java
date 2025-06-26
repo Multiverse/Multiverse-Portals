@@ -26,7 +26,7 @@ public class DisplayUtils {
 
     public void showStaticInfo(CommandSender sender, MVPortal portal, String message) {
         sender.sendMessage(ChatColor.AQUA + "--- " + message + ChatColor.DARK_AQUA + portal.getName() + ChatColor.AQUA + " ---");
-        String[] locParts = portal.getLocation().toString().split(":");
+        String[] locParts = portal.getPortalLocation().toString().split(":");
         sender.sendMessage("Coords: " + ChatColor.GOLD + locParts[0] + ChatColor.WHITE + " to " + ChatColor.GOLD + locParts[1] + ChatColor.WHITE + " in " + ChatColor.GOLD + portal.getWorld().getName() );
         if (portal.getDestination() == null) {
             sender.sendMessage("Destination: " + ChatColor.RED + ChatColor.ITALIC + "NOT SET!");

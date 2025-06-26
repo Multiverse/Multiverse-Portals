@@ -183,7 +183,7 @@ public class MultiversePortals extends MultiverseModule {
         if (keys != null) {
             for (String pname : keys) {
                 MVPortal portal = MVPortal.loadMVPortalFromConfig(this, pname);
-                if (portal.getLocation().isValidLocation()) {
+                if (portal.getPortalLocation().isValidLocation()) {
                     this.portalManager.get().addPortal(portal);
                 } else {
                     Logging.warning(String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));

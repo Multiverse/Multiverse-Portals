@@ -41,7 +41,21 @@ import org.bukkit.util.Vector;
 
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
-public class MVPortal {
+public final class MVPortal {
+
+    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
+            Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
+
+    public static final Pattern PORTAL_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
+
+    public static boolean isPortalInterior(Material material) {
+        return INTERIOR_MATERIALS.contains(material);
+    }
+
+    public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
+        return new MVPortal(instance, name);
+    }
+
     private final MultiversePortals plugin;
     private final PortalsConfig portalsConfig;
     private final WorldManager worldManager;
@@ -58,15 +72,6 @@ public class MVPortal {
     private Permission permission;
     private Permission fillPermission;
     private Permission exempt;
-
-    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
-            Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
-
-    public static final Pattern PORTAL_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
-
-    public static boolean isPortalInterior(Material material) {
-        return INTERIOR_MATERIALS.contains(material);
-    }
 
     public MVPortal(LoadedMultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this(instance, name);
@@ -136,9 +141,8 @@ public class MVPortal {
         }
     }
 
-    ConfigurationSection save() {
-        this.configHandle.save();
-        return this.configHandle.getConfig();
+    public String getName() {
+        return this.name;
     }
 
     /**
@@ -153,13 +157,41 @@ public class MVPortal {
         return this.stringPropertyHandle;
     }
 
+    ConfigurationSection save() {
+        this.configHandle.save();
+        return this.configHandle.getConfig();
+    }
+
+    /**
+     *
+     * @param owner
+     * @return
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public boolean setOwner(String owner) {
+        return this.configHandle.set(configNodes.owner, owner).isSuccess();
+    }
+
+    /**
+     *
+     * @return
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public String getOwner() {
+        return this.configHandle.get(configNodes.owner);
+    }
+
     /**
      * Set the value of teleportNonPlayers
      *
      * @param teleportNonPlayers The new value
      */
     @ApiStatus.AvailableSince("5.1")
-    public void setTeleportNonPlayers (boolean teleportNonPlayers) {
+    public void setTeleportNonPlayers(boolean teleportNonPlayers) {
         this.configHandle.set(configNodes.teleportNonPlayers, teleportNonPlayers);
     }
 
@@ -175,32 +207,20 @@ public class MVPortal {
         return this.configHandle.get(configNodes.safeTeleport);
     }
 
-    public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
-        return new MVPortal(instance, name);
+    private boolean setCurrency(Material currency) {
+        return this.configHandle.set(configNodes.currency, currency).isSuccess();
     }
 
     public Material getCurrency() {
         return this.configHandle.get(configNodes.currency);
     }
 
-    public double getPrice() {
-        return this.configHandle.get(configNodes.price);
-    }
-
-    private boolean setCurrency(Material currency) {
-        return this.configHandle.set(configNodes.currency, currency).isSuccess();
-    }
-
     private boolean setPrice(double price) {
         return this.configHandle.set(configNodes.price, price).isSuccess();
     }
 
-    public boolean setPortalLocation(String locationString, String worldString) {
-        LoadedMultiverseWorld world = null;
-        if (this.worldManager.isWorld(worldString)) {
-            world = this.worldManager.getLoadedWorld(worldString).getOrNull();
-        }
-        return this.setPortalLocation(locationString, world);
+    public double getPrice() {
+        return this.configHandle.get(configNodes.price);
     }
 
     /**
@@ -213,6 +233,14 @@ public class MVPortal {
     @ApiStatus.AvailableSince("5.1")
     public boolean setPortalLocation(String locationString) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString));
+    }
+
+    public boolean setPortalLocation(String locationString, String worldString) {
+        LoadedMultiverseWorld world = null;
+        if (this.worldManager.isWorld(worldString)) {
+            world = this.worldManager.getLoadedWorld(worldString).getOrNull();
+        }
+        return this.setPortalLocation(locationString, world);
     }
 
     public boolean setPortalLocation(String locationString, LoadedMultiverseWorld world) {
@@ -235,8 +263,11 @@ public class MVPortal {
         return true;
     }
 
-    private boolean setOwner(String owner) {
-        return this.configHandle.set(configNodes.owner, owner).isSuccess();
+    public PortalLocation getPortalLocation() {
+        if (this.location == null) {
+            this.location = PortalLocation.parseLocation(this.configHandle.get(configNodes.location));
+        }
+        return this.location;
     }
 
     public boolean setDestination(String destinationString) {
@@ -253,18 +284,10 @@ public class MVPortal {
     }
 
     public DestinationInstance<?, ?> getDestination() {
-        return this.destinationsProvider.parseDestination(this.configHandle.get(configNodes.destination)).getOrNull();
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public PortalLocation getLocation() {
-        if (this.location == null) {
-            this.location = PortalLocation.parseLocation(this.configHandle.get(configNodes.location));
-        }
-        return this.location;
+        return this.destinationsProvider.parseDestination(this.configHandle.get(configNodes.destination))
+                .onFailure(f ->
+                        Logging.warning("Portal " + this.name + " has an invalid DESTINATION! " + f.getFailureMessage().formatted()))
+                .getOrNull();
     }
 
     public Location getSafePlayerSpawnLocation() {
@@ -386,7 +409,7 @@ public class MVPortal {
         // Limit the search to the portal's region, extended by 1 block.
         boolean frameValid = false;
         {
-            MultiverseRegion r = getLocation().getRegion();
+            MultiverseRegion r = getPortalLocation().getRegion();
             int useX = (r.getWidth()  == 1) ? 0 : 1;
             int useY = (r.getHeight() == 1) ? 0 : 1;
             int useZ = (r.getDepth()  == 1) ? 0 : 1;
@@ -519,7 +542,8 @@ public class MVPortal {
      * @deprecated Busscript feature has been removed.
      */
     @Deprecated(since = "5.1" , forRemoval = true)
-    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")    public String getHandlerScript() {
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public String getHandlerScript() {
         Logging.warning("handle script is deprecated");
         return "";
     }
@@ -528,7 +552,8 @@ public class MVPortal {
      * @deprecated Busscript feature has been removed.
      */
     @Deprecated(since = "5.1" , forRemoval = true)
-    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")    public void setHandlerScript(String handlerScript) {
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public void setHandlerScript(String handlerScript) {
         Logging.warning("handle script is deprecated");
     }
 
@@ -539,5 +564,14 @@ public class MVPortal {
     @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public boolean isExempt(Player player) {
         return false;
+    }
+
+    /**
+     * @deprecated Use {@link MVPortal#getPortalLocation()} instead.
+     */
+    @Deprecated(forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public PortalLocation getLocation() {
+        return getPortalLocation();
     }
 }
