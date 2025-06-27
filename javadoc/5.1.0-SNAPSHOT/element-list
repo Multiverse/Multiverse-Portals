@@ -1,0 +1,9 @@
+org.mvplugins.multiverse.portals
+org.mvplugins.multiverse.portals.command
+org.mvplugins.multiverse.portals.commands
+org.mvplugins.multiverse.portals.config
+org.mvplugins.multiverse.portals.destination
+org.mvplugins.multiverse.portals.enums
+org.mvplugins.multiverse.portals.event
+org.mvplugins.multiverse.portals.listeners
+org.mvplugins.multiverse.portals.utils
