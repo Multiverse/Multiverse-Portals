@@ -14,29 +14,35 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.util.Vector;
 
+import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
+import javax.annotation.Nullable;
+
 public class PortalLocation {
 
-    private MultiverseRegion region;
-    private boolean validLocation = false;
+    public static PortalLocation parseLocation(String locationString) {
+        String[] split = locationString.split(":");
+        if (split.length != 3) {
+            Logging.warning("Failed Parsing Location (Format Error, was expecting: `WORLD:X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
+            return getInvalidPortalLocation();
+        }
 
-    public PortalLocation(Vector pos1, Vector pos2, LoadedMultiverseWorld world) {
-        this.validLocation = this.setLocation(pos1, pos2, world);
-    }
+        String worldName = split[0];
+        LoadedMultiverseWorld world = MultiverseCoreApi.get().getWorldManager().getLoadedWorld(worldName).getOrNull();
+        if (world == null) {
+            Logging.warning("Failed Parsing World (World Error, World did not exist or was not imported into Multiverse-Core!)");
+            return getInvalidPortalLocation();
+        }
 
-    public PortalLocation() {
-    }
-
-    /**
-     * This constructor takes the Vectors from WorldEdit and converts them to Bukkit vectors.
-     *
-     * @param minPt
-     * @param maxPt
-     */
-    public PortalLocation(BlockVector3 minPt, BlockVector3 maxPt, LoadedMultiverseWorld world) {
-        this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
+        Vector pos1 = parseVector(split[1]);
+        Vector pos2 = parseVector(split[2]);
+        if (pos1 == null || pos2 == null) {
+            Logging.warning("Failed Parsing Location (Vector Error, was expecting: `WORLD:X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
+            return getInvalidPortalLocation();
+        }
+        return new PortalLocation(pos1, pos2, world);
     }
 
     public static PortalLocation parseLocation(String locationString, LoadedMultiverseWorld world, String portalName) {
@@ -58,11 +64,30 @@ public class PortalLocation {
             return getInvalidPortalLocation();
         }
         return new PortalLocation(pos1, pos2, world);
-
     }
 
     private static PortalLocation getInvalidPortalLocation() {
         return new PortalLocation();
+    }
+
+    private MultiverseRegion region;
+    private boolean validLocation = false;
+
+    public PortalLocation() {
+    }
+
+    public PortalLocation(Vector pos1, Vector pos2, LoadedMultiverseWorld world) {
+        this.validLocation = this.setLocation(pos1, pos2, world);
+    }
+
+    /**
+     * This constructor takes the Vectors from WorldEdit and converts them to Bukkit vectors.
+     *
+     * @param minPt
+     * @param maxPt
+     */
+    public PortalLocation(BlockVector3 minPt, BlockVector3 maxPt, LoadedMultiverseWorld world) {
+        this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
     }
 
     private static Vector parseVector(String vectorString) {
@@ -117,29 +142,19 @@ public class PortalLocation {
         return this.region.getMaximumPoint();
     }
 
-    @Override
-    public String toString() {
-        if (this.region == null) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.region.getMinimumPoint().getX() + ",");
-        sb.append(this.region.getMinimumPoint().getY() + ",");
-        sb.append(this.region.getMinimumPoint().getZ() + ":");
-        sb.append(this.region.getMaximumPoint().getX() + ",");
-        sb.append(this.region.getMaximumPoint().getY() + ",");
-        sb.append(this.region.getMaximumPoint().getZ());
-        return sb.toString();
-    }
-
-    public LoadedMultiverseWorld getMVWorld() {
+    public @Nullable LoadedMultiverseWorld getMVWorld() {
         if (this.region == null) {
             return null;
         }
         return this.region.getWorld();
     }
 
-    public MultiverseRegion getRegion() {
+    public @Nullable MultiverseRegion getRegion() {
         return this.region;
+    }
+
+    @Override
+    public String toString() {
+        return this.region == null ? "" : this.region.toString();
     }
 }

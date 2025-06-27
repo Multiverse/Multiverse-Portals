@@ -2,12 +2,11 @@ package org.mvplugins.multiverse.portals.commands;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.locale.message.LocalizableMessage;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
-import org.mvplugins.multiverse.core.command.MVCommandManager;import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
+import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Description;
@@ -20,10 +19,6 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
-import org.mvplugins.multiverse.portals.PortalLocation;
-import org.mvplugins.multiverse.portals.PortalPlayerSession;
-import org.mvplugins.multiverse.portals.enums.SetProperties;
-import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 @Service
 class ModifyCommand extends PortalsCommand {
@@ -39,7 +34,7 @@ class ModifyCommand extends PortalsCommand {
 
     @Subcommand("modify")
     @CommandPermission("multiverse.portal.modify")
-    @CommandCompletion("@mvportals @setproperties @empty")
+    @CommandCompletion("@mvportals @portalpropertynames @portalpropertyvalues")
     @Syntax("[portal] <property> <value>")
     @Description("Allows you to modify all values that can be set.")
     public void onModifyCommand(
@@ -52,47 +47,40 @@ class ModifyCommand extends PortalsCommand {
 
             @Syntax("<property>")
             @Description("The property to modify.")
-            SetProperties property,
+            String property,
 
             @Single
             @Syntax("<value>")
             @Description("The value to set.")
             String value
     ) {
-        Logging.info("Modifying portal: " + portal.getName() + " property: " + property + " value: " + value);
-        // Simply chop off the rest, if they have loc, that's good enough!
-        if (property == SetProperties.loc || property == SetProperties.location) {
-            if (!issuer.isPlayer()) {
-                issuer.sendMessage("You must be a player to use location property!");
-                return;
-            }
-            this.setLocation(portal, issuer.getPlayer());
-            return;
-        }
-        String propertyString = property.toString().toLowerCase();
-        if (this.setProperty(portal, propertyString, value)) {
-            issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to " + ChatColor.AQUA + value);
-        } else {
-            issuer.sendMessage("Property " + property + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to " + ChatColor.AQUA + value);
-            if (propertyString.equalsIgnoreCase("dest") || propertyString.equalsIgnoreCase("destination")) {
-                issuer.sendMessage("Multiverse could not find the destination: " + ChatColor.GOLD + value);
+        //todo: remove this in 6.0
+        if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
+            if (value.equalsIgnoreCase("here") && !worldManager.isWorld("here")) {
+                Logging.warning("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                issuer.sendError("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                value = "e:@here";
             }
         }
-    }
 
-    private boolean setProperty(MVPortal selectedPortal, String property, String value) {
-        return selectedPortal.setProperty(property, value);
-    }
-
-    private void setLocation(MVPortal selectedPortal, Player player) {
-        PortalPlayerSession ps = this.plugin.getPortalSession(player);
-        MultiverseRegion r = ps.getSelectedRegion();
-        if (r != null) {
-            LoadedMultiverseWorld world = this.worldManager.getLoadedWorld(player.getWorld().getName()).getOrNull();
-            PortalLocation location = new PortalLocation(r.getMinimumPoint(), r.getMaximumPoint(), world);
-            selectedPortal.setPortalLocation(location);
-            player.sendMessage("Portal location has been set to your " + ChatColor.GREEN + "selection" + ChatColor.WHITE + "!");
-        }
+        String finalValue = value;
+        var stringPropertyHandle = portal.getStringPropertyHandle();
+        stringPropertyHandle.setPropertyString(issuer.getIssuer(), property, value)
+                .onSuccess(ignore -> {
+                    this.plugin.savePortalsConfig();
+                    issuer.sendMessage(ChatColor.GREEN + "Property " + ChatColor.AQUA + property + ChatColor.GREEN
+                            + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to "
+                            + ChatColor.AQUA + stringPropertyHandle.getProperty(property).getOrNull());
+                }).onFailure(failure -> {
+                    issuer.sendError("Property " + ChatColor.AQUA + property + ChatColor.RED + " of Portal "
+                            + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to "
+                            + ChatColor.AQUA + finalValue);
+                    if (failure instanceof LocalizableMessage localizableMessage) {
+                        issuer.sendError(localizableMessage.getLocalizableMessage());
+                    } else {
+                        issuer.sendError(failure.getMessage());
+                    }
+                });
     }
 
     @Service
@@ -104,7 +92,7 @@ class ModifyCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpmodify|mvpm")
-        public void onModifyCommand(MVCommandIssuer issuer, MVPortal portal, SetProperties property, String value) {
+        public void onModifyCommand(MVCommandIssuer issuer, MVPortal portal, String property, String value) {
             super.onModifyCommand(issuer, portal, property, value);
         }
     }

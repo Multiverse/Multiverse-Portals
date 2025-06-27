@@ -89,4 +89,14 @@ public class MultiverseRegion {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return this.world.getName() + ":" +
+                this.min.getX() + "," +
+                this.min.getY() + "," +
+                this.min.getZ() + ":" +
+                this.max.getX() + "," +
+                this.max.getY() + "," +
+                this.max.getZ();
+    }
 }

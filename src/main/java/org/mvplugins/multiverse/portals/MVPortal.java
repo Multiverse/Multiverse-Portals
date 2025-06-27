@@ -16,19 +16,24 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import com.dumptruckman.minecraft.util.Logging;
+import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+import org.mvplugins.multiverse.core.config.handle.MemoryConfigurationHandle;
+import org.mvplugins.multiverse.core.config.handle.StringPropertyHandle;
+import org.mvplugins.multiverse.core.config.migration.ConfigMigrator;
+import org.mvplugins.multiverse.core.config.migration.VersionMigrator;
+import org.mvplugins.multiverse.core.config.migration.action.MoveMigratorAction;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.teleportation.BlockSafety;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
-import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
-import org.mvplugins.multiverse.core.utils.MaterialConverter;
-import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
+import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.PortalType;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -38,26 +43,21 @@ import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 public class MVPortal {
     private final MultiversePortals plugin;
+    private final PortalsConfig portalsConfig;
     private final WorldManager worldManager;
     private final DestinationsProvider destinationsProvider;
     private final BlockSafety blockSafety;
 
     private final String name;
-    private final String portalConfigString;
-    private final FileConfiguration config;
+    private final MVPortalNodes configNodes;
+    private final MemoryConfigurationHandle configHandle;
+    private final StringPropertyHandle stringPropertyHandle;
 
     private PortalLocation location;
-    private DestinationInstance<?, ?> destination;
-    private String owner;
+
     private Permission permission;
     private Permission fillPermission;
     private Permission exempt;
-    private Material currency = null;
-    private double price = 0.0;
-    private boolean safeTeleporter;
-    private boolean teleportNonPlayers;
-    private boolean allowSave;
-    private String handlerScript;
 
     private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
             Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
@@ -66,10 +66,6 @@ public class MVPortal {
 
     public static boolean isPortalInterior(Material material) {
         return INTERIOR_MATERIALS.contains(material);
-    }
-
-    public MVPortal(@NotNull MultiversePortals plugin, @NotNull String name) {
-        this(plugin, name, true);
     }
 
     public MVPortal(LoadedMultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
@@ -86,26 +82,42 @@ public class MVPortal {
 
     // If this is called with allowSave=false, the caller needs to be sure to
     // call allowSave() when they're finished modifying it.
-    private MVPortal(
-            MultiversePortals plugin,
-            String name,
-            boolean allowSave) {
-        // Disallow saving until initialization is finished.
-        this.allowSave = false;
-
+    private MVPortal(MultiversePortals plugin, String name) {
         this.plugin = plugin;
+        this.portalsConfig = this.plugin.getServiceLocator().getService(PortalsConfig.class);
         this.worldManager = this.plugin.getServiceLocator().getService(WorldManager.class);
         this.destinationsProvider = this.plugin.getServiceLocator().getService(DestinationsProvider.class);
         this.blockSafety = this.plugin.getServiceLocator().getService(BlockSafety.class);
 
-        this.config = this.plugin.getPortalsConfig();
         this.name = name;
-        this.portalConfigString = "portals." + this.name;
-        this.setCurrency(MaterialConverter.stringToMaterial(this.config.getString(this.portalConfigString + ".entryfee.currency")));
-        this.setPrice(this.config.getDouble(this.portalConfigString + ".entryfee.amount", 0.0));
-        this.setUseSafeTeleporter(this.config.getBoolean(this.portalConfigString + ".safeteleport", true));
-        this.setTeleportNonPlayers(this.config.getBoolean(this.portalConfigString + ".teleportnonplayers", false));
-        this.setHandlerScript(this.config.getString(this.portalConfigString + ".handlerscript", ""));
+
+        var config = this.plugin.getPortalsConfig();
+        this.configNodes = new MVPortalNodes(plugin, this);
+        var portalSection = config.getConfigurationSection("portals." + this.name);
+        if (portalSection == null) {
+            portalSection = config.createSection("portals." + this.name);
+        }
+        this.configHandle = MemoryConfigurationHandle.builder(portalSection, configNodes.getNodes())
+                .migrator(ConfigMigrator.builder(configNodes.version)
+                        .addVersionMigrator(VersionMigrator.builder(1.0)
+                                .addAction(MoveMigratorAction.of("safeteleport", "safe-teleport"))
+                                .addAction(MoveMigratorAction.of("teleportnonplayers", "teleport-non-players"))
+                                .build())
+                        .addVersionMigrator(VersionMigrator.builder(1.1)
+                                .addAction(configSection -> {
+                                    // combine world and location into 1 string
+                                    var world = configSection.getString("world");
+                                    var location = configSection.getString("location");
+                                    if (world != null && location != null) {
+                                        configSection.set("location", world + ":" + location);
+                                    }
+                                })
+                                .build())
+                        .build())
+                .build();
+        this.stringPropertyHandle = new StringPropertyHandle(this.configHandle);
+        configHandle.load();
+
         this.permission = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access." + this.name);
         if (this.permission == null) {
             this.permission = new Permission("multiverse.portal.access." + this.name, "Allows access to the " + this.name + " portal", PermissionDefault.OP);
@@ -122,127 +134,65 @@ public class MVPortal {
             this.exempt = new Permission("multiverse.portal.exempt." + this.name, "A player who has this permission will not pay to use this portal " + this.name + " portal", PermissionDefault.FALSE);
             this.plugin.getServer().getPluginManager().addPermission(this.exempt);
         }
-        this.addToUpperLists();
-
-        if (allowSave) {
-            this.allowSave = true;
-            saveConfig();
-        }
     }
 
-    private void allowSave() {
-        this.allowSave = true;
+    ConfigurationSection save() {
+        this.configHandle.save();
+        return this.configHandle.getConfig();
     }
 
-    private void setTeleportNonPlayers(boolean b) {
-        this.teleportNonPlayers = b;
-        this.config.set(this.portalConfigString + ".teleportnonplayers", this.teleportNonPlayers);
-        saveConfig();
+    /**
+     * Gets the string property handle
+     *
+     * @return The string property handle
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public StringPropertyHandle getStringPropertyHandle() {
+        return this.stringPropertyHandle;
+    }
+
+    /**
+     * Set the value of teleportNonPlayers
+     *
+     * @param teleportNonPlayers The new value
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public void setTeleportNonPlayers (boolean teleportNonPlayers) {
+        this.configHandle.set(configNodes.teleportNonPlayers, teleportNonPlayers);
     }
 
     public boolean getTeleportNonPlayers() {
-        return teleportNonPlayers;
+        return this.configHandle.get(configNodes.teleportNonPlayers);
     }
 
     private void setUseSafeTeleporter(boolean teleport) {
-        this.safeTeleporter = teleport;
-        this.config.set(this.portalConfigString + ".safeteleport", teleport);
-        saveConfig();
+        this.configHandle.set(configNodes.safeTeleport, teleport);
     }
 
     public boolean useSafeTeleporter() {
-        return this.safeTeleporter;
-    }
-
-    private void addToUpperLists() {
-        Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
-        Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
-        Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
-        Permission allPortalExempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
-        Permission allPortalFill = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill.*");
-        if (allPortalAccess == null) {
-            allPortalAccess = new Permission("multiverse.portal.access.*");
-            this.plugin.getServer().getPluginManager().addPermission(allPortalAccess);
-        }
-        if (allPortalExempt == null) {
-            allPortalExempt = new Permission("multiverse.portal.exempt.*");
-            this.plugin.getServer().getPluginManager().addPermission(allPortalExempt);
-        }
-        if (allPortalFill == null) {
-            allPortalFill = new Permission("multiverse.portal.fill.*");
-            this.plugin.getServer().getPluginManager().addPermission(allPortalFill);
-        }
-        if (allPortals == null) {
-            allPortals = new Permission("multiverse.portal.*");
-            this.plugin.getServer().getPluginManager().addPermission(allPortals);
-        }
-
-        if (all == null) {
-            all = new Permission("multiverse.*");
-            this.plugin.getServer().getPluginManager().addPermission(all);
-        }
-        all.getChildren().put("multiverse.portal.*", true);
-        allPortals.getChildren().put("multiverse.portal.access.*", true);
-        allPortals.getChildren().put("multiverse.portal.exempt.*", true);
-        allPortals.getChildren().put("multiverse.portal.fill.*", true);
-        allPortalAccess.getChildren().put(this.permission.getName(), true);
-        allPortalExempt.getChildren().put(this.exempt.getName(), true);
-        allPortalFill.getChildren().put(this.fillPermission.getName(), true);
-
-        this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
-        for(Player player : this.plugin.getServer().getOnlinePlayers()){
-            player.recalculatePermissions();
-        }
+        return this.configHandle.get(configNodes.safeTeleport);
     }
 
     public static MVPortal loadMVPortalFromConfig(MultiversePortals instance, String name) {
-        boolean allowSave = false;
-        MVPortal portal = new MVPortal(instance, name, allowSave);
-
-        // Don't load portals from configs, as we have a linked list issue
-        // Have to load all portals first, then resolve their destinations.
-
-        String portalLocString = portal.config.getString(portal.portalConfigString + ".location", "");
-        String worldString = portal.config.getString(portal.portalConfigString + ".world", "");
-        portal.setPortalLocation(portalLocString, worldString);
-
-        portal.setOwner(portal.config.getString(portal.portalConfigString + ".owner", ""));
-        portal.setCurrency(MaterialConverter.stringToMaterial(portal.config.getString(portal.portalConfigString + ".entryfee.currency")));
-        portal.setPrice(portal.config.getDouble(portal.portalConfigString + ".entryfee.amount", 0.0));
-
-        // We've finished reading the portal from the config file. Any further
-        // changes to this portal should be saved.
-        portal.allowSave();
-
-        return portal;
+        return new MVPortal(instance, name);
     }
 
     public Material getCurrency() {
-        return this.currency;
+        return this.configHandle.get(configNodes.currency);
     }
 
     public double getPrice() {
-        return this.price;
+        return this.configHandle.get(configNodes.price);
     }
 
     private boolean setCurrency(Material currency) {
-        this.currency = currency;
-        config.set(this.portalConfigString + ".entryfee.currency", currency == null ? null : currency.name());
-        saveConfig();
-        return true;
+        return this.configHandle.set(configNodes.currency, currency).isSuccess();
     }
 
     private boolean setPrice(double price) {
-        this.price = price;
-        config.set(this.portalConfigString + ".entryfee.amount", price);
-        saveConfig();
-        return true;
-    }
-
-    private void saveConfig() {
-        if (this.allowSave) {
-            this.plugin.savePortalsConfig();
-        }
+        return this.configHandle.set(configNodes.price, price).isSuccess();
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
@@ -253,34 +203,40 @@ public class MVPortal {
         return this.setPortalLocation(locationString, world);
     }
 
+    /**
+     *
+     * @param locationString
+     * @return
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public boolean setPortalLocation(String locationString) {
+        return this.setPortalLocation(PortalLocation.parseLocation(locationString));
+    }
+
     public boolean setPortalLocation(String locationString, LoadedMultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
 
     public boolean setPortalLocation(PortalLocation location) {
+        if (!setPortalLocationInternal(location)) {
+            return false;
+        }
+        return configHandle.set(configNodes.location, this.location.toString()).isSuccess();
+    }
+
+    boolean setPortalLocationInternal(PortalLocation location) {
         this.location = location;
         if (!this.location.isValidLocation()) {
             Logging.warning("Portal " + this.name + " has an invalid LOCATION!");
             return false;
         }
-        this.config.set(this.portalConfigString + ".location", this.location.toString());
-        MultiverseWorld world = this.location.getMVWorld();
-        if (world != null) {
-
-            this.config.set(this.portalConfigString + ".world", world.getName());
-        } else {
-            Logging.warning("Portal " + this.name + " has an invalid WORLD");
-            return false;
-        }
-        saveConfig();
         return true;
     }
 
     private boolean setOwner(String owner) {
-        this.owner = owner;
-        this.config.set(this.portalConfigString + ".owner", this.owner);
-        saveConfig();
-        return true;
+        return this.configHandle.set(configNodes.owner, owner).isSuccess();
     }
 
     public boolean setDestination(String destinationString) {
@@ -293,10 +249,11 @@ public class MVPortal {
             Logging.warning("Portal " + this.name + " has an invalid DESTINATION!");
             return false;
         }
-        this.destination = newDestination;
-        this.config.set(this.portalConfigString + ".destination", this.destination.toString());
-        saveConfig();
-        return true;
+        return this.configHandle.set(configNodes.destination, newDestination.toString()).isSuccess();
+    }
+
+    public DestinationInstance<?, ?> getDestination() {
+        return this.destinationsProvider.parseDestination(this.configHandle.get(configNodes.destination)).getOrNull();
     }
 
     public String getName() {
@@ -304,6 +261,9 @@ public class MVPortal {
     }
 
     public PortalLocation getLocation() {
+        if (this.location == null) {
+            this.location = PortalLocation.parseLocation(this.configHandle.get(configNodes.location));
+        }
         return this.location;
     }
 
@@ -319,17 +279,6 @@ public class MVPortal {
         return new Location(this.getWorld(), finalX, finalY, finalZ);
     }
 
-    /**
-     * Allows us to check the column first but only when doing portals
-     *
-     * @param finalX
-     * @param finalZ
-     * @param y
-     * @param yMax
-     * @param w
-     *
-     * @return
-     */
     private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
         // If this class exists, then this Multiverse-Core MUST exist!
         // TODO there really ought to be a better way!
@@ -371,9 +320,7 @@ public class MVPortal {
         if (this.getFillMaterial() == Material.NETHER_PORTAL) {
             return PortalType.Normal;
         }
-
         // TODO in 5.0.0: Catch IllegalStateException and return a new PortalType, INVALID.
-
         return PortalType.Legacy;
     }
 
@@ -395,69 +342,13 @@ public class MVPortal {
         return player.hasPermission(this.fillPermission);
     }
 
-    public DestinationInstance<?, ?> getDestination() {
-        return this.destination;
-    }
-
-    public boolean setProperty(String property, String value) {
-        if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
-            return this.setDestination(value);
-        }
-
-
-        if (property.equalsIgnoreCase("curr") || property.equalsIgnoreCase("currency")) {
-            return this.setCurrency(Material.matchMaterial(value));
-        }
-
-        if (property.equalsIgnoreCase("price")) {
-            try {
-                return this.setPrice(Double.parseDouble(value));
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-
-        if (property.equalsIgnoreCase("owner")) {
-            return this.setOwner(value);
-        }
-        if (property.equalsIgnoreCase("safe")) {
-            try {
-                this.setUseSafeTeleporter(Boolean.parseBoolean(value));
-                return true;
-            } catch (Exception e) {
-
-            }
-        }
-        if (property.equalsIgnoreCase("telenonplayers")) {
-            try {
-                this.setTeleportNonPlayers(Boolean.parseBoolean(value));
-                return true;
-            } catch (Exception e) {
-            }
-        }
-        if (property.equalsIgnoreCase("handlerscript")) {
-            this.setHandlerScript(value);
-            return true;
-        }
-        return false;
-    }
-
+    @Nullable
     public World getWorld() {
         LoadedMultiverseWorld mvWorld = this.location.getMVWorld();
         if (mvWorld == null) {
             return null;
         }
         return mvWorld.getBukkitWorld().getOrNull();
-    }
-
-    public String getHandlerScript() {
-        return handlerScript;
-    }
-
-    public void setHandlerScript(String handlerScript) {
-        this.handlerScript = handlerScript;
-        this.config.set(this.portalConfigString + ".handlerscript", this.handlerScript);
-        saveConfig();
     }
 
     public Permission getPermission() {
@@ -468,39 +359,12 @@ public class MVPortal {
         return this.fillPermission;
     }
 
-    public void removePermission() {
-        this.removeFromUpperLists(this.permission);
-        this.plugin.getServer().getPluginManager().removePermission(permission);
+    public Permission getExempt() {
+        return this.exempt;
     }
 
-    private void removeFromUpperLists(Permission permission) {
-        Permission all = this.plugin.getServer().getPluginManager().getPermission("multiverse.*");
-        Permission allPortals = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.*");
-        Permission allPortalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
-        Permission allPortalExempt = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.exempt.*");
-        Permission allPortalFill = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.fill.*");
-        if (all != null) {
-            all.getChildren().remove(this.permission.getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(all);
-        }
-
-        if (allPortals != null) {
-            allPortals.getChildren().remove(this.permission.getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortals);
-        }
-
-        if (allPortalAccess != null) {
-            allPortalAccess.getChildren().remove(this.permission.getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalAccess);
-        }
-        if (allPortalExempt != null) {
-            allPortalExempt.getChildren().remove(this.exempt.getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalExempt);
-        }
-        if (allPortalFill != null) {
-            allPortalFill.getChildren().remove(this.fillPermission.getName());
-            this.plugin.getServer().getPluginManager().recalculatePermissionDefaults(allPortalFill);
-        }
+    public void removePermission() {
+        this.plugin.getServer().getPluginManager().removePermission(permission);
     }
 
     /**
@@ -510,7 +374,7 @@ public class MVPortal {
      * @return true if the frame around the location is valid; false otherwise
      */
     public boolean isFrameValid(Location l) {
-        List<Material> validMaterials = MultiversePortals.FrameMaterials;
+        List<Material> validMaterials = portalsConfig.getFrameMaterials();
         if (validMaterials == null || validMaterials.isEmpty()) {
             // All frame materials are valid.
             return true;
@@ -629,19 +493,8 @@ public class MVPortal {
         }
         Logging.finer(String.format("frame has common material %s", commonMaterial));
 
-        return MultiversePortals.FrameMaterials.contains(commonMaterial);
+        return portalsConfig.getFrameMaterials().contains(commonMaterial);
     }
-
-    @Deprecated
-    public boolean isExempt(Player player) {
-        return false;
-    }
-
-    public Permission getExempt() {
-        return this.exempt;
-    }
-
-
 
     private MultiverseRegion expandedRegion(MultiverseRegion r, int x, int y, int z) {
         Vector min = new Vector().copy(r.getMinimumPoint());
@@ -651,4 +504,40 @@ public class MVPortal {
         return new MultiverseRegion(min, max, r.getWorld());
     }
 
+    // deprecated island
+
+    /**
+     * @deprecated Use {@link MVPortal#getStringPropertyHandle()} instead.
+     */
+    @Deprecated(since = "5.1" , forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public boolean setProperty(String property, String value) {
+        return this.stringPropertyHandle.setPropertyString(property, value).isSuccess();
+    }
+
+    /**
+     * @deprecated Busscript feature has been removed.
+     */
+    @Deprecated(since = "5.1" , forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")    public String getHandlerScript() {
+        Logging.warning("handle script is deprecated");
+        return "";
+    }
+
+    /**
+     * @deprecated Busscript feature has been removed.
+     */
+    @Deprecated(since = "5.1" , forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")    public void setHandlerScript(String handlerScript) {
+        Logging.warning("handle script is deprecated");
+    }
+
+    /**
+     * @deprecated This feature has been removed.
+     */
+    @Deprecated(since = "5.1" , forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public boolean isExempt(Player player) {
+        return false;
+    }
 }
