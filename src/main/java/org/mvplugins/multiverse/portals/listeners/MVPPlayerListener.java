@@ -111,7 +111,7 @@ public class MVPPlayerListener implements PortalsListener {
             } else {
                 Material fillMaterial = Material.AIR;
                 Logging.finer("Fill Material: " + fillMaterial);
-                this.filler.fillRegion(portal.getLocation().getRegion(), event.getBlockClicked().getLocation(), fillMaterial, event.getPlayer());
+                this.filler.fillRegion(portal.getPortalLocation().getRegion(), event.getBlockClicked().getLocation(), fillMaterial, event.getPlayer());
             }
         }
     }
@@ -150,7 +150,7 @@ public class MVPPlayerListener implements PortalsListener {
                 }
 
                 Logging.finer("Fill Material: " + fillMaterial);
-                this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
+                this.filler.fillRegion(portal.getPortalLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
             }
         }
     }
@@ -203,7 +203,7 @@ public class MVPPlayerListener implements PortalsListener {
                         fillMaterial = Material.AIR;
                     }
                     Logging.finer("Fill Material: " + fillMaterial);
-                    event.setCancelled(this.filler.fillRegion(portal.getLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer()));
+                    event.setCancelled(this.filler.fillRegion(portal.getPortalLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer()));
                 }
             }
             return;

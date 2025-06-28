@@ -96,7 +96,7 @@ public class PortalManager {
 
             // Ignore portals the player can't use.
             if (!checkPermission || !portalsConfig.getEnforcePortalAccess() || portal.playerCanEnterPortal(sender)) {
-                PortalLocation portalLoc = portal.getLocation();
+                PortalLocation portalLoc = portal.getPortalLocation();
                 if (portalLoc.isValidLocation() && portalLoc.getRegion().containsVector(l)) {
                     return portal;
                 }
@@ -134,7 +134,7 @@ public class PortalManager {
     public MVPortal getPortal(Location l) {
         MultiverseWorld world = this.worldManager.getLoadedWorld(l.getWorld().getName()).getOrNull();
         for (MVPortal portal : getNearbyPortals(world, l)) {
-            MultiverseRegion r = portal.getLocation().getRegion();
+            MultiverseRegion r = portal.getPortalLocation().getRegion();
             if (r != null && r.containsVector(l)) {
                 return portal;
             }
@@ -207,7 +207,7 @@ public class PortalManager {
             // leaving behind portal blocks (which would take an unsuspecting
             // player to the nether instead of their expected destination).
 
-            MultiverseRegion region = removed.getLocation().getRegion();
+            MultiverseRegion region = removed.getPortalLocation().getRegion();
             replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR);
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
@@ -250,7 +250,7 @@ public class PortalManager {
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         for (MVPortal p : all) {
-            MultiverseWorld portalworld = p.getLocation().getMVWorld();
+            MultiverseWorld portalworld = p.getPortalLocation().getMVWorld();
             if (portalworld != null && portalworld.equals(world)) {
                 validItems.add(p);
             }
@@ -266,7 +266,7 @@ public class PortalManager {
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         if (portalsConfig.getEnforcePortalAccess()) {
             for (MVPortal p : all) {
-                if (p.getLocation().isValidLocation() && p.getLocation().getMVWorld().equals(world) &&
+                if (p.getPortalLocation().isValidLocation() && p.getPortalLocation().getMVWorld().equals(world) &&
                         p.playerCanEnterPortal((Player) sender)) {
                     validItems.add(p);
                 }
@@ -350,7 +350,7 @@ public class PortalManager {
 
         // If this portal spans multiple chunks, we'll add it to each chunk that
         // contains part of it.
-        PortalLocation location = portal.getLocation();
+        PortalLocation location = portal.getPortalLocation();
         Vector min = location.getMinimum();
         Vector max = location.getMaximum();
         int c1x = blockToChunk(min.getBlockX()), c1z = blockToChunk(min.getBlockZ());
@@ -381,7 +381,7 @@ public class PortalManager {
             return;
         }
 
-        PortalLocation location = portal.getLocation();
+        PortalLocation location = portal.getPortalLocation();
         Vector min = location.getMinimum();
         Vector max = location.getMaximum();
         int c1x = blockToChunk(min.getBlockX()), c1z = blockToChunk(min.getBlockZ());
