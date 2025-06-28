@@ -13,7 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 @Service
-public class PlayerListenerHelper {
+final class PlayerListenerHelper {
 
     private final AsyncSafetyTeleporter safetyTeleporter;
 
@@ -34,8 +34,10 @@ public class PlayerListenerHelper {
                 playerName, portalName));
     }
 
-    void performTeleport(Player player, Location to, PortalPlayerSession ps, DestinationInstance<?, ?> destination) {
-        safetyTeleporter.to(destination).teleport(player)
+    void performTeleport(Player player, Location to, PortalPlayerSession ps, DestinationInstance<?, ?> destination, boolean checkSafety) {
+        safetyTeleporter.to(destination)
+                .checkSafety(checkSafety && destination.checkTeleportSafety())
+                .teleportSingle(player)
                 .onSuccess(() -> {
                     ps.playerDidTeleport(to);
                     ps.setTeleportTime(new Date());

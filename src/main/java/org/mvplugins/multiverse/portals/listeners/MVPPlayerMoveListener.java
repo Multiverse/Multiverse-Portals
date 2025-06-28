@@ -153,7 +153,7 @@ public class MVPPlayerMoveListener implements Listener {
                                 price > 0D ? "been charged" : "earned",
                                 economist.formatPrice(price, currency),
                                 portal.getName()));
-                        helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                        helper.performTeleport(event.getPlayer(), event.getTo(), ps, d, portal.getCheckDestinationSafety());
                     }
                 } else {
                     p.sendMessage(economist.getNSFMessage(currency,
@@ -164,7 +164,7 @@ public class MVPPlayerMoveListener implements Listener {
                 MVPortalEvent portalEvent = new MVPortalEvent(d, event.getPlayer(), portal);
                 this.plugin.getServer().getPluginManager().callEvent(portalEvent);
                 if (!portalEvent.isCancelled()) {
-                    helper.performTeleport(event.getPlayer(), event.getTo(), ps, d);
+                    helper.performTeleport(event.getPlayer(), event.getTo(), ps, d, portal.getCheckDestinationSafety());
                 }
             }
         }
