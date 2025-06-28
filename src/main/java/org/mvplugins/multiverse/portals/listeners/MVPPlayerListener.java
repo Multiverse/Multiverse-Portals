@@ -283,7 +283,7 @@ public class MVPPlayerListener implements PortalsListener {
                     return;
                 }
 
-                if (portalDest.checkTeleportSafety()) {
+                if (portal.getCheckDestinationSafety() && portalDest.checkTeleportSafety()) {
                     Location safeLocation = blockSafety.findSafeSpawnLocation(portalDest.getLocation(event.getPlayer()).getOrNull());
                     if (safeLocation == null) {
                         event.setCancelled(true);

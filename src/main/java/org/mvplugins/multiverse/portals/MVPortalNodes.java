@@ -99,6 +99,10 @@ final class MVPortalNodes {
                     .toTry())
             .build());
 
+    final ConfigNode<Boolean> checkDestinationSafety = node(ConfigNode.builder("check-destination-safety", Boolean.class)
+            .defaultValue(true)
+            .build());
+
     final ConfigNode<Double> version = node(ConfigNode.builder("version", Double.class)
             .defaultValue(0.0)
             .hidden()

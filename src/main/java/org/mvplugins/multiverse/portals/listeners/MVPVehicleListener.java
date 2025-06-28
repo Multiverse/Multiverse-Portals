@@ -13,6 +13,7 @@ import java.util.List;
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Material;
 import org.bukkit.event.Listener;
+import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.economy.MVEconomist;
 import org.mvplugins.multiverse.core.permissions.CorePermissionsChecker;
 import org.mvplugins.multiverse.core.teleportation.LocationManipulation;
@@ -101,7 +102,9 @@ public class MVPVehicleListener implements Listener {
             }
         }
 
-        safetyTeleporter.to(portal.getDestination())
+        DestinationInstance<?, ?> destination = portal.getDestination();
+        safetyTeleporter.to(destination)
+                .checkSafety(portal.getCheckDestinationSafety() && destination.checkTeleportSafety())
                 .passengerMode(PassengerModes.RETAIN_ALL)
                 .teleportSingle(vehicle)
                 .onSuccess(() -> Logging.finer("Successfully teleported vehicle %s using portal %s",
