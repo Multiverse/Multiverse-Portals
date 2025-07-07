@@ -29,6 +29,7 @@ import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.teleportation.BlockSafety;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
+import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.PortalType;
 import org.bukkit.Location;
@@ -288,6 +289,29 @@ public final class MVPortal {
                 .onFailure(f ->
                         Logging.warning("Portal " + this.name + " has an invalid DESTINATION! " + f.getFailureMessage().formatted()))
                 .getOrNull();
+    }
+
+    /**
+     *
+     * @param checkDestinationSafety
+     * @return
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public Try<Void> setCheckDestinationSafety(boolean checkDestinationSafety) {
+        return this.configHandle.set(configNodes.checkDestinationSafety, checkDestinationSafety);
+    }
+
+    /**
+     *
+     * @return
+     *
+     * @since 5.1
+     */
+    @ApiStatus.AvailableSince("5.1")
+    public boolean getCheckDestinationSafety() {
+        return this.configHandle.get(configNodes.checkDestinationSafety);
     }
 
     public Location getSafePlayerSpawnLocation() {
