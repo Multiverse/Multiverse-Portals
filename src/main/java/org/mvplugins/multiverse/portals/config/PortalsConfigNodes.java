@@ -114,7 +114,7 @@ final class PortalsConfigNodes {
 
     final ConfigNode<Boolean> enforcePortalAccess = node(ConfigNode.builder("portal-usage.enforce-portal-access", Boolean.class)
             .comment("If enabled, players will not be able to teleport to mvportals they do not have access to.")
-            .comment("The permission node is: `multiverse.portal.access.PORTALNAME`")
+            .comment("The permission node is: `multiverse.portal.access.<portal-name>`")
             .defaultValue(true)
             .name("enforce-portal-access")
             .aliases("enforceportalaccess")
@@ -123,7 +123,7 @@ final class PortalsConfigNodes {
 
     final ConfigNode<Integer> portalCooldown = node(ConfigNode.builder("portal-usage.portal-cooldown", Integer.class)
             .comment("")
-            .comment("The number of seconds a player must wait between using a mvportal.")
+            .comment("The time (in milliseconds) a player must wait between using a mvportal.")
             .defaultValue(1000)
             .name("portal-cooldown")
             .aliases("portalcooldown")
@@ -161,6 +161,7 @@ final class PortalsConfigNodes {
             .comment("")
             .comment("If enabled, player movement will be tracked to determine if the player has entered a portal.")
             .comment("Disabling this will cause mvportals without nether or end fill to not work.")
+            .comment("Only disable this if all your portals have nether or end fill and want to slight enhance performance.")
             .defaultValue(true)
             .name("use-on-move")
             .aliases("useonmove")
