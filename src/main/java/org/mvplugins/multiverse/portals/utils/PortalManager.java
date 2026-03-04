@@ -28,6 +28,7 @@ import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
+import org.mvplugins.multiverse.external.vavr.control.Option;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalLocation;
@@ -208,8 +209,8 @@ public class PortalManager {
             // leaving behind portal blocks (which would take an unsuspecting
             // player to the nether instead of their expected destination).
 
-            MultiverseRegion region = removed.getPortalLocation().getRegion();
-            replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR);
+            Option.of(removed.getPortalLocation().getRegion()).peek(region ->
+                    replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR));
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());

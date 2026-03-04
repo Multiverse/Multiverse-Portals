@@ -13,11 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import com.dumptruckman.minecraft.util.Logging;
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
+import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.ApiStatus;
 import org.mvplugins.multiverse.core.config.CoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
@@ -201,21 +199,22 @@ public class MultiversePortals extends MultiverseModule {
 
     private void loadPortals() {
         this.MVPPortalConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "portals.yml"));
-        if (!this.MVPPortalConfig.isConfigurationSection("portals")) {
-            this.MVPPortalConfig.createSection("portals");
+
+        ConfigurationSection portalsSection = this.MVPPortalConfig.getConfigurationSection("portals");
+        if (portalsSection == null) {
+            portalsSection = this.MVPPortalConfig.createSection("portals");
         }
-        Set<String> keys = this.MVPPortalConfig.getConfigurationSection("portals").getKeys(false);
-        if (keys != null) {
-            for (String pname : keys) {
-                MVPortal portal = MVPortal.loadMVPortalFromConfig(this, pname);
-                if (portal.getPortalLocation().isValidLocation()) {
-                    this.portalManager.get().addPortal(portal);
-                } else {
-                    Logging.warning(String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));
-                }
+
+        Set<String> keys = portalsSection.getKeys(false);
+        for (String pname : keys) {
+            MVPortal portal = MVPortal.loadMVPortalFromConfig(this, pname);
+            if (portal.getPortalLocation().isValidLocation()) {
+                this.portalManager.get().addPortal(portal);
+            } else {
+                Logging.warning(String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));
             }
-            Logging.info(keys.size() + " - Portals(s) loaded");
         }
+        Logging.info(this.portalManager.get().getAllPortals().size() + " - Portals(s) loaded");
         this.savePortalsConfig();
     }
 
@@ -227,7 +226,7 @@ public class MultiversePortals extends MultiverseModule {
             this.MVPPortalConfig.save(new File(this.getDataFolder(), "portals.yml"));
             return true;
         } catch (IOException e) {
-            Logging.severe("Failed to save Portals portals.yml.");
+            Logging.severe("Failed to save Portals portals.yml: %s", e.getMessage());
             return false;
         }
     }
