@@ -174,15 +174,16 @@ public class PortalManager {
         if (!isPortal(portalName)) {
             return null;
         }
+
+        MVPortal removed = this.portals.remove(portalName);
+        MultiverseWorld world = this.worldManager.getLoadedWorld(removed.getWorld()).getOrNull();
+        removeFromWorldChunkPortals(world, removed);
+
         if (removeFromConfigs) {
             FileConfiguration config = this.plugin.getPortalsConfig();
             config.set("portals." + portalName, null);
             this.plugin.savePortalsConfig();
         }
-
-        MVPortal removed = this.portals.remove(portalName);
-        MultiverseWorld world = this.worldManager.getLoadedWorld(removed.getWorld()).getOrNull();
-        removeFromWorldChunkPortals(world, removed);
 
         removed.removePermission();
         Permission portalAccess = this.plugin.getServer().getPluginManager().getPermission("multiverse.portal.access.*");
