@@ -20,7 +20,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.mvplugins.multiverse.core.config.CoreConfig;
 import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
+import org.mvplugins.multiverse.core.dynamiclistener.DynamicListenerRegistration;
 import org.mvplugins.multiverse.core.module.MultiverseModule;
+import org.mvplugins.multiverse.core.utils.ReflectHelper;
 import org.mvplugins.multiverse.core.utils.StringFormatter;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jakarta.inject.Provider;
@@ -74,6 +76,8 @@ public class MultiversePortals extends MultiverseModule {
     private Provider<BstatsMetricsConfigurator> metricsConfiguratorProvider;
     @Inject
     private Provider<ActionHandlerProvider> actionHandlerProvider;
+    @Inject
+    protected Provider<DynamicListenerRegistration> dynamicListenerRegistrationProvider;
 
     private FileConfiguration MVPPortalConfig;
     private WorldEditConnection worldEditConnection;
@@ -140,23 +144,23 @@ public class MultiversePortals extends MultiverseModule {
     }
 
     private void registerEvents() {
-        var pluginManager = getServer().getPluginManager();
-
-        Try.run(() -> serviceLocator.getAllServices(PortalsListener.class).forEach(
-                        listener -> pluginManager.registerEvents(listener, this)))
-                .onFailure(e -> {
-                    throw new RuntimeException("Failed to register listeners. Terminating...", e);
-                });
+        registerDynamicListeners(PortalsListener.class);
+        DynamicListenerRegistration dynamicListenerRegistration = dynamicListenerRegistrationProvider.get();
         if (portalsConfigProvider.get().getTeleportVehicles()) {
-            pluginManager.registerEvents(serviceLocator.getService(MVPVehicleListener.class), this);
+            dynamicListenerRegistration.register(serviceLocator.getService(MVPVehicleListener.class), this);
         }
         if (portalsConfigProvider.get().getTeleportEntities()) {
-            pluginManager.registerEvents(serviceLocator.getService(MVPEntityPortalListener.class), this);
+            dynamicListenerRegistration.register(serviceLocator.getService(MVPEntityPortalListener.class), this);
         }
         if (portalsConfigProvider.get().getUseOnMove()) {
-            pluginManager.registerEvents(serviceLocator.getService(MVPPlayerMoveListener.class), this);
+            dynamicListenerRegistration.register(serviceLocator.getService(MVPPlayerMoveListener.class), this);
             if (portalsConfigProvider.get().getTeleportEntities()) {
-                pluginManager.registerEvents(serviceLocator.getService(MVPEntityMoveListener.class), this);
+                dynamicListenerRegistration.register(serviceLocator.getService(MVPEntityMoveListener.class), this);
+                if (!ReflectHelper.hasClass("io.papermc.paper.event.entity.EntityMoveEvent")) {
+                    Logging.warning("Teleporting entities on custom/empty fills without nether portals requires" +
+                            "PaperMC to work. You may experience issues with entities not teleporting when using custom " +
+                            "fills if you are not using PaperMC or a fork that includes the EntityMoveEvent.");
+                }
             }
         }
     }

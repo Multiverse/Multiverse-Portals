@@ -12,8 +12,9 @@ import java.util.Date;
 import java.util.List;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.bukkit.event.Listener;
-import org.mvplugins.multiverse.core.teleportation.AsyncSafetyTeleporter;
+import org.jetbrains.annotations.ApiStatus;
+import org.mvplugins.multiverse.core.dynamiclistener.DynamicListener;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
@@ -21,7 +22,6 @@ import org.mvplugins.multiverse.portals.enums.MoveType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 
 import org.mvplugins.multiverse.portals.MVPortal;
@@ -29,8 +29,9 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
+@ApiStatus.Internal
 @Service
-public final class MVPVehicleListener implements Listener {
+public final class MVPVehicleListener implements DynamicListener {
     private final MultiversePortals plugin;
     private final PortalManager portalManager;
     private final PortalListenerHelper helper;
@@ -46,7 +47,7 @@ public final class MVPVehicleListener implements Listener {
         this.helper = helper;
     }
 
-    @EventHandler
+    @EventMethod
     void vehicleMove(VehicleMoveEvent event) {
         if (helper.isWithinSameBlock(event.getFrom(), event.getTo())) {
             return;

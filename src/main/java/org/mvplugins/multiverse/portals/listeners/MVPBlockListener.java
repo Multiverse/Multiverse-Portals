@@ -8,11 +8,13 @@
 package org.mvplugins.multiverse.portals.listeners;
 
 import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.DefaultEventPriority;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.IgnoreIfCancelled;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.jvnet.hk2.annotations.Service;
@@ -30,7 +32,8 @@ final class MVPBlockListener implements PortalsListener {
         this.portalsConfig = portalsConfig;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventMethod
+    @IgnoreIfCancelled
     void blockPhysics(BlockPhysicsEvent event) {
         if (event.getChangedType() == Material.NETHER_PORTAL || event.getBlock().getType() == Material.NETHER_PORTAL) {
             if (portalManager.isPortal(event.getBlock().getLocation())) {
@@ -39,7 +42,9 @@ final class MVPBlockListener implements PortalsListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    @EventMethod
+    @IgnoreIfCancelled
+    @DefaultEventPriority(EventPriority.LOW)
     void blockFromTo(BlockFromToEvent event) {
         // The to block should never be null, but apparently it is sometimes...
         if (event.getBlock() == null || event.getToBlock() == null) {

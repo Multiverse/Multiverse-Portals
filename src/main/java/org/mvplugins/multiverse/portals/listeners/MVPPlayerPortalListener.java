@@ -4,11 +4,11 @@ import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.jvnet.hk2.annotations.Service;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.IgnoreIfCancelled;
 import org.mvplugins.multiverse.core.teleportation.BlockSafety;
-import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.MVPortal;
@@ -41,7 +41,8 @@ final class MVPPlayerPortalListener implements PortalsListener {
         this.helper = helper;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventMethod
+    @IgnoreIfCancelled
     void playerPortal(PlayerPortalEvent event) {
         Logging.finer("onPlayerPortal called!");
         Player player = event.getPlayer();
