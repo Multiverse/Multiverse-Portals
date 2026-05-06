@@ -5,6 +5,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.inject.PluginServiceLocator;
+import org.mvplugins.multiverse.portals.action.ActionHandlerProvider;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.utils.PortalFiller;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
@@ -74,6 +75,18 @@ public final class MultiversePortalsApi {
     @ApiStatus.AvailableSince( "5.1")
     public @NotNull PortalsConfig getPortalsConfig() {
         return Objects.requireNonNull(serviceLocator.getService(PortalsConfig.class));
+    }
+
+    /**
+     * Gets the instance of ActionHandlerProvider.
+     *
+     * @return The ActionHandlerProvider instance.
+     *
+     * @since 5.3
+     */
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull ActionHandlerProvider getActionHandlerProvider() {
+        return Objects.requireNonNull(serviceLocator.getService(ActionHandlerProvider.class));
     }
 
     /**
