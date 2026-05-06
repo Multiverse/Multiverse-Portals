@@ -3,10 +3,12 @@ package org.mvplugins.multiverse.portals.listeners;
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.jetbrains.annotations.ApiStatus;
 import org.jvnet.hk2.annotations.Service;
+import org.mvplugins.multiverse.core.dynamiclistener.DynamicListener;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.IgnoreIfCancelled;
 import org.mvplugins.multiverse.core.teleportation.BlockSafety;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
@@ -14,8 +16,9 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
+@ApiStatus.Internal
 @Service
-public final class MVPEntityPortalListener implements Listener {
+public final class MVPEntityPortalListener implements DynamicListener {
 
     private final PortalManager portalManager;
     private final PortalsConfig portalsConfig;
@@ -33,7 +36,8 @@ public final class MVPEntityPortalListener implements Listener {
         this.helper = helper;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventMethod
+    @IgnoreIfCancelled
     void entityPortal(EntityPortalEvent event) {
         Entity entity = event.getEntity();
         Location location = entity.getLocation();

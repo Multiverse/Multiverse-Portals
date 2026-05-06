@@ -10,6 +10,7 @@ package org.mvplugins.multiverse.portals.listeners;
 import java.io.File;
 
 import com.dumptruckman.minecraft.util.Logging;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
 import org.mvplugins.multiverse.core.event.MVConfigReloadEvent;
 import org.mvplugins.multiverse.core.event.MVDebugModeEvent;
 import org.mvplugins.multiverse.core.event.MVDumpsDebugInfoEvent;
@@ -19,7 +20,6 @@ import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.bukkit.Location;
-import org.bukkit.event.EventHandler;
 
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
@@ -42,8 +42,8 @@ final class MVPCoreListener implements PortalsListener {
      * This method is called when Multiverse-Core wants to know what version we are.
      * @param event The Version event.
      */
-    @EventHandler
-    public void dumpsDebugInfoRequest(MVDumpsDebugInfoEvent event) {
+    @EventMethod
+    void dumpsDebugInfoRequest(MVDumpsDebugInfoEvent event) {
         event.appendDebugInfo(this.plugin.getVersionInfo());
         File configFile = new File(this.plugin.getDataFolder(), "config.yml");
         File portalsFile = new File(this.plugin.getDataFolder(), "portals.yml");
@@ -55,15 +55,15 @@ final class MVPCoreListener implements PortalsListener {
      * This method is called when Multiverse-Core wants to reload the configs.
      * @param event The Config Reload event.
      */
-    @EventHandler
-    public void configReload(MVConfigReloadEvent event) {
+    @EventMethod
+    void configReload(MVConfigReloadEvent event) {
         plugin.reloadConfigs();
         event.addConfig("Multiverse-Portals - portals.yml");
         event.addConfig("Multiverse-Portals - config.yml");
     }
 
-    @EventHandler
-    public void debugModeChange(MVDebugModeEvent event) {
+    @EventMethod
+    void debugModeChange(MVDebugModeEvent event) {
         Logging.setDebugLevel(event.getLevel());
     }
 
@@ -72,8 +72,8 @@ final class MVPCoreListener implements PortalsListener {
      * It's used to handle the intriquite messiness of priority between MV plugins.
      * @param event The PTP event.
      */
-    @EventHandler
-    public void portalTouchEvent(MVPlayerTouchedPortalEvent event) {
+    @EventMethod
+    void portalTouchEvent(MVPlayerTouchedPortalEvent event) {
         Logging.finer("Found The TouchedPortal event.");
         Location l = event.getBlockTouched();
         if (!event.canUseThisPortal() || (!this.portalManager.isPortal(l))) {

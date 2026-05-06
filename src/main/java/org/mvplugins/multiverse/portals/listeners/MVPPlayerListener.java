@@ -8,10 +8,9 @@
 package org.mvplugins.multiverse.portals.listeners;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.mvplugins.multiverse.core.teleportation.BlockSafety;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.DefaultEventPriority;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
 import org.mvplugins.multiverse.core.teleportation.LocationManipulation;
-import org.mvplugins.multiverse.core.destination.DestinationInstance;
-import org.mvplugins.multiverse.core.economy.MVEconomist;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
@@ -22,22 +21,17 @@ import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
 import org.mvplugins.multiverse.portals.WorldEditConnection;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
-import org.mvplugins.multiverse.portals.event.MVPortalEvent;
 import org.mvplugins.multiverse.portals.utils.PortalFiller;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -68,12 +62,13 @@ final class MVPPlayerListener implements PortalsListener {
         this.worldManager = worldManager;
     }
 
-    @EventHandler
+    @EventMethod
     void playerQuit(PlayerQuitEvent event) {
         this.plugin.destroyPortalSession(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventMethod
+    @DefaultEventPriority(EventPriority.MONITOR)
     void playerTeleport(PlayerTeleportEvent event) {
         if (event.isCancelled()) {
             Logging.fine("The PlayerTeleportEvent was already cancelled. Doing nothing.");
@@ -83,7 +78,8 @@ final class MVPPlayerListener implements PortalsListener {
         ps.playerDidTeleport(event.getTo());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventMethod
+    @DefaultEventPriority(EventPriority.LOW)
     void playerBucketFill(PlayerBucketFillEvent event) {
         if (event.isCancelled()) {
             Logging.fine("The PlayerBucketFillEvent was already cancelled. Doing nothing.");
@@ -112,7 +108,8 @@ final class MVPPlayerListener implements PortalsListener {
                 event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventMethod
+    @DefaultEventPriority(EventPriority.LOW)
     void playerBucketEmpty(PlayerBucketEmptyEvent event) {
         if (event.isCancelled()) {
             Logging.fine("The PlayerBucketEmptyEvent was already cancelled. Doing nothing.");
@@ -153,7 +150,8 @@ final class MVPPlayerListener implements PortalsListener {
         this.filler.fillRegion(portal.getPortalLocation().getRegion(), translatedLocation, fillMaterial, event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventMethod
+    @DefaultEventPriority(EventPriority.LOW)
     void playerInteract(PlayerInteractEvent event) {
         if (event.isCancelled()) {
             Logging.fine("The PlayerInteractEvent was already cancelled. Doing nothing.");

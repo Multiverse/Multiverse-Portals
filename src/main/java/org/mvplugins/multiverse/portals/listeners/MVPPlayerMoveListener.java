@@ -8,7 +8,11 @@
 package org.mvplugins.multiverse.portals.listeners;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.bukkit.event.Listener;
+import org.jetbrains.annotations.ApiStatus;
+import org.mvplugins.multiverse.core.dynamiclistener.DynamicListener;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.DefaultEventPriority;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
+import org.mvplugins.multiverse.core.dynamiclistener.annotations.IgnoreIfCancelled;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
@@ -21,12 +25,12 @@ import org.mvplugins.multiverse.portals.event.MVPortalEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+@ApiStatus.Internal
 @Service
-public final class MVPPlayerMoveListener implements Listener {
+public final class MVPPlayerMoveListener implements DynamicListener {
 
     private final MultiversePortals plugin;
     private final PortalsConfig portalsConfig;
@@ -42,7 +46,9 @@ public final class MVPPlayerMoveListener implements Listener {
         this.helper = helper;
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
+    @EventMethod
+    @IgnoreIfCancelled
+    @DefaultEventPriority(EventPriority.LOW)
     void playerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer(); // Grab Player
         Location loc = player.getLocation(); // Grab Location
