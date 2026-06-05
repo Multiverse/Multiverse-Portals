@@ -1,6 +1,8 @@
 name: Multiverse-Portals
 main: org.mvplugins.multiverse.portals.MultiversePortals
 authors: ['Rigby', 'fernferret', 'benwoo1110']
+website: 'https://modrinth.com/plugin/multiverse-portals'
+description: 'Jump through a portal into any multiverse destination imaginable!'
 version: ${version}
 api-version: 1.13
 depend: ['Multiverse-Core']
