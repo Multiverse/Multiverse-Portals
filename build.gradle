@@ -29,7 +29,7 @@ configure(apiDependencies) {
 
 dependencies {
     // Multiverse
-    externalPlugin 'org.mvplugins.multiverse.core:multiverse-core:5.1.0-SNAPSHOT'
+    externalPlugin 'org.mvplugins.multiverse.core:multiverse-core:5.5.0'
 
     // WorldEdit
     externalPlugin('com.sk89q.worldedit:worldedit-bukkit:7.4.0') {

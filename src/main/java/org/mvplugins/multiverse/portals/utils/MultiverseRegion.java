@@ -9,7 +9,11 @@ package org.mvplugins.multiverse.portals.utils;
 
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
+import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
+import org.mvplugins.multiverse.external.jetbrains.annotations.Nullable;
 
 /**
  * This is a placeholder of good things to come...
@@ -18,11 +22,11 @@ import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
  */
 public class MultiverseRegion {
 
-    private Vector min;
-    private Vector max;
-    private LoadedMultiverseWorld world;
+    private final Vector min;
+    private final Vector max;
+    private final MultiverseWorld world;
 
-    public MultiverseRegion(Object pos1, Object pos2, LoadedMultiverseWorld w) {
+    public MultiverseRegion(Object pos1, Object pos2, MultiverseWorld w) {
         // Creating soft dependencies on WE
         if (pos1 instanceof com.sk89q.worldedit.math.BlockVector3 && pos2 instanceof com.sk89q.worldedit.math.BlockVector3) {
             com.sk89q.worldedit.math.BlockVector3 weV1 = (com.sk89q.worldedit.math.BlockVector3) pos1;
@@ -33,13 +37,14 @@ public class MultiverseRegion {
             this.max = Vector.getMaximum(tmp1, tmp2);
             this.world = w;
         }
+        throw new UnsupportedOperationException("WorldEdit plugin not installed!");
     }
 
-    public MultiverseRegion(Location loc1, Location loc2, LoadedMultiverseWorld w) {
+    public MultiverseRegion(Location loc1, Location loc2, MultiverseWorld w) {
         this(loc1.toVector(), loc2.toVector(), w);
     }
 
-    public MultiverseRegion(Vector pos1, Vector pos2, LoadedMultiverseWorld w) {
+    public MultiverseRegion(Vector pos1, Vector pos2, MultiverseWorld w) {
         this.min = Vector.getMinimum(pos1, pos2);
         this.max = Vector.getMaximum(pos1, pos2);
         this.world = w;
@@ -53,7 +58,17 @@ public class MultiverseRegion {
         return this.max;
     }
 
-    public LoadedMultiverseWorld getWorld() {
+    /**
+     * @deprecated Use {@link #getMultiverseWorld()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public @Nullable LoadedMultiverseWorld getWorld() {
+        return this.world.asLoadedWorld().getOrNull();
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull MultiverseWorld getMultiverseWorld() {
         return this.world;
     }
 
@@ -74,7 +89,7 @@ public class MultiverseRegion {
     }
 
     public boolean containsVector(Location l) {
-        if (!this.world.getBukkitWorld().map(w -> w.equals(l.getWorld())).getOrElse(false)) {
+        if (l.getWorld() != null && !l.getWorld().getName().equals(this.world.getName())) {
             return false;
         }
         if (!(l.getBlockX() >= min.getBlockX() && l.getBlockX() <= max.getBlockX())) {

@@ -42,7 +42,9 @@ public class DisplayUtils {
 
         issuer.sendMessage(ChatColor.AQUA + "--- " + message + ChatColor.DARK_AQUA + portal.getName() + ChatColor.AQUA + " ---");
         String[] locParts = portal.getPortalLocation().toString().split(":");
-        issuer.sendMessage(ChatColor.WHITE + "Coords: " + ChatColor.GOLD + locParts[1] + ChatColor.WHITE + " to " + ChatColor.GOLD + locParts[2] + ChatColor.WHITE + " in " + ChatColor.GOLD + portal.getWorld().getName() );
+        issuer.sendMessage(ChatColor.WHITE + "Coords: " + ChatColor.GOLD + locParts[1] + ChatColor.WHITE + " to "
+                + ChatColor.GOLD + locParts[2] + ChatColor.WHITE + " in " + ChatColor.GOLD
+                + portal.getMultiverseWorld().map(MultiverseWorld::getName).getOrElse(ChatColor.RED + "!!ERROR!!"));
         issuer.sendMessage(ChatColor.WHITE + "Configured Action Type: " + ChatColor.GOLD + portal.getActionType());
         if (portal.getAction().isEmpty()) {
             issuer.sendMessage(ChatColor.WHITE + "Configured Action: " + ChatColor.RED + ChatColor.ITALIC + "NOT SET!");
