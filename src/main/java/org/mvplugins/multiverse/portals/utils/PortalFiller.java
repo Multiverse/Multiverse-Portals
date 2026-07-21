@@ -9,7 +9,6 @@ package org.mvplugins.multiverse.portals.utils;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Axis;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,24 +16,32 @@ import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 
 import org.mvplugins.multiverse.core.teleportation.LocationManipulation;
+import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 @Service
 public class PortalFiller {
     private final LocationManipulation locationManipulation;
+    private final MVCommandManager commandManager;
 
     @Inject
-    PortalFiller(@NotNull LocationManipulation locationManipulation) {
+    PortalFiller(@NotNull LocationManipulation locationManipulation,
+                 @NotNull MVCommandManager commandManager) {
         this.locationManipulation = locationManipulation;
+        this.commandManager = commandManager;
     }
 
     public boolean fillRegion(MultiverseRegion r, Location l, Material type, Player player) {
         if (r.getWidth() != 1 && r.getDepth() != 1) {
-            player.sendMessage("Cannot fill portal, It needs a width or depth of " + ChatColor.GOLD + "1" + ChatColor.WHITE +
-                    ". w:[" + ChatColor.AQUA + r.getWidth() + ChatColor.WHITE + "] d:[" + ChatColor.AQUA + r.getDepth() + ChatColor.WHITE + "]");
+            commandManager.getCommandIssuer(player).sendError(MVPi18n.PORTAL_FILL_INVALIDSIZE,
+                    replace("{width}").with(r.getWidth()),
+                    replace("{depth}").with(r.getDepth()));
         }
         return this.fillRegion(r, l, type);
     }

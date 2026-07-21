@@ -1,9 +1,8 @@
 package org.mvplugins.multiverse.portals.commands;
 
-import org.bukkit.ChatColor;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -14,6 +13,7 @@ import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
@@ -30,21 +30,21 @@ class RemoveCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.remove")
     @CommandCompletion("@mvportals")
     @Syntax("<portal-name>")
-    @Description("Removes a existing portal.")
+    @Description("{@@mv-portals.remove.description}")
     void onRemoveCommand(
             MVCommandIssuer issuer,
 
             @Syntax("<portal-name>")
-            @Description("The name of the portal to remove.")
+            @Description("{@@mv-portals.remove.name.description}")
             String portalName
     ) {
         if (!this.portalManager.isPortal(portalName)) {
-            issuer.sendMessage("The portal Portal " + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + " does NOT exist!");
+            issuer.sendError(MVPi18n.REMOVE_NOTFOUND, Replace.NAME.with(portalName));
             return;
         }
 
         MVPortal portal = this.portalManager.removePortal(portalName, true);
-        issuer.sendMessage("Portal " + ChatColor.DARK_AQUA + portal.getName() + ChatColor.WHITE + " was removed successfully!");
+        issuer.sendInfo(MVPi18n.REMOVE_SUCCESS, Replace.NAME.with(portal.getName()));
     }
 
     @Service

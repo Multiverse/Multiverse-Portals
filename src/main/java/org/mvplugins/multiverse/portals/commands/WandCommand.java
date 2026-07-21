@@ -1,9 +1,9 @@
 package org.mvplugins.multiverse.portals.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
+import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -19,6 +19,9 @@ import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.WorldEditConnection;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 @Service
 class WandCommand extends PortalsCommand {
@@ -27,7 +30,8 @@ class WandCommand extends PortalsCommand {
     private final PortalsConfig portalsConfig;
 
     @Inject
-    WandCommand(@NotNull MultiversePortals plugin, @NotNull PortalsConfig portalsConfig) {
+    WandCommand(@NotNull MultiversePortals plugin,
+                @NotNull PortalsConfig portalsConfig) {
         this.plugin = plugin;
         this.portalsConfig = portalsConfig;
     }
@@ -36,15 +40,17 @@ class WandCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.givewand")
     @CommandCompletion("enable|disable|toggle")
     @Syntax("[enable|disable|toggle]")
-    @Description("Gives you the wand that MV uses. This will only work if you are NOT using WorldEdit.")
+    @Description("{@@mv-portals.wand.description}")
     void onWandCommand(
+            @NotNull MVCommandIssuer issuer,
+
             @Flags("resolve=issuerOnly")
             Player player,
 
             @Optional
             @Single
             @Syntax("[enable|disable|toggle]")
-            @Description("Enable, disable, or toggle the wand.")
+            @Description("{@@mv-portals.wand.action.description}")
             String action
     ) {
         if (action != null) {
@@ -55,27 +61,29 @@ class WandCommand extends PortalsCommand {
             } else if (action.equals("toggle")) {
                 this.plugin.setWandEnabled(!this.plugin.isWandEnabled());
             } else {
-                player.sendMessage(ChatColor.RED + "You must specify one of 'enable,' 'disable,' or 'toggle!'");
+                issuer.sendError(MVPi18n.WAND_INVALIDACTION);
             }
             return;
         }
 
         WorldEditConnection worldEdit = plugin.getWorldEditConnection();
         if (worldEdit != null && worldEdit.isConnected()) {
-            player.sendMessage(ChatColor.GREEN + "Cool!" + ChatColor.WHITE + " You're using" + ChatColor.AQUA + " WorldEdit! ");
-            player.sendMessage("Just use " + ChatColor.GOLD + "the WorldEdit wand " + ChatColor.WHITE + "to perform portal selections!");
+            issuer.sendInfo(MVPi18n.WAND_WORLDEDIT);
             return;
         }
         ItemStack wand = new ItemStack(portalsConfig.getWandMaterial(), 1);
 
         if (player.getInventory().getItemInMainHand().getAmount() == 0) {
             player.getInventory().setItemInMainHand(wand);
-            player.sendMessage("You have been given a " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")!");
+            issuer.sendInfo(MVPi18n.WAND_GIVEN,
+                    replace("{wandMaterial}").with(wand.getType()));
         } else {
             if (player.getInventory().addItem(wand).isEmpty()) {
-                player.sendMessage("A " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")" + ChatColor.WHITE + " has been placed in your inventory.");
+                issuer.sendInfo(MVPi18n.WAND_INVENTORY,
+                        replace("{wandMaterial}").with(wand.getType()));
             } else {
-                player.sendMessage("Your Inventory is full. A " + ChatColor.GREEN + "Multiverse Portal Wand(" + wand.getType() + ")" + ChatColor.WHITE + " has been placed dropped nearby.");
+                issuer.sendInfo(MVPi18n.WAND_DROPPED,
+                        replace("{wandMaterial}").with(wand.getType()));
                 player.getWorld().dropItemNaturally(player.getLocation(), wand);
             }
         }
@@ -90,8 +98,8 @@ class WandCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpwand|mvpw")
-        void onWandCommand(Player player, String action) {
-            super.onWandCommand(player, action);
+        void onWandCommand(MVCommandIssuer issuer, Player player, String action) {
+            super.onWandCommand(issuer, player, action);
         }
     }
 }

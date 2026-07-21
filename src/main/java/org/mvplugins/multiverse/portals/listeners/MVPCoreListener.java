@@ -11,6 +11,7 @@ import java.io.File;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.mvplugins.multiverse.core.dynamiclistener.annotations.EventMethod;
+import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.core.event.MVConfigReloadEvent;
 import org.mvplugins.multiverse.core.event.MVDebugModeEvent;
 import org.mvplugins.multiverse.core.event.MVDumpsDebugInfoEvent;
@@ -23,6 +24,7 @@ import org.bukkit.Location;
 
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 @Service
@@ -30,12 +32,17 @@ final class MVPCoreListener implements PortalsListener {
     private final MultiversePortals plugin;
     private final PortalsConfig config;
     private final PortalManager portalManager;
+    private final MVCommandManager commandManager;
 
     @Inject
-    MVPCoreListener(@NotNull MultiversePortals plugin, @NotNull PortalManager portalManager, @NotNull PortalsConfig config) {
+    MVPCoreListener(@NotNull MultiversePortals plugin,
+                    @NotNull PortalManager portalManager,
+                    @NotNull PortalsConfig config,
+                    @NotNull MVCommandManager commandManager) {
         this.plugin = plugin;
         this.portalManager = portalManager;
         this.config = config;
+        this.commandManager = commandManager;
     }
 
     /**
@@ -95,7 +102,7 @@ final class MVPCoreListener implements PortalsListener {
                 return;
             }
             // They can see it, is it val
-            event.getPlayer().sendMessage("This Multiverse Portal does not have a valid destination!");
+            commandManager.getCommandIssuer(event.getPlayer()).sendError(MVPi18n.PORTAL_DESTINATION_INVALID);
             event.setCanUseThisPortal(false);
         }
     }

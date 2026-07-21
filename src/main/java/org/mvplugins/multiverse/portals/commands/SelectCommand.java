@@ -1,8 +1,9 @@
 package org.mvplugins.multiverse.portals.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
+import org.mvplugins.multiverse.core.command.MVCommandIssuer;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -17,6 +18,9 @@ import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 @Service
 class SelectCommand extends PortalsCommand {
@@ -25,7 +29,8 @@ class SelectCommand extends PortalsCommand {
     private final PortalsConfig portalsConfig;
 
     @Inject
-    SelectCommand(@NotNull MultiversePortals plugin, @NotNull PortalsConfig portalsConfig) {
+    SelectCommand(@NotNull MultiversePortals plugin,
+                  @NotNull PortalsConfig portalsConfig) {
         this.plugin = plugin;
         this.portalsConfig = portalsConfig;
     }
@@ -34,29 +39,31 @@ class SelectCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.select,multiverse.portal.create")
     @CommandCompletion("@mvportals")
     @Syntax("<portal>")
-    @Description("Selects a portal so you can perform multiple modifications on it.")
+    @Description("{@@mv-portals.select.description}")
     void onSelectCommand(
+            @NotNull MVCommandIssuer issuer,
+
             @Flags("resolve=issuerOnly")
             Player player,
 
             @Optional
             @Syntax("<portal>")
-            @Description("The portal to select")
+            @Description("{@@mv-portals.select.portal.description}")
             MVPortal portal
     ) {
         if (portal == null) {
             MVPortal selected = this.plugin.getPortalSession(player).getSelectedPortal();
             if (this.plugin.getPortalSession(player).getSelectedPortal() == null) {
-                player.sendMessage("You have not selected a portal yet!");
-                player.sendMessage("Use a " + ChatColor.GREEN + portalsConfig.getWandMaterial() + ChatColor.WHITE + " to do so!");
+                issuer.sendError(MVPi18n.SELECT_NONE,
+                        replace("{wandMaterial}").with(portalsConfig.getWandMaterial()));
                 return;
             }
-            player.sendMessage("You have selected: " + ChatColor.DARK_AQUA + selected.getName());
+            issuer.sendInfo(MVPi18n.SELECT_CURRENT, Replace.NAME.with(selected.getName()));
             return;
         }
 
         this.plugin.getPortalSession(player).selectPortal(portal);
-        player.sendMessage("Portal: " + ChatColor.DARK_AQUA + portal.getName() + ChatColor.WHITE + " has been selected.");
+        issuer.sendInfo(MVPi18n.SELECT_SUCCESS, Replace.NAME.with(portal.getName()));
     }
 
     @Service
@@ -68,8 +75,8 @@ class SelectCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpselect|mvps")
-        void onSelectCommand(Player player, MVPortal portal) {
-            super.onSelectCommand(player, portal);
+        void onSelectCommand(MVCommandIssuer issuer, Player player, MVPortal portal) {
+            super.onSelectCommand(issuer, player, portal);
         }
     }
 }

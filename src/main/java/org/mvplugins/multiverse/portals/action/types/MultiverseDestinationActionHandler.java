@@ -1,11 +1,11 @@
 package org.mvplugins.multiverse.portals.action.types;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Vehicle;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.locale.message.Message;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.teleportation.AsyncSafetyTeleporter;
 import org.mvplugins.multiverse.core.teleportation.PassengerMode;
 import org.mvplugins.multiverse.core.teleportation.PassengerModes;
@@ -14,6 +14,8 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.action.ActionFailureReason;
 import org.mvplugins.multiverse.portals.action.ActionHandler;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
+
 
 final class MultiverseDestinationActionHandler extends ActionHandler<MultiverseDestinationActionHandlerType, MultiverseDestinationActionHandler> {
 
@@ -43,8 +45,8 @@ final class MultiverseDestinationActionHandler extends ActionHandler<MultiverseD
 
     @Override
     public @NotNull Message actionDescription(Entity entity) {
-        //todo use v5.4's DestinationInstance#getDisplayMessage method
-        return Message.of(ChatColor.AQUA + "Teleports to " + ChatColor.GOLD + destinationInstance.toString());
+        return Message.of(MVPi18n.ACTION_MULTIVERSEDESTINATION_DESCRIPTION,
+                Replace.DESTINATION.with(destinationInstance.toString()));
     }
 
     private PassengerMode passengerModeFor(MVPortal portal, Entity entity) {

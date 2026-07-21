@@ -3,7 +3,7 @@ package org.mvplugins.multiverse.portals.commands;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.core.locale.MVCorei18n;
-import org.mvplugins.multiverse.core.locale.message.MessageReplacement;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -30,18 +30,18 @@ class ConfigCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.config")
     @CommandCompletion("@portalconfigproperties @portalconfigvalues")
     @Syntax("<property> [value]")
-    @Description("Allows you to set Global MV Portals Variables.")
+    @Description("{@@mv-portals.config.description}")
     void onConfigCommand(
             @NotNull MVCommandIssuer issuer,
 
             @Optional
             @Syntax("<property>")
-            @Description("The property to set or get info of.")
+            @Description("{@@mv-portals.config.property.description}")
             String property,
 
             @Optional
             @Syntax("[value]")
-            @Description("The value to set.")
+            @Description("{@@mv-portals.config.value.description}")
             String value
     ) {
         if (value == null) {
@@ -53,26 +53,26 @@ class ConfigCommand extends PortalsCommand {
 
     private void showConfigValue(MVCommandIssuer issuer, String name) {
         portalsConfig.getStringPropertyHandle().getProperty(name)
-                .onSuccess(value -> issuer.sendMessage(MVCorei18n.CONFIG_SHOW_SUCCESS,
-                        MessageReplacement.Replace.NAME.with(name),
-                        MessageReplacement.Replace.VALUE.with(value)))
-                .onFailure(e -> issuer.sendMessage(MVCorei18n.CONFIG_SHOW_ERROR,
-                        MessageReplacement.Replace.NAME.with(name),
-                        MessageReplacement.Replace.ERROR.with(e)));
+                .onSuccess(value -> issuer.sendInfo(MVCorei18n.CONFIG_SHOW_SUCCESS,
+                        Replace.NAME.with(name),
+                        Replace.VALUE.with(value)))
+                .onFailure(e -> issuer.sendError(MVCorei18n.CONFIG_SHOW_ERROR,
+                        Replace.NAME.with(name),
+                        Replace.ERROR.with(e)));
     }
 
     private void updateConfigValue(MVCommandIssuer issuer, String name, String value) {
         portalsConfig.getStringPropertyHandle().setPropertyString(issuer.getIssuer(), name, value)
                 .onSuccess(ignore -> {
                     portalsConfig.save();
-                    issuer.sendMessage(MVCorei18n.CONFIG_SET_SUCCESS,
-                            MessageReplacement.Replace.NAME.with(name),
-                            MessageReplacement.Replace.VALUE.with(value));
+                    issuer.sendInfo(MVCorei18n.CONFIG_SET_SUCCESS,
+                            Replace.NAME.with(name),
+                            Replace.VALUE.with(value));
                 })
-                .onFailure(e -> issuer.sendMessage(MVCorei18n.CONFIG_SET_ERROR,
-                        MessageReplacement.Replace.NAME.with(name),
-                        MessageReplacement.Replace.VALUE.with(value),
-                        MessageReplacement.Replace.ERROR.with(e)));
+                .onFailure(e -> issuer.sendError(MVCorei18n.CONFIG_SET_ERROR,
+                        Replace.NAME.with(name),
+                        Replace.VALUE.with(value),
+                        Replace.ERROR.with(e)));
     }
 
     @Service

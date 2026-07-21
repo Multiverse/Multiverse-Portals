@@ -98,6 +98,8 @@ public class MultiversePortals extends MultiverseModule {
 
         Logging.setDebugLevel(coreConfig.get().getGlobalDebug());
 
+        this.setUpLocales();
+
         // Register our commands
         this.registerCommands();
 

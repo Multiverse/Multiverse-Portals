@@ -6,6 +6,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.mvplugins.multiverse.core.utils.REPatterns;
+import org.mvplugins.multiverse.core.locale.message.Message;
+import org.mvplugins.multiverse.external.acf.locales.MessageKeyProvider;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 abstract class CommandRunner {
 
@@ -20,12 +25,12 @@ abstract class CommandRunner {
 
     final String rawCmd;
     private final String cmdStr;
-    final String cmdType;
+    private final MessageKeyProvider descriptionKey;
 
-    private CommandRunner(String rawCmd, String cmdStr, String cmdType) {
+    private CommandRunner(String rawCmd, String cmdStr, MessageKeyProvider descriptionKey) {
         this.rawCmd = rawCmd;
         this.cmdStr = cmdStr;
-        this.cmdType = cmdType;
+        this.descriptionKey = descriptionKey;
     }
 
     void runCommand(CommandSender sender) {
@@ -46,12 +51,17 @@ abstract class CommandRunner {
         return parsedCmd;
     }
 
+    Message actionDescription(CommandSender sender) {
+        return Message.of(descriptionKey,
+                replace("{command}").with(parseCmdStrPlaceholders(sender)));
+    }
+
     protected abstract void runCommand(CommandSender sender, String cmd);
 
     private static class Self extends CommandRunner {
 
         private Self(String rawCmd, String cmdStr) {
-            super(rawCmd, cmdStr, "myself");
+            super(rawCmd, cmdStr, MVPi18n.ACTION_COMMAND_SELF);
         }
 
         @Override
@@ -63,7 +73,7 @@ abstract class CommandRunner {
     private static class Op extends CommandRunner {
 
         private Op(String rawCmd, String cmdStr) {
-            super(rawCmd, cmdStr, "as operator");
+            super(rawCmd, cmdStr, MVPi18n.ACTION_COMMAND_OPERATOR);
         }
 
         @Override
@@ -83,7 +93,7 @@ abstract class CommandRunner {
     private static class Console extends CommandRunner {
 
         private Console(String rawCmd, String cmdStr) {
-            super(rawCmd, cmdStr, "from console");
+            super(rawCmd, cmdStr, MVPi18n.ACTION_COMMAND_CONSOLE);
         }
 
         @Override

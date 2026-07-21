@@ -1,6 +1,5 @@
 package org.mvplugins.multiverse.portals.action.types;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.mvplugins.multiverse.core.locale.message.Message;
 import org.mvplugins.multiverse.core.utils.result.Attempt;
@@ -26,8 +25,7 @@ final class CommandActionHandler extends ActionHandler<CommandActionHandlerType,
 
     @Override
     public @NotNull Message actionDescription(Entity entity) {
-        return Message.of(ChatColor.AQUA + "Runs command " + commandRunner.cmdType + " " + ChatColor.GOLD + "/"
-                + commandRunner.parseCmdStrPlaceholders(entity));
+        return commandRunner.actionDescription(entity);
     }
 
     @Override

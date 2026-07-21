@@ -2,15 +2,15 @@ package org.mvplugins.multiverse.portals;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.config.node.ConfigNode;
 import org.mvplugins.multiverse.core.config.node.Node;
 import org.mvplugins.multiverse.core.config.node.NodeGroup;
-import org.mvplugins.multiverse.core.destination.DestinationsProvider;
 import org.mvplugins.multiverse.core.exceptions.MultiverseException;
+import org.mvplugins.multiverse.core.locale.message.Message;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.action.ActionHandler;
 import org.mvplugins.multiverse.portals.action.ActionHandlerProvider;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 import java.util.Collections;
@@ -74,17 +74,20 @@ final class MVPortalNodes {
             .stringParser((sender, input, type) -> {
                 if (input.equals("@selected-region")) {
                     if (!(sender instanceof Player player)) {
-                        return Try.failure(new MultiverseException("You can only use '@selected-region' as a player."));
+                        return Try.failure(new MultiverseException(
+                                Message.of(MVPi18n.PORTALCONFIG_LOCATION_PLAYERSONLY)));
                     }
                     MultiverseRegion region = plugin.getPortalSession(player).getSelectedRegion();
                     if (region == null) {
-                        return Try.failure(new MultiverseException("You must select a region first. See `/mvp wand` for more info."));
+                        return Try.failure(new MultiverseException(
+                                Message.of(MVPi18n.PORTALCONFIG_LOCATION_SELECTIONREQUIRED)));
                     }
                     return Try.success(region.toString());
                 }
                 PortalLocation portalLocation = PortalLocation.parseLocation(input);
                 if (!portalLocation.isValidLocation()) {
-                    return Try.failure(new MultiverseException("Invalid location format. The portal location must be in the format `WORLD:X,Y,Z:X,Y,Z`."));
+                    return Try.failure(new MultiverseException(
+                            Message.of(MVPi18n.PORTALCONFIG_LOCATION_INVALID)));
                 }
                 return Try.success(portalLocation.toString());
             })

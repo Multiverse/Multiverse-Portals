@@ -9,6 +9,7 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.action.ActionFailureReason;
 import org.mvplugins.multiverse.portals.action.ActionHandlerType;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 
 import java.util.Collection;
 
@@ -30,7 +31,7 @@ final class ServerActionHandlerType extends ActionHandlerType<ServerActionHandle
                                                                                    @NotNull String action) {
         if (action.isEmpty()) {
             return Attempt.failure(ActionFailureReason.INSTANCE,
-                    Message.of("Please specific a server name as the portal's action."));
+                    Message.of(MVPi18n.ACTION_SERVER_INVALID));
         }
         return Attempt.success(new ServerActionHandler(this, plugin, action));
     }
