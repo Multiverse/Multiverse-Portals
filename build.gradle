@@ -1,6 +1,6 @@
 plugins {
     id 'checkstyle'
-    id 'org.mvplugins.multiverse-plugin' version '1.2.0'
+    id 'org.mvplugins.multiverse-plugin' version '1.2.2'
 }
 
 group = 'org.mvplugins.multiverse.portals'
@@ -22,9 +22,9 @@ repositories {
 }
 
 configure(apiDependencies) {
-    serverApiVersion = '1.18.2-R0.1-SNAPSHOT'
+    serverApiVersion = '1.21.11-R0.1-SNAPSHOT'
     mockBukkitServerApiVersion = '1.21'
-    mockBukkitVersion = '4.31.1'
+    mockBukkitVersion = '4.110.0'
 }
 
 dependencies {
@@ -32,12 +32,12 @@ dependencies {
     externalPlugin 'org.mvplugins.multiverse.core:multiverse-core:5.1.0-SNAPSHOT'
 
     // WorldEdit
-    externalPlugin('com.sk89q.worldedit:worldedit-bukkit:7.2.9') {
+    externalPlugin('com.sk89q.worldedit:worldedit-bukkit:7.4.0') {
         exclude group: 'org.bukkit', module: 'bukkit'
     }
 
     // PlaceholderAPI
-    externalPlugin 'me.clip:placeholderapi:2.11.6'
+    externalPlugin 'me.clip:placeholderapi:2.12.3'
 
     // Utils
     shadowed('com.dumptruckman.minecraft:Logging:1.1.1') {
@@ -45,11 +45,11 @@ dependencies {
     }
 
     // hk2 for annotation processing only
-    compileOnly('org.glassfish.hk2:hk2-api:3.0.3') {
+    compileOnly('org.glassfish.hk2:hk2-api:3.1.1') {
         exclude group: '*', module: '*'
     }
-    annotationProcessor 'org.glassfish.hk2:hk2-metadata-generator:3.0.3'
-    testAnnotationProcessor 'org.glassfish.hk2:hk2-metadata-generator:3.0.3'
+    annotationProcessor 'org.glassfish.hk2:hk2-metadata-generator:3.1.1'
+    testAnnotationProcessor 'org.glassfish.hk2:hk2-metadata-generator:3.1.1'
 }
 
 checkstyle {
