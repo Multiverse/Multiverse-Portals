@@ -9,10 +9,13 @@ package org.mvplugins.multiverse.portals.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -28,6 +31,7 @@ import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
+import org.mvplugins.multiverse.external.jetbrains.annotations.Nullable;
 import org.mvplugins.multiverse.external.vavr.control.Option;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
@@ -49,10 +53,7 @@ public class PortalManager {
 
     // For each world, keep a map of chunk hashes (see hashChunk()) to lists of
     // portals in those chunks.
-    private final Map<MultiverseWorld, Map<Integer, Collection<MVPortal>>> worldChunkPortals;
-
-    // getNearbyPortals() returns this instead of null. =)
-    private static final Collection<MVPortal> emptyPortalSet = new ArrayList<MVPortal>();
+    private final Map<String, Map<Integer, Collection<MVPortal>>> worldChunkPortals;
 
     @Inject
     PortalManager(@NotNull MultiversePortals plugin,
@@ -133,7 +134,7 @@ public class PortalManager {
      * @return Null if no portal found, otherwise the MVPortal at that location.
      */
     public MVPortal getPortal(Location l) {
-        MultiverseWorld world = this.worldManager.getLoadedWorld(l.getWorld().getName()).getOrNull();
+        MultiverseWorld world = this.worldManager.getWorld(l.getWorld().getName()).getOrNull();
         for (MVPortal portal : getNearbyPortals(world, l)) {
             MultiverseRegion r = portal.getPortalLocation().getRegion();
             if (r != null && r.containsVector(l)) {
@@ -144,12 +145,17 @@ public class PortalManager {
     }
 
     public boolean addPortal(MVPortal portal) {
-        if (!this.portals.containsKey(portal.getName())) {
-            MultiverseWorld world = this.worldManager.getLoadedWorld(portal.getWorld()).getOrNull();
-            addUniquePortal(world, portal.getName(), portal);
-            return true;
+        if (this.portals.containsKey(portal.getName())) {
+            return false;
         }
-        return false;
+        MultiverseWorld world = portal.getMultiverseWorld().getOrNull();
+        if (world == null) {
+            Logging.warning("Cannot add portal %s as it location is not in a Multiverse world!",
+                    portal.getName());
+            return false;
+        }
+        addUniquePortal(world, portal.getName(), portal);
+        return true;
     }
 
     public boolean addPortal(MultiverseWorld world, String name, String owner, PortalLocation location) {
@@ -161,7 +167,7 @@ public class PortalManager {
     }
     
     // Add a portal whose name is already known to be unique.
-    private void addUniquePortal(MultiverseWorld world, String name, MVPortal portal) {
+    private void addUniquePortal(@NotNull MultiverseWorld world, @NotNull String name, @NotNull MVPortal portal) {
         this.portals.put(name, portal);
         this.plugin.savePortalsConfig();
         addToWorldChunkPortals(world, portal);
@@ -172,13 +178,15 @@ public class PortalManager {
     }
 
     private MVPortal removePortal(String portalName, boolean removeFromConfigs, boolean delayRecalculation) {
-        if (!isPortal(portalName)) {
+        MVPortal removed = this.portals.remove(portalName);
+        if (removed == null) {
             return null;
         }
 
-        MVPortal removed = this.portals.remove(portalName);
-        MultiverseWorld world = this.worldManager.getLoadedWorld(removed.getWorld()).getOrNull();
-        removeFromWorldChunkPortals(world, removed);
+        MultiverseWorld world = removed.getMultiverseWorld().getOrNull();
+        if (world != null) {
+            removeFromWorldChunkPortals(world, removed);
+        }
 
         if (removeFromConfigs) {
             FileConfiguration config = this.plugin.getPortalsConfig();
@@ -210,7 +218,8 @@ public class PortalManager {
             // player to the nether instead of their expected destination).
 
             Option.of(removed.getPortalLocation().getRegion()).peek(region ->
-                    replaceInRegion(removed.getWorld(), region, Material.NETHER_PORTAL, Material.AIR));
+                    removed.getBukkitWorld().peek(bukkitWorld ->
+                            replaceInRegion(bukkitWorld, region, Material.NETHER_PORTAL, Material.AIR)));
         }
         this.plugin.getServer().getPluginManager().removePermission(removed.getPermission());
         this.plugin.getServer().getPluginManager().removePermission(removed.getExempt());
@@ -252,7 +261,7 @@ public class PortalManager {
         List<MVPortal> all = this.getAllPortals();
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         for (MVPortal p : all) {
-            MultiverseWorld portalworld = p.getPortalLocation().getMVWorld();
+            MultiverseWorld portalworld = p.getPortalLocation().getMultiverseWorld().getOrNull();
             if (portalworld != null && portalworld.equals(world)) {
                 validItems.add(p);
             }
@@ -268,8 +277,9 @@ public class PortalManager {
         List<MVPortal> validItems = new ArrayList<MVPortal>();
         if (portalsConfig.getEnforcePortalAccess()) {
             for (MVPortal p : all) {
-                if (p.getPortalLocation().isValidLocation() && p.getPortalLocation().getMVWorld().equals(world) &&
-                        p.playerCanEnterPortal((Player) sender)) {
+                if (p.getPortalLocation().isValidLocation()
+                        && Objects.equals(p.getPortalLocation().getMultiverseWorld(), world)
+                        && p.playerCanEnterPortal((Player) sender)) {
                     validItems.add(p);
                 }
             }
@@ -344,11 +354,8 @@ public class PortalManager {
     
     private void addToWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
 
-        Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
-        if (chunksToPortals == null) {
-            chunksToPortals = new HashMap<Integer, Collection<MVPortal>>();
-            this.worldChunkPortals.put(world, chunksToPortals);
-        }
+        Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.
+                computeIfAbsent(world.getName(), k -> new HashMap<>());
 
         // If this portal spans multiple chunks, we'll add it to each chunk that
         // contains part of it.
@@ -373,8 +380,8 @@ public class PortalManager {
         }
     }
     
-    private void removeFromWorldChunkPortals(MultiverseWorld world, MVPortal portal) {
-        Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world);
+    private void removeFromWorldChunkPortals(@NotNull MultiverseWorld world, @NotNull MVPortal portal) {
+        Map<Integer, Collection<MVPortal>> chunksToPortals = this.worldChunkPortals.get(world.getName());
 
         if (chunksToPortals == null) {
             // 'world' might be a new instance of an adventure world that's
@@ -403,21 +410,21 @@ public class PortalManager {
      * @param location the location
      * @return a collection of nearby portals; may be empty, but will not be null
      */
-    private Collection<MVPortal> getNearbyPortals(MultiverseWorld world, Location location) {
-
-        Collection<MVPortal> nearbyPortals = null;
-
-        Map<Integer, Collection<MVPortal>> chunkMap = this.worldChunkPortals.get(world);
+    private Collection<MVPortal> getNearbyPortals(@Nullable MultiverseWorld world, Location location) {
+        if (world == null) {
+            return Collections.emptyList();
+        }
+        Map<Integer, Collection<MVPortal>> chunkMap = this.worldChunkPortals.get(world.getName());
         if (chunkMap != null) {
             int cx = blockToChunk(location.getBlockX());
             int cz = blockToChunk(location.getBlockZ());
             Integer hash = hashChunk(cx, cz);
 
-            nearbyPortals = chunkMap.get(hash);
+            return chunkMap.getOrDefault(hash, Collections.emptyList());
         }
 
         // Never return null. (This just keeps the caller from having to do a
         // null check.)
-        return nearbyPortals != null ? nearbyPortals : emptyPortalSet;
+        return Collections.emptyList();
     }
 }

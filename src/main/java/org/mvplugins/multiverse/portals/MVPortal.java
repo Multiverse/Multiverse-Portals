@@ -37,6 +37,7 @@ import org.mvplugins.multiverse.core.teleportation.BlockSafety;
 import org.mvplugins.multiverse.core.utils.result.Attempt;
 import org.mvplugins.multiverse.core.utils.text.ChatTextFormatter;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.external.vavr.control.Option;
 import org.mvplugins.multiverse.external.vavr.control.Try;
@@ -90,7 +91,13 @@ public final class MVPortal {
     private Permission fillPermission;
     private Permission exempt;
 
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public MVPortal(LoadedMultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
+        this((MultiverseWorld) world, instance, name, owner, location);
+    }
+
+    public MVPortal(MultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location, world);
@@ -268,14 +275,17 @@ public final class MVPortal {
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
-        LoadedMultiverseWorld world = null;
-        if (this.worldManager.isWorld(worldString)) {
-            world = this.worldManager.getLoadedWorld(worldString).getOrNull();
-        }
+        MultiverseWorld world = this.worldManager.getWorld(worldString).getOrNull();
         return this.setPortalLocation(locationString, world);
     }
 
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public boolean setPortalLocation(String locationString, LoadedMultiverseWorld world) {
+        return this.setPortalLocation(locationString, (MultiverseWorld) world);
+    }
+
+    public boolean setPortalLocation(String locationString, MultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
 
@@ -382,16 +392,21 @@ public final class MVPortal {
         return this.configHandle.get(configNodes.checkDestinationSafety);
     }
 
-    public Location getSafePlayerSpawnLocation() {
+    public @Nullable Location getSafePlayerSpawnLocation() {
         PortalLocation pl = this.location;
+        World world = getBukkitWorld().getOrNull();
+        if (pl == null || world == null) {
+            return null;
+        }
+
         double portalWidth = Math.abs((pl.getMaximum().getBlockX()) - pl.getMinimum().getBlockX()) + 1;
         double portalDepth = Math.abs((pl.getMaximum().getBlockZ()) - pl.getMinimum().getBlockZ()) + 1;
 
         double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
         // double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
-        double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), this.getWorld());
-        return new Location(this.getWorld(), finalX, finalY, finalZ);
+        double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), world);
+        return new Location(world, finalX, finalY, finalZ);
     }
 
     private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
@@ -419,8 +434,14 @@ public final class MVPortal {
                     this.getName()));
         }
 
-        return this.location.getMinimum().getMidpoint(this.location.getMaximum())
-                .toLocation(this.location.getMVWorld().getBukkitWorld().getOrNull()).getBlock().getType();
+        return this.location.getMinimum()
+                .getMidpoint(this.location.getMaximum())
+                .toLocation(this.location.getMultiverseWorld()
+                        .flatMap(MultiverseWorld::asLoadedWorld)
+                        .flatMap(LoadedMultiverseWorld::getBukkitWorld)
+                        .getOrNull())
+                .getBlock()
+                .getType();
     }
 
     /**
@@ -457,13 +478,25 @@ public final class MVPortal {
         return player.hasPermission(this.fillPermission);
     }
 
-    @Nullable
-    public World getWorld() {
-        LoadedMultiverseWorld mvWorld = this.location.getMVWorld();
-        if (mvWorld == null) {
-            return null;
-        }
-        return mvWorld.getBukkitWorld().getOrNull();
+    /**
+     * @deprecated Use {@link #getBukkitWorld()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public @Nullable World getWorld() {
+        return getBukkitWorld().getOrNull();
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull Option<World> getBukkitWorld() {
+        return location.getMultiverseWorld()
+                .flatMap(MultiverseWorld::asLoadedWorld)
+                .flatMap(LoadedMultiverseWorld::getBukkitWorld);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull Option<MultiverseWorld> getMultiverseWorld() {
+        return location.getMultiverseWorld();
     }
 
     public Permission getPermission() {
@@ -616,7 +649,7 @@ public final class MVPortal {
         Vector max = new Vector().copy(r.getMaximumPoint());
         min.add(new Vector(-x, -y, -z));
         max.add(new Vector( x,  y,  z));
-        return new MultiverseRegion(min, max, r.getWorld());
+        return new MultiverseRegion(min, max, r.getMultiverseWorld());
     }
 
     // deprecated island
