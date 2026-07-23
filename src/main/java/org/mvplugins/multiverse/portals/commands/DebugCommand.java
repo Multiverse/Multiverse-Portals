@@ -2,7 +2,6 @@ package org.mvplugins.multiverse.portals.commands;
 
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -32,7 +31,7 @@ class DebugCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.debug")
     @CommandCompletion("on|off")
     @Syntax("[on|off]")
-    @Description("Instead of teleporting you to a place when you walk into a portal you will see the details about it. This command toggles.")
+    @Description("{@@mv-portals.debug.description}")
     void onDebugCommand(
         @Flags("resolve=issuerOnly")
         Player player,
@@ -40,6 +39,7 @@ class DebugCommand extends PortalsCommand {
         @Optional
         @Single
         @Syntax("[on|off]")
+        @Description("{@@mv-portals.debug.toggle.description}")
         String toggle
     ) {
         PortalPlayerSession ps = this.plugin.getPortalSession(player);

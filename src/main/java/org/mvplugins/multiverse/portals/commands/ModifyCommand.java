@@ -1,9 +1,9 @@
 package org.mvplugins.multiverse.portals.commands;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.bukkit.ChatColor;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.locale.message.LocalizableMessage;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
@@ -12,7 +12,6 @@ import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermissi
 import org.mvplugins.multiverse.external.acf.commands.annotation.ConsumesRest;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Description;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Flags;
-import org.mvplugins.multiverse.external.acf.commands.annotation.Single;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Subcommand;
 import org.mvplugins.multiverse.external.acf.commands.annotation.Syntax;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
@@ -20,6 +19,9 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 @Service
 class ModifyCommand extends PortalsCommand {
@@ -37,29 +39,29 @@ class ModifyCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.modify")
     @CommandCompletion("@mvportals @portalpropertynames @portalpropertyvalues")
     @Syntax("[portal] <property> <value>")
-    @Description("Allows you to modify all values that can be set.")
+    @Description("{@@mv-portals.modify.description}")
     public void onModifyCommand(
             MVCommandIssuer issuer,
 
             @Flags("resolve=issuerAware")
             @Syntax("[portal]")
-            @Description("The portal to modify.")
+            @Description("{@@mv-portals.modify.portal.description}")
             MVPortal portal,
 
             @Syntax("<property>")
-            @Description("The property to modify.")
+            @Description("{@@mv-portals.modify.property.description}")
             String property,
 
             @ConsumesRest
             @Syntax("<value>")
-            @Description("The value to set.")
+            @Description("{@@mv-portals.modify.value.description}")
             String value
     ) {
         //todo: remove this in 6.0
         if (property.equalsIgnoreCase("dest") || property.equalsIgnoreCase("destination")) {
             if (value.equalsIgnoreCase("here") && !worldManager.isWorld("here")) {
                 Logging.warning("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
-                issuer.sendError("Using 'here' as a destination is deprecated and will be removed in a future version. Use 'e:@here' instead.");
+                issuer.sendError(MVPi18n.MODIFY_HEREDEPRECATED);
                 value = "e:@here";
             }
         }
@@ -69,24 +71,25 @@ class ModifyCommand extends PortalsCommand {
         stringPropertyHandle.setPropertyString(issuer.getIssuer(), property, value)
                 .onSuccess(ignore -> {
                     if (!this.plugin.savePortalsConfig()) {
-                        issuer.sendError("Could not save portals configuration file!");
+                        issuer.sendError(MVPi18n.MODIFY_SAVEFAILED);
                         return;
                     }
-                    issuer.sendMessage(ChatColor.GREEN + "Property " + ChatColor.AQUA + property + ChatColor.GREEN
-                            + " of Portal " + ChatColor.YELLOW + portal.getName() + ChatColor.GREEN + " was set to "
-                            + ChatColor.AQUA + stringPropertyHandle.getProperty(property).getOrNull());
+                    issuer.sendInfo(MVPi18n.MODIFY_SUCCESS,
+                            Replace.NAME.with(property),
+                            replace("{portal}").with(portal.getName()),
+                            Replace.VALUE.with(stringPropertyHandle.getProperty(property).getOrNull()));
                     if (property.equalsIgnoreCase("action-type")) {
-                        issuer.sendError("Please note that changing the action type &edoes NOT modify &cthe action itself. "
-                                + "You need to modify the action property as well to ensure the portal works as expected.");
+                        issuer.sendError(MVPi18n.MODIFY_ACTIONTYPEWARNING);
                     }
                 }).onFailure(failure -> {
-                    issuer.sendError("Property " + ChatColor.AQUA + property + ChatColor.RED + " of Portal "
-                            + ChatColor.YELLOW + portal.getName() + ChatColor.RED + " was NOT set to "
-                            + ChatColor.AQUA + finalValue);
+                    issuer.sendError(MVPi18n.MODIFY_FAILURE,
+                            Replace.NAME.with(property),
+                            replace("{portal}").with(portal.getName()),
+                            Replace.VALUE.with(finalValue));
                     if (failure instanceof LocalizableMessage localizableMessage) {
                         issuer.sendError(localizableMessage.getLocalizableMessage());
                     } else {
-                        issuer.sendError(failure.getMessage());
+                        issuer.sendError(MVPi18n.GENERIC_ERROR_DETAILS, Replace.ERROR.with(failure.getMessage()));
                     }
                 });
     }

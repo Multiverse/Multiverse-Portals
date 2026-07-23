@@ -3,7 +3,6 @@ package org.mvplugins.multiverse.portals.commands;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
 import org.mvplugins.multiverse.core.command.MVCommandIssuer;
-import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -16,6 +15,7 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.DisplayUtils;
 
 @Service
@@ -34,20 +34,20 @@ class InfoCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.info")
     @CommandCompletion("@mvportals")
     @Syntax("[portal]")
-    @Description("Displays information about a portal.")
+    @Description("{@@mv-portals.info.description}")
     void onInfoCommand(
             @NotNull MVCommandIssuer issuer,
 
             @Flags("resolve=issuerAware")
             @Syntax("[portal]")
-            @Description("The portal to show info")
+            @Description("{@@mv-portals.info.portal.description}")
             MVPortal portal
     ) {
         if(issuer.isPlayer()) {
             Player p = issuer.getPlayer();
             this.plugin.getPortalSession(p).showDebugInfo(portal);
         } else {
-            displayUtils.showStaticInfo(issuer.getIssuer(), portal, "Portal Info: ");
+            displayUtils.showStaticInfo(issuer.getIssuer(), portal, MVPi18n.PORTALINFO_COMMANDHEADER);
         }
     }
 
