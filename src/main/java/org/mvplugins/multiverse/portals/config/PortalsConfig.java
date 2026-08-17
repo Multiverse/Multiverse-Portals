@@ -11,6 +11,7 @@ import org.mvplugins.multiverse.core.config.handle.StringPropertyHandle;
 import org.mvplugins.multiverse.core.config.migration.ConfigMigrator;
 import org.mvplugins.multiverse.core.config.migration.VersionMigrator;
 import org.mvplugins.multiverse.core.config.migration.action.MoveMigratorAction;
+import org.mvplugins.multiverse.core.config.migration.action.SetMigratorAction;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.MultiversePortals;
@@ -50,6 +51,9 @@ public final class PortalsConfig {
                                 .addAction(MoveMigratorAction.of("teleportvehicles", "portal-usage.teleport-vehicles"))
                                 .addAction(MoveMigratorAction.of("netheranimation", "portal-usage.nether-animation"))
                                 .addAction(MoveMigratorAction.of("framematerials", "portal-creation.frame-materials"))
+                                .build())
+                        .addVersionMigrator(VersionMigrator.builder(5.1)
+                                .addAction(SetMigratorAction.of("portal-usage.send-no-permission-messages", false))
                                 .build())
                         .build())
                 .build();
@@ -201,6 +205,29 @@ public final class PortalsConfig {
     @ApiStatus.AvailableSince("5.1")
     public Try<Void> setEnforcePortalAccess(boolean enforcePortalAccess) {
         return configHandle.set(configNodes.enforcePortalAccess, enforcePortalAccess);
+    }
+
+    /**
+     *
+     * @return
+     *
+     * @since 5.3
+     */
+    @ApiStatus.AvailableSince("5.3")
+    public boolean getSendNoPermissionMessages() {
+        return configHandle.get(configNodes.sendNoPermissionMessages);
+    }
+
+    /**
+     *
+     * @param sendNoPermissionMessages
+     * @return
+     *
+     * @since 5.3
+     */
+    @ApiStatus.AvailableSince("5.3")
+    public Try<Void> setSendNoPermissionMessages(boolean sendNoPermissionMessages) {
+        return configHandle.set(configNodes.sendNoPermissionMessages, sendNoPermissionMessages);
     }
 
     /**

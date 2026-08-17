@@ -39,6 +39,9 @@ import org.mvplugins.multiverse.core.utils.text.ChatTextFormatter;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
+import org.mvplugins.multiverse.external.acf.locales.MessageKey;
+import org.mvplugins.multiverse.external.acf.locales.MessageKeyProvider;
+import org.mvplugins.multiverse.external.vavr.control.Either;
 import org.mvplugins.multiverse.external.vavr.control.Option;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.action.ActionFailureReason;
@@ -55,6 +58,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
 
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 public final class MVPortal {
@@ -152,6 +156,12 @@ public final class MVPortal {
                                 .build())
                         .addVersionMigrator(VersionMigrator.builder(1.2)
                                 .addAction(MoveMigratorAction.of("destination", "action"))
+                                .build())
+                        .addVersionMigrator(VersionMigrator.builder(1.3)
+                                .addAction(MoveMigratorAction.of("action", "action.value"))
+                                .addAction(MoveMigratorAction.of("action-type", "action.type"))
+                                .addAction(MoveMigratorAction.of("currency", "entry-fee.currency"))
+                                .addAction(MoveMigratorAction.of("price", "entry-fee.price"))
                                 .build())
                         .build())
                 .build();
@@ -260,6 +270,39 @@ public final class MVPortal {
 
     public double getPrice() {
         return this.configHandle.get(configNodes.price);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Try<Void> setActionSuccessMessage(String message) {
+        return this.configHandle.set(this.configNodes.actionSuccessMessage, message);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Option<Either<MessageKeyProvider, String>> getActionSuccessMessage() {
+        return getMessageEither(this.configHandle.get(this.configNodes.actionSuccessMessage), MVPi18n.PORTAL_ACTION_SUCCESS);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Try<Void> setNoPermissionMessage(String message) {
+        return this.configHandle.set(this.configNodes.noPermissionMessage, message);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Option<Either<MessageKeyProvider, String>> getNoPermissionMessage() {
+        return getMessageEither(this.configHandle.get(this.configNodes.noPermissionMessage),MVPi18n.PORTAL_PERMISSION_DENIED);
+    }
+
+    private Option<Either<MessageKeyProvider, String>> getMessageEither(String message, MessageKeyProvider defaultMessageKey) {
+        if (message == null || message.equalsIgnoreCase("@disabled")) {
+            return Option.none();
+        }
+        if (message.equalsIgnoreCase("@default")) {
+            return Option.of(Either.left(defaultMessageKey));
+        }
+        if (message.startsWith("@@")) {
+            return Option.of(Either.left(MessageKey.of(message.substring(2))));
+        }
+        return Option.of(Either.right(message));
     }
 
     /**

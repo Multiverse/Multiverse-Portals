@@ -55,7 +55,8 @@ public final class MVPEntityMoveListener implements DynamicListener {
 
                 Logging.fine("[EntityMoveEvent] Portal action for entity: " + entity);
                 helper.stateSuccess(entity.getName(), portal.getName());
-                portal.runActionFor(entity);
+                portal.runActionFor(entity)
+                        .onSuccess(() -> helper.sendActionSuccessMessage(portal, entity));
             }
         };
     }

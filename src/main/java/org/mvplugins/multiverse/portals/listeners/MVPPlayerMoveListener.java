@@ -96,6 +96,7 @@ public final class MVPPlayerMoveListener implements DynamicListener {
         }
 
         Logging.fine("[PlayerMoveEvent] Portal action for player: " + player);
-        portal.runActionFor(player);
+        portal.runActionFor(player)
+                .onSuccess(() -> helper.sendActionSuccessMessage(portal, player));
     }
 }

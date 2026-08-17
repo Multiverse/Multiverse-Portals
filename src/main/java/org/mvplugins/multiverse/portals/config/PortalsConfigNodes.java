@@ -122,6 +122,15 @@ final class PortalsConfigNodes {
             .onSetValue((oldValue, newValue) -> MultiversePortals.EnforcePortalAccess = newValue)
             .build());
 
+    final ConfigNode<Boolean> sendNoPermissionMessages = node(ConfigNode.builder("portal-usage.send-no-permission-messages", Boolean.class)
+            .comment("")
+            .comment("This is a global toggle to disable the sending of no permission messages for all portals.")
+            .comment("This is only applicable if `enforce-portal-access` is enabled above, else permission checks will not happen anyways.")
+            .comment("If you are looking to customize/disable specific portal's message, use each portal's `no-permission-message` property.")
+            .defaultValue(true)
+            .name("send-no-permission-messages")
+            .build());
+
     final ConfigNode<Integer> portalCooldown = node(ConfigNode.builder("portal-usage.portal-cooldown", Integer.class)
             .comment("")
             .comment("The time (in milliseconds) a player must wait between using a mvportal.")
