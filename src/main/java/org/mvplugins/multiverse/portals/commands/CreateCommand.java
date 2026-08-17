@@ -6,6 +6,7 @@ import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
 import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -76,7 +77,7 @@ class CreateCommand extends PortalsCommand {
         }
 
         MVPortal portal = this.portalManager.getPortal(portalName);
-        PortalLocation location = new PortalLocation(region.getMinimumPoint(), region.getMaximumPoint(), world);
+        PortalLocation location = new PortalLocation(region.getMinimumPoint(), region.getMaximumPoint(), (MultiverseWorld) world);
         if (this.portalManager.addPortal(world, portalName, player.getName(), location)) {
             issuer.sendInfo(MVPi18n.CREATE_SUCCESS, Replace.NAME.with(portalName));
             // If the portal did not exist, ie: we're creating it.

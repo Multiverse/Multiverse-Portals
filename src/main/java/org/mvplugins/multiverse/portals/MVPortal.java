@@ -95,12 +95,16 @@ public final class MVPortal {
     private Permission fillPermission;
     private Permission exempt;
 
+    /**
+     * @deprecated Use {@link MVPortal(MultiverseWorld, MultiversePortals, String, String, String)} instead.
+     */
     @Deprecated(forRemoval = true, since = "5.3")
     @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public MVPortal(LoadedMultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this((MultiverseWorld) world, instance, name, owner, location);
     }
 
+    @ApiStatus.AvailableSince("5.3")
     public MVPortal(MultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this(instance, name);
         this.setOwner(owner);
@@ -328,6 +332,7 @@ public final class MVPortal {
         return this.setPortalLocation(locationString, (MultiverseWorld) world);
     }
 
+    @ApiStatus.AvailableSince("5.3")
     public boolean setPortalLocation(String locationString, MultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }

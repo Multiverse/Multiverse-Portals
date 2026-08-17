@@ -26,6 +26,16 @@ public class MultiverseRegion {
     private final Vector max;
     private final MultiverseWorld world;
 
+    /**
+     * @deprecated Use {@link MultiverseRegion(Object, Object, MultiverseWorld)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public MultiverseRegion(Object pos1, Object pos2, LoadedMultiverseWorld w) {
+        this(pos1, pos2, (MultiverseWorld) w);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
     public MultiverseRegion(Object pos1, Object pos2, MultiverseWorld w) {
         // Creating soft dependencies on WE
         if (pos1 instanceof com.sk89q.worldedit.math.BlockVector3 && pos2 instanceof com.sk89q.worldedit.math.BlockVector3) {
@@ -36,14 +46,35 @@ public class MultiverseRegion {
             this.min = Vector.getMinimum(tmp1, tmp2);
             this.max = Vector.getMaximum(tmp1, tmp2);
             this.world = w;
+            return;
         }
         throw new UnsupportedOperationException("WorldEdit plugin not installed!");
     }
 
+    /**
+     * @deprecated Use {@link MultiverseRegion(Location, Location, MultiverseWorld)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public MultiverseRegion(Location loc1, Location loc2, LoadedMultiverseWorld w) {
+        this(loc1.toVector(), loc2.toVector(), (MultiverseWorld) w);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
     public MultiverseRegion(Location loc1, Location loc2, MultiverseWorld w) {
         this(loc1.toVector(), loc2.toVector(), w);
     }
 
+    /**
+     * @deprecated Use {@link MultiverseRegion(Vector, Vector, MultiverseWorld)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public MultiverseRegion(Vector pos1, Vector pos2, LoadedMultiverseWorld w) {
+        this(pos1, pos2, (MultiverseWorld) w);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
     public MultiverseRegion(Vector pos1, Vector pos2, MultiverseWorld w) {
         this.min = Vector.getMinimum(pos1, pos2);
         this.max = Vector.getMaximum(pos1, pos2);
