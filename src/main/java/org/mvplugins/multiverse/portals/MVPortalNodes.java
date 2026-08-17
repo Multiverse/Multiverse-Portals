@@ -39,27 +39,40 @@ final class MVPortalNodes {
         return node;
     }
 
-    final ConfigNode<Material> currency = node(ConfigNode.builder("currency", Material.class)
+    final ConfigNode<String> actionType = node(ConfigNode.builder("action.type", String.class)
+            .name("action-type")
+            .suggester(input -> actionHandlerProvider.getAllHandlerTypeNames())
+            .defaultValue("multiverse-destination")
+            .build());
+
+    final ConfigNode<String> action = node(ConfigNode.builder("action.value", String.class)
+            .name("action")
+            .defaultValue("")
+            .aliases("destination", "dest")
+            .suggester((sender, input) -> actionHandlerProvider.getHandlerType(portal.getActionType())
+                    .map(actionHandlerType -> actionHandlerType.suggestActions(sender, input))
+                    .getOrElse(Collections.emptyList()))
+            .stringParser((sender, input, type) ->
+                    Try.of(() -> actionHandlerProvider.getHandlerType(portal.getActionType())
+                            .mapAttempt(actionHandlerType -> actionHandlerType.parseHandler(sender, input))
+                            .map(ActionHandler::serialise)
+                            .getOrThrow(failure ->
+                                    new MultiverseException(failure.getFailureMessage()))))
+            .build());
+
+    final ConfigNode<Boolean> checkDestinationSafety = node(ConfigNode.builder("check-destination-safety", Boolean.class)
+            .defaultValue(true)
+            .build());
+
+    final ConfigNode<Material> currency = node(ConfigNode.builder("entry-fee.currency", Material.class)
+            .name("currency")
             .defaultValue(Material.AIR)
             .aliases("curr")
             .build());
 
-    final ConfigNode<Double> price = node(ConfigNode.builder("price", Double.class)
+    final ConfigNode<Double> price = node(ConfigNode.builder("entry-fee.price", Double.class)
+            .name("price")
             .defaultValue(0.0)
-            .build());
-
-    final ConfigNode<Boolean> safeTeleport = node(ConfigNode.builder("safe-teleport", Boolean.class)
-            .defaultValue(true)
-            .aliases("safe")
-            .build());
-
-    final ConfigNode<Boolean> teleportNonPlayers = node(ConfigNode.builder("teleport-non-players", Boolean.class)
-            .defaultValue(false)
-            .aliases("telenonplayers")
-            .build());
-
-    final ConfigNode<String> owner = node(ConfigNode.builder("owner", String.class)
-            .defaultValue("")
             .build());
 
     final ConfigNode<String> location = node(ConfigNode.builder("location", String.class)
@@ -91,30 +104,32 @@ final class MVPortalNodes {
                 }
                 return Try.success(portalLocation.toString());
             })
-            .onSetValue((oldValue, newValue) -> portal.setPortalLocationInternal(PortalLocation.parseLocation(newValue)))
+            .onLoadAndChange((oldValue, newValue) ->
+                    portal.setPortalLocationInternal(PortalLocation.parseLocation(newValue)))
             .build());
 
-    final ConfigNode<String> actionType = node(ConfigNode.builder("action-type", String.class)
-            .suggester(input -> actionHandlerProvider.getAllHandlerTypeNames())
-            .defaultValue("multiverse-destination")
+    final ConfigNode<String> actionSuccessMessage = node(ConfigNode.builder("message.action-success", String.class)
+            .name("action-success-message")
+            .defaultValue("@disabled")
             .build());
 
-    final ConfigNode<String> action = node(ConfigNode.builder("action", String.class)
+    final ConfigNode<String> noPermissionMessage = node(ConfigNode.builder("message.no-permission", String.class)
+            .name("no-permission-message")
+            .defaultValue("@default")
+            .build());
+
+    final ConfigNode<String> owner = node(ConfigNode.builder("owner", String.class)
             .defaultValue("")
-            .aliases("destination", "dest")
-            .suggester((sender, input) -> actionHandlerProvider.getHandlerType(portal.getActionType())
-                    .map(actionHandlerType -> actionHandlerType.suggestActions(sender, input))
-                    .getOrElse(Collections.emptyList()))
-            .stringParser((sender, input, type) ->
-                    Try.of(() -> actionHandlerProvider.getHandlerType(portal.getActionType())
-                            .mapAttempt(actionHandlerType -> actionHandlerType.parseHandler(sender, input))
-                            .map(ActionHandler::serialise)
-                            .getOrThrow(failure ->
-                                    new MultiverseException(failure.getFailureMessage()))))
             .build());
 
-    final ConfigNode<Boolean> checkDestinationSafety = node(ConfigNode.builder("check-destination-safety", Boolean.class)
+    final ConfigNode<Boolean> safeTeleport = node(ConfigNode.builder("safe-teleport", Boolean.class)
             .defaultValue(true)
+            .aliases("safe")
+            .build());
+
+    final ConfigNode<Boolean> teleportNonPlayers = node(ConfigNode.builder("teleport-non-players", Boolean.class)
+            .defaultValue(false)
+            .aliases("telenonplayers")
             .build());
 
     final ConfigNode<Double> version = node(ConfigNode.builder("version", Double.class)

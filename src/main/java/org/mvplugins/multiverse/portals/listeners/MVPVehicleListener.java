@@ -101,7 +101,9 @@ public final class MVPVehicleListener implements DynamicListener {
         Logging.fine("[VehicleMoveEvent] Portal action for vehicle: " + vehicle);
         helper.stateSuccess(vehicle.getName(), portal.getName());
         portal.runActionFor(vehicle)
-                .onSuccess(() -> playerPassengers.forEach(player ->
-                        plugin.getPortalSession(player).setTeleportTime(new Date())));
+                .onSuccess(() -> playerPassengers.forEach(player -> {
+                    helper.sendActionSuccessMessage(portal, player);
+                    plugin.getPortalSession(player).setTeleportTime(new Date());
+                }));
     }
 }

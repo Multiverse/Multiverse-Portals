@@ -102,8 +102,10 @@ final class MVPPlayerPortalListener implements PortalsListener {
 
         Logging.fine("[PlayerPortalEvent] Portal action for player: " + player);
         helper.stateSuccess(player.getDisplayName(), portal.getName());
+        var finalPortal = portal;
         portal.runActionFor(player)
                 .onSuccess(() -> {
+                    helper.sendActionSuccessMessage(finalPortal, player);
                     event.setCancelled(true);
                 });
     }

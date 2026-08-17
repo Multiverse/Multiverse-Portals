@@ -12,10 +12,6 @@ repositories {
         url = uri('https://maven.enginehub.org/repo/')
     }
     maven {
-        name = 'benthecat'
-        url = uri('https://repo.c0ding.party/multiverse-beta')
-    }
-    maven {
         name = "helpchatRepoReleases"
         url = uri("https://repo.helpch.at/releases/")
     }

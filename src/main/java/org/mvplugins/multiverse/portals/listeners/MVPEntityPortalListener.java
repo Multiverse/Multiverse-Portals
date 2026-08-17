@@ -64,7 +64,11 @@ public final class MVPEntityPortalListener implements DynamicListener {
 
         Logging.fine("[EntityPortalEvent] Portal action for entity: " + entity);
         helper.stateSuccess(entity.getName(), portal.getName());
+        var finalPortal = portal;
         portal.runActionFor(entity)
-                .onSuccess(() -> event.setCancelled(true));
+                .onSuccess(() -> {
+                    helper.sendActionSuccessMessage(finalPortal, entity);
+                    event.setCancelled(true);
+                });
     }
 }
