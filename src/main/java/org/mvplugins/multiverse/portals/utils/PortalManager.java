@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.Location;
@@ -37,7 +36,6 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalLocation;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
-
 
 /**
  * Manages all portals for all worlds.
@@ -278,7 +276,7 @@ public class PortalManager {
         if (portalsConfig.getEnforcePortalAccess()) {
             for (MVPortal p : all) {
                 if (p.getPortalLocation().isValidLocation()
-                        && Objects.equals(p.getPortalLocation().getMultiverseWorld(), world)
+                        && p.getPortalLocation().getMultiverseWorld().exists(world::equals)
                         && p.playerCanEnterPortal((Player) sender)) {
                     validItems.add(p);
                 }
