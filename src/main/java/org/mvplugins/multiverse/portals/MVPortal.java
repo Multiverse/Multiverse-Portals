@@ -95,12 +95,16 @@ public final class MVPortal {
     private Permission fillPermission;
     private Permission exempt;
 
+    /**
+     * @deprecated Use {@link MVPortal(MultiverseWorld, MultiversePortals, String, String, String)} instead.
+     */
     @Deprecated(forRemoval = true, since = "5.3")
     @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public MVPortal(LoadedMultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this((MultiverseWorld) world, instance, name, owner, location);
     }
 
+    @ApiStatus.AvailableSince("5.3")
     public MVPortal(MultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this(instance, name);
         this.setOwner(owner);
@@ -328,6 +332,7 @@ public final class MVPortal {
         return this.setPortalLocation(locationString, (MultiverseWorld) world);
     }
 
+    @ApiStatus.AvailableSince("5.3")
     public boolean setPortalLocation(String locationString, MultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
@@ -468,7 +473,7 @@ public final class MVPortal {
      * this gets the Material at the center of the portal.
      *
      * @return The Material that fills this portal.
-     * @throws IllegalStateException If this portal's location is no longer valid.
+     * @throws IllegalStateException If this portal's location is no longer valid or world is unloaded.
      */
     public Material getFillMaterial() throws IllegalStateException {
         if (!this.location.isValidLocation()) {
@@ -476,13 +481,21 @@ public final class MVPortal {
                     "Failed to get fill material from MV Portal (%s): Portal location is invalid.",
                     this.getName()));
         }
-
+        World world = this.location.getMultiverseWorld()
+                .flatMap(MultiverseWorld::asLoadedWorld)
+                .flatMap(LoadedMultiverseWorld::getBukkitWorld)
+                .getOrNull();
+        if (world == null) {
+            String worldName = this.location.getMultiverseWorld()
+                    .map(MultiverseWorld::getName)
+                    .getOrElse("unknown");
+            throw new IllegalStateException(String.format(
+                    "Failed to get fill material from MV Portal (%s): World '%s' is unloaded.",
+                    this.getName(), worldName));
+        }
         return this.location.getMinimum()
                 .getMidpoint(this.location.getMaximum())
-                .toLocation(this.location.getMultiverseWorld()
-                        .flatMap(MultiverseWorld::asLoadedWorld)
-                        .flatMap(LoadedMultiverseWorld::getBukkitWorld)
-                        .getOrNull())
+                .toLocation(world)
                 .getBlock()
                 .getType();
     }

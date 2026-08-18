@@ -16,6 +16,7 @@ import org.mvplugins.multiverse.core.command.MVCommandManager;
 import org.mvplugins.multiverse.core.locale.message.Message;
 import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.MoveType;
@@ -153,7 +154,7 @@ public class PortalPlayerSession {
         this.leftClickWorld = world;
         String position = "(" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
         if (this.leftClickWorld == this.rightClickWorld && this.rightClick != null) {
-            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
+            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, (MultiverseWorld) this.leftClickWorld);
             this.issuer.sendInfo(MVPi18n.SELECTION_FIRST_AREA,
                     replace("{position}").with(position),
                     Replace.COUNT.with(tempReg.getArea()));
@@ -172,7 +173,7 @@ public class PortalPlayerSession {
         this.rightClickWorld = world;
         String position = "(" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
         if (this.leftClickWorld == this.rightClickWorld && this.leftClick != null) {
-            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
+            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, (MultiverseWorld) this.leftClickWorld);
             this.issuer.sendInfo(MVPi18n.SELECTION_SECOND_AREA,
                     replace("{position}").with(position),
                     Replace.COUNT.with(tempReg.getArea()));
@@ -192,7 +193,7 @@ public class PortalPlayerSession {
                 Location maxPoint = worldEdit.getSelectionMaxPoint(this.player);
                 if (minPoint != null && maxPoint != null && minPoint.getWorld().equals(maxPoint.getWorld())) {
                     return new MultiverseRegion(minPoint, maxPoint,
-                            this.worldManager.getLoadedWorld(minPoint.getWorld().getName()).getOrNull());
+                            this.worldManager.getWorld(minPoint.getWorld().getName()).getOrNull());
                 } else {
                     this.issuer.sendError(MVPi18n.SELECTION_WORLDEDIT_INCOMPLETE);
                     return null;
@@ -217,7 +218,7 @@ public class PortalPlayerSession {
                     replace("{rightWorld}").with(this.rightClickWorld.getAlias()));
             return null;
         }
-        return new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
+        return new MultiverseRegion(this.leftClick, this.rightClick, (MultiverseWorld) this.leftClickWorld);
     }
 
     /**

@@ -57,6 +57,7 @@ public class PortalLocation {
         return parseLocation(locationString, (MultiverseWorld) world, portalName);
     }
 
+    @ApiStatus.AvailableSince("5.3")
     public static PortalLocation parseLocation(String locationString, MultiverseWorld world, String portalName) {
         String[] split = locationString.split(":");
         if (split.length != 2) {
@@ -88,6 +89,13 @@ public class PortalLocation {
     public PortalLocation() {
     }
 
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public PortalLocation(Vector pos1, Vector pos2, LoadedMultiverseWorld world) {
+        this(pos1, pos2, (MultiverseWorld) world);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
     public PortalLocation(Vector pos1, Vector pos2, MultiverseWorld world) {
         this.validLocation = this.setLocation(pos1, pos2, world);
     }
@@ -99,7 +107,7 @@ public class PortalLocation {
      * @param maxPt
      */
     public PortalLocation(BlockVector3 minPt, BlockVector3 maxPt, LoadedMultiverseWorld world) {
-        this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
+        this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), (MultiverseWorld) world);
     }
 
     private static Vector parseVector(String vectorString) {
