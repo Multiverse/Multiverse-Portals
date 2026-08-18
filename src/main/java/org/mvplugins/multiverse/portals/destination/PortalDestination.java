@@ -5,6 +5,7 @@ import org.mvplugins.multiverse.core.destination.Destination;
 import org.mvplugins.multiverse.core.destination.DestinationSuggestionPacket;
 import org.mvplugins.multiverse.core.locale.MVCorei18n;
 import org.mvplugins.multiverse.core.locale.message.Message;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.teleportation.LocationManipulation;
 import org.mvplugins.multiverse.core.utils.result.Attempt;
 import org.mvplugins.multiverse.core.utils.result.FailureReason;
@@ -15,9 +16,11 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.jetbrains.annotations.Nullable;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
 
 import java.util.Collection;
+
 
 @Service
 public class PortalDestination implements Destination<PortalDestination, PortalDestinationInstance, PortalDestination.InstanceFailureReason> {
@@ -40,13 +43,15 @@ public class PortalDestination implements Destination<PortalDestination, PortalD
     public @NotNull Attempt<PortalDestinationInstance, InstanceFailureReason> getDestinationInstance(@Nullable String destinationParams) {
         String[] items = destinationParams.split(":");
         if (items.length > 3) {
-            return Attempt.failure(InstanceFailureReason.INVALID_FORMAT, Message.of("Invalid format! Expected format is: p:portalName:[direction]"));
+            return Attempt.failure(InstanceFailureReason.INVALID_FORMAT,
+                    Message.of(MVPi18n.DESTINATION_PORTAL_INVALIDFORMAT));
         }
 
         String portalName = items[0];
         MVPortal portal = portalManager.getPortal(portalName);
         if (portal == null) {
-            return Attempt.failure(InstanceFailureReason.PORTAL_NOT_FOUND, Message.of("Portal '" + portalName + "' does not exist!"));
+            return Attempt.failure(InstanceFailureReason.PORTAL_NOT_FOUND,
+                    Message.of(MVPi18n.DESTINATION_PORTAL_NOTFOUND, Replace.NAME.with(portalName)));
         }
 
         String direction = (items.length == 2) ? items[1] : null;

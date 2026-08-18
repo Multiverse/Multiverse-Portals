@@ -37,7 +37,11 @@ import org.mvplugins.multiverse.core.teleportation.BlockSafety;
 import org.mvplugins.multiverse.core.utils.result.Attempt;
 import org.mvplugins.multiverse.core.utils.text.ChatTextFormatter;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
+import org.mvplugins.multiverse.external.acf.locales.MessageKey;
+import org.mvplugins.multiverse.external.acf.locales.MessageKeyProvider;
+import org.mvplugins.multiverse.external.vavr.control.Either;
 import org.mvplugins.multiverse.external.vavr.control.Option;
 import org.mvplugins.multiverse.external.vavr.control.Try;
 import org.mvplugins.multiverse.portals.action.ActionFailureReason;
@@ -54,11 +58,12 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
 
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 
 public final class MVPortal {
 
-    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL, Material.GRASS,
+    private static final Collection<Material> INTERIOR_MATERIALS = Arrays.asList(Material.NETHER_PORTAL,
             Material.VINE, Material.SNOW, Material.AIR, Material.WATER, Material.LAVA);
 
     public static final Pattern PORTAL_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
@@ -90,7 +95,17 @@ public final class MVPortal {
     private Permission fillPermission;
     private Permission exempt;
 
+    /**
+     * @deprecated Use {@link MVPortal(MultiverseWorld, MultiversePortals, String, String, String)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public MVPortal(LoadedMultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
+        this((MultiverseWorld) world, instance, name, owner, location);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public MVPortal(MultiverseWorld world, MultiversePortals instance, String name, String owner, String location) {
         this(instance, name);
         this.setOwner(owner);
         this.setPortalLocation(location, world);
@@ -145,6 +160,12 @@ public final class MVPortal {
                                 .build())
                         .addVersionMigrator(VersionMigrator.builder(1.2)
                                 .addAction(MoveMigratorAction.of("destination", "action"))
+                                .build())
+                        .addVersionMigrator(VersionMigrator.builder(1.3)
+                                .addAction(MoveMigratorAction.of("action", "action.value"))
+                                .addAction(MoveMigratorAction.of("action-type", "action.type"))
+                                .addAction(MoveMigratorAction.of("currency", "entry-fee.currency"))
+                                .addAction(MoveMigratorAction.of("price", "entry-fee.price"))
                                 .build())
                         .build())
                 .build();
@@ -255,6 +276,39 @@ public final class MVPortal {
         return this.configHandle.get(configNodes.price);
     }
 
+    @ApiStatus.AvailableSince("5.3")
+    public Try<Void> setActionSuccessMessage(String message) {
+        return this.configHandle.set(this.configNodes.actionSuccessMessage, message);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Option<Either<MessageKeyProvider, String>> getActionSuccessMessage() {
+        return getMessageEither(this.configHandle.get(this.configNodes.actionSuccessMessage), MVPi18n.PORTAL_ACTION_SUCCESS);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Try<Void> setNoPermissionMessage(String message) {
+        return this.configHandle.set(this.configNodes.noPermissionMessage, message);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public Option<Either<MessageKeyProvider, String>> getNoPermissionMessage() {
+        return getMessageEither(this.configHandle.get(this.configNodes.noPermissionMessage),MVPi18n.PORTAL_PERMISSION_DENIED);
+    }
+
+    private Option<Either<MessageKeyProvider, String>> getMessageEither(String message, MessageKeyProvider defaultMessageKey) {
+        if (message == null || message.equalsIgnoreCase("@disabled")) {
+            return Option.none();
+        }
+        if (message.equalsIgnoreCase("@default")) {
+            return Option.of(Either.left(defaultMessageKey));
+        }
+        if (message.startsWith("@@")) {
+            return Option.of(Either.left(MessageKey.of(message.substring(2))));
+        }
+        return Option.of(Either.right(message));
+    }
+
     /**
      *
      * @param locationString
@@ -268,14 +322,18 @@ public final class MVPortal {
     }
 
     public boolean setPortalLocation(String locationString, String worldString) {
-        LoadedMultiverseWorld world = null;
-        if (this.worldManager.isWorld(worldString)) {
-            world = this.worldManager.getLoadedWorld(worldString).getOrNull();
-        }
+        MultiverseWorld world = this.worldManager.getWorld(worldString).getOrNull();
         return this.setPortalLocation(locationString, world);
     }
 
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public boolean setPortalLocation(String locationString, LoadedMultiverseWorld world) {
+        return this.setPortalLocation(locationString, (MultiverseWorld) world);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public boolean setPortalLocation(String locationString, MultiverseWorld world) {
         return this.setPortalLocation(PortalLocation.parseLocation(locationString, world, this.name));
     }
 
@@ -382,16 +440,21 @@ public final class MVPortal {
         return this.configHandle.get(configNodes.checkDestinationSafety);
     }
 
-    public Location getSafePlayerSpawnLocation() {
+    public @Nullable Location getSafePlayerSpawnLocation() {
         PortalLocation pl = this.location;
+        World world = getBukkitWorld().getOrNull();
+        if (pl == null || world == null) {
+            return null;
+        }
+
         double portalWidth = Math.abs((pl.getMaximum().getBlockX()) - pl.getMinimum().getBlockX()) + 1;
         double portalDepth = Math.abs((pl.getMaximum().getBlockZ()) - pl.getMinimum().getBlockZ()) + 1;
 
         double finalX = (portalWidth / 2.0) + pl.getMinimum().getBlockX();
         // double finalY = pl.getMinimum().getBlockY();
         double finalZ = (portalDepth / 2.0) + pl.getMinimum().getBlockZ();
-        double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), this.getWorld());
-        return new Location(this.getWorld(), finalX, finalY, finalZ);
+        double finalY = this.getMinimumWith2Air((int) finalX, (int) finalZ, pl.getMinimum().getBlockY(), pl.getMaximum().getBlockY(), world);
+        return new Location(world, finalX, finalY, finalZ);
     }
 
     private double getMinimumWith2Air(int finalX, int finalZ, int y, int yMax, World w) {
@@ -410,7 +473,7 @@ public final class MVPortal {
      * this gets the Material at the center of the portal.
      *
      * @return The Material that fills this portal.
-     * @throws IllegalStateException If this portal's location is no longer valid.
+     * @throws IllegalStateException If this portal's location is no longer valid or world is unloaded.
      */
     public Material getFillMaterial() throws IllegalStateException {
         if (!this.location.isValidLocation()) {
@@ -418,9 +481,23 @@ public final class MVPortal {
                     "Failed to get fill material from MV Portal (%s): Portal location is invalid.",
                     this.getName()));
         }
-
-        return this.location.getMinimum().getMidpoint(this.location.getMaximum())
-                .toLocation(this.location.getMVWorld().getBukkitWorld().getOrNull()).getBlock().getType();
+        World world = this.location.getMultiverseWorld()
+                .flatMap(MultiverseWorld::asLoadedWorld)
+                .flatMap(LoadedMultiverseWorld::getBukkitWorld)
+                .getOrNull();
+        if (world == null) {
+            String worldName = this.location.getMultiverseWorld()
+                    .map(MultiverseWorld::getName)
+                    .getOrElse("unknown");
+            throw new IllegalStateException(String.format(
+                    "Failed to get fill material from MV Portal (%s): World '%s' is unloaded.",
+                    this.getName(), worldName));
+        }
+        return this.location.getMinimum()
+                .getMidpoint(this.location.getMaximum())
+                .toLocation(world)
+                .getBlock()
+                .getType();
     }
 
     /**
@@ -457,13 +534,25 @@ public final class MVPortal {
         return player.hasPermission(this.fillPermission);
     }
 
-    @Nullable
-    public World getWorld() {
-        LoadedMultiverseWorld mvWorld = this.location.getMVWorld();
-        if (mvWorld == null) {
-            return null;
-        }
-        return mvWorld.getBukkitWorld().getOrNull();
+    /**
+     * @deprecated Use {@link #getBukkitWorld()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
+    public @Nullable World getWorld() {
+        return getBukkitWorld().getOrNull();
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull Option<World> getBukkitWorld() {
+        return location.getMultiverseWorld()
+                .flatMap(MultiverseWorld::asLoadedWorld)
+                .flatMap(LoadedMultiverseWorld::getBukkitWorld);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull Option<MultiverseWorld> getMultiverseWorld() {
+        return location.getMultiverseWorld();
     }
 
     public Permission getPermission() {
@@ -616,7 +705,7 @@ public final class MVPortal {
         Vector max = new Vector().copy(r.getMaximumPoint());
         min.add(new Vector(-x, -y, -z));
         max.add(new Vector( x,  y,  z));
-        return new MultiverseRegion(min, max, r.getWorld());
+        return new MultiverseRegion(min, max, r.getMultiverseWorld());
     }
 
     // deprecated island

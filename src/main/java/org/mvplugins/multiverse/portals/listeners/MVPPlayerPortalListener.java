@@ -1,7 +1,6 @@
 package org.mvplugins.multiverse.portals.listeners;
 
 import com.dumptruckman.minecraft.util.Logging;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -70,7 +69,7 @@ final class MVPPlayerPortalListener implements PortalsListener {
         }
 
         if (!portal.isFrameValid(playerPortalLoc)) {
-            player.sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material." + ChatColor.RED + " You should exit it now.");
+            helper.sendInvalidFrameMessage(player);
             event.setCancelled(true);
             return;
         }
@@ -103,8 +102,10 @@ final class MVPPlayerPortalListener implements PortalsListener {
 
         Logging.fine("[PlayerPortalEvent] Portal action for player: " + player);
         helper.stateSuccess(player.getDisplayName(), portal.getName());
+        var finalPortal = portal;
         portal.runActionFor(player)
                 .onSuccess(() -> {
+                    helper.sendActionSuccessMessage(finalPortal, player);
                     event.setCancelled(true);
                 });
     }

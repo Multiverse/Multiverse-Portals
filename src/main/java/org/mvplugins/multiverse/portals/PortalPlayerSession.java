@@ -11,19 +11,25 @@ import java.util.Date;
 
 import com.dumptruckman.minecraft.util.Logging;
 import org.bukkit.entity.LivingEntity;
-import org.mvplugins.multiverse.core.economy.MVEconomist;
+import org.mvplugins.multiverse.core.command.MVCommandIssuer;
+import org.mvplugins.multiverse.core.command.MVCommandManager;
+import org.mvplugins.multiverse.core.locale.message.Message;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.MoveType;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.DisplayUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 public class PortalPlayerSession {
     private final MultiversePortals plugin;
@@ -32,6 +38,7 @@ public class PortalPlayerSession {
     private final WorldManager worldManager;
     private final DisplayUtils displayUtils;
     private final Player player;
+    private final MVCommandIssuer issuer;
 
     private MVPortal portalSelection = null;
     private MVPortal standingIn = null;
@@ -52,6 +59,7 @@ public class PortalPlayerSession {
         this.worldManager = plugin.getServiceLocator().getService(WorldManager.class);
         this.displayUtils = plugin.getServiceLocator().getService(DisplayUtils.class);
         this.player = p;
+        this.issuer = plugin.getServiceLocator().getService(MVCommandManager.class).getCommandIssuer(p);
         this.setLocation(p.getLocation());
         this.lastTeleportTime = new Date(new Date().getTime() - this.portalsConfig.getPortalCooldown());
     }
@@ -68,10 +76,9 @@ public class PortalPlayerSession {
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
         if (this.debugMode) {
-            this.player.sendMessage("Portal debug mode " + ChatColor.GREEN + "ENABLED");
-            this.player.sendMessage("Use " + ChatColor.DARK_AQUA + "/mvp debug" + ChatColor.WHITE + " to disable.");
+            this.issuer.sendInfo(MVPi18n.DEBUG_ENABLED);
         } else {
-            this.player.sendMessage("Portal debug mode " + ChatColor.RED + "DISABLED");
+            this.issuer.sendInfo(MVPi18n.DEBUG_DISABLED);
         }
     }
 
@@ -145,12 +152,16 @@ public class PortalPlayerSession {
         }
         this.leftClick = v;
         this.leftClickWorld = world;
-        String message = ChatColor.AQUA + "First position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
+        String position = "(" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
         if (this.leftClickWorld == this.rightClickWorld && this.rightClick != null) {
-            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
-            message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
+            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, (MultiverseWorld) this.leftClickWorld);
+            this.issuer.sendInfo(MVPi18n.SELECTION_FIRST_AREA,
+                    replace("{position}").with(position),
+                    Replace.COUNT.with(tempReg.getArea()));
+        } else {
+            this.issuer.sendInfo(MVPi18n.SELECTION_FIRST,
+                    replace("{position}").with(position));
         }
-        this.player.sendMessage(message);
         return true;
     }
 
@@ -160,12 +171,16 @@ public class PortalPlayerSession {
         }
         this.rightClick = v;
         this.rightClickWorld = world;
-        String message = ChatColor.AQUA + "Second position set to: (" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
+        String position = "(" + v.getBlockX() + ", " + v.getBlockY() + ", " + v.getBlockZ() + ")";
         if (this.leftClickWorld == this.rightClickWorld && this.leftClick != null) {
-            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
-            message += ChatColor.GOLD + " (" + tempReg.getArea() + " blocks)";
+            MultiverseRegion tempReg = new MultiverseRegion(this.leftClick, this.rightClick, (MultiverseWorld) this.leftClickWorld);
+            this.issuer.sendInfo(MVPi18n.SELECTION_SECOND_AREA,
+                    replace("{position}").with(position),
+                    Replace.COUNT.with(tempReg.getArea()));
+        } else {
+            this.issuer.sendInfo(MVPi18n.SELECTION_SECOND,
+                    replace("{position}").with(position));
         }
-        this.player.sendMessage(message);
         return true;
 
     }
@@ -178,32 +193,32 @@ public class PortalPlayerSession {
                 Location maxPoint = worldEdit.getSelectionMaxPoint(this.player);
                 if (minPoint != null && maxPoint != null && minPoint.getWorld().equals(maxPoint.getWorld())) {
                     return new MultiverseRegion(minPoint, maxPoint,
-                            this.worldManager.getLoadedWorld(minPoint.getWorld().getName()).getOrNull());
+                            this.worldManager.getWorld(minPoint.getWorld().getName()).getOrNull());
                 } else {
-                    this.player.sendMessage("You haven't finished your selection.");
+                    this.issuer.sendError(MVPi18n.SELECTION_WORLDEDIT_INCOMPLETE);
                     return null;
                 }
             } else {
-                this.player.sendMessage("You must have a WorldEdit selection to do this.");
+                this.issuer.sendError(MVPi18n.SELECTION_WORLDEDIT_REQUIRED);
                 return null;
             }
         }
         // They're using our crappy selection:
         if (this.leftClick == null) {
-            this.player.sendMessage("You need to LEFT click on a block with your wand!");
+            this.issuer.sendError(MVPi18n.SELECTION_LEFT_REQUIRED);
             return null;
         }
         if (this.rightClick == null) {
-            this.player.sendMessage("You need to RIGHT click on a block with your wand!");
+            this.issuer.sendError(MVPi18n.SELECTION_RIGHT_REQUIRED);
             return null;
         }
         if (!this.leftClickWorld.equals(this.rightClickWorld)) {
-            this.player.sendMessage("You need to select both coords in the same world!");
-            this.player.sendMessage("Left Click Position was in:" + this.leftClickWorld.getAlias());
-            this.player.sendMessage("Right Click Position was in:" + this.rightClickWorld.getAlias());
+            this.issuer.sendError(MVPi18n.SELECTION_SAMEWORLD_REQUIRED,
+                    replace("{leftWorld}").with(this.leftClickWorld.getAlias()),
+                    replace("{rightWorld}").with(this.rightClickWorld.getAlias()));
             return null;
         }
-        return new MultiverseRegion(this.leftClick, this.rightClick, this.leftClickWorld);
+        return new MultiverseRegion(this.leftClick, this.rightClick, (MultiverseWorld) this.leftClickWorld);
     }
 
     /**
@@ -251,13 +266,13 @@ public class PortalPlayerSession {
             return false;
         }
 
-        displayUtils.showStaticInfo(this.player, this.standingIn, "You are currently standing in ");
+        displayUtils.showStaticInfo(this.player, this.standingIn, MVPi18n.PORTALINFO_DEBUGHEADER);
         return true;
     }
 
     public boolean showDebugInfo(MVPortal portal) {
         if (portal.playerCanEnterPortal(this.player)) {
-            displayUtils.showStaticInfo(this.player, portal, "Portal Info ");
+            displayUtils.showStaticInfo(this.player, portal, MVPi18n.PORTALINFO_HEADER);
         }
         Logging.info("Player " + this.player.getName() + " walked through" + portal.getName() + " with debug on.");
         return true;
@@ -276,7 +291,7 @@ public class PortalPlayerSession {
     public boolean checkAndSendCooldownMessage() {
         long cooldownMs = this.getRemainingTeleportCooldown();
         if (cooldownMs > 0) {
-            this.player.sendMessage(this.getCooldownMessage(cooldownMs));
+            this.issuer.sendError(this.getCooldownMessage(cooldownMs));
             return true;
         }
 
@@ -303,11 +318,9 @@ public class PortalPlayerSession {
      * @param cooldownMs The cooldown time in milliseconds.
      * @return           A message to be sent to a player, informing them about the remaining cooldown time.
      */
-    private String getCooldownMessage(long cooldownMs) {
-        return "There is a portal " + ChatColor.AQUA + "cooldown "
-                + ChatColor.WHITE + "in effect. Please try again in "
-                + ChatColor.GOLD + this.formatCooldownTime(cooldownMs)
-                + ChatColor.WHITE + ".";
+    private Message getCooldownMessage(long cooldownMs) {
+        return Message.of(MVPi18n.PORTAL_COOLDOWN,
+                replace("{cooldown}").with(formatCooldownTime(cooldownMs)));
     }
 
     /**

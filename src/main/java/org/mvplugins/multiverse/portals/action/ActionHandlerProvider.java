@@ -4,14 +4,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.core.locale.message.Message;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.utils.result.Attempt;
 import org.mvplugins.multiverse.external.jetbrains.annotations.ApiStatus;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.external.vavr.control.Option;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.mvplugins.multiverse.core.locale.message.MessageReplacement.replace;
 
 /**
  * Provides various actions that can be performed when a portal is used. This extends to more than just teleporting.
@@ -68,8 +72,9 @@ public final class ActionHandlerProvider {
         return Option.of(handlerTypeMap.get(name))
                 .map(Attempt::<ActionHandlerType<?, ?>, ActionFailureReason>success)
                 .getOrElse(() -> Attempt.failure(ActionFailureReason.INSTANCE,
-                        Message.of("Unknown action type '" + name + "'. Supported types are: "
-                                + String.join(", ", handlerTypeMap.keySet()))));
+                        Message.of(MVPi18n.ACTION_UNKNOWN_TYPE,
+                                Replace.NAME.with(name),
+                                replace("{types}").with(String.join(", ", handlerTypeMap.keySet())))));
     }
 
     /**

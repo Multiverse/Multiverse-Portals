@@ -14,11 +14,14 @@ import com.dumptruckman.minecraft.util.Logging;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.bukkit.util.Vector;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
+import org.mvplugins.multiverse.external.vavr.control.Option;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
-
-import javax.annotation.Nullable;
 
 public class PortalLocation {
 
@@ -30,7 +33,7 @@ public class PortalLocation {
         }
 
         String worldName = split[0];
-        LoadedMultiverseWorld world = MultiverseCoreApi.get().getWorldManager().getLoadedWorld(worldName).getOrNull();
+        MultiverseWorld world = MultiverseCoreApi.get().getWorldManager().getWorld(worldName).getOrNull();
         if (world == null) {
             Logging.warning("Failed Parsing World (World Error, World did not exist or was not imported into Multiverse-Core!)");
             return getInvalidPortalLocation();
@@ -45,7 +48,17 @@ public class PortalLocation {
         return new PortalLocation(pos1, pos2, world);
     }
 
+    /**
+     * @deprecated Use {@link #parseLocation(String, MultiverseWorld, String)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public static PortalLocation parseLocation(String locationString, LoadedMultiverseWorld world, String portalName) {
+        return parseLocation(locationString, (MultiverseWorld) world, portalName);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public static PortalLocation parseLocation(String locationString, MultiverseWorld world, String portalName) {
         String[] split = locationString.split(":");
         if (split.length != 2) {
             Logging.warning("Failed Parsing Location for: " + portalName + " (Format Error, was expecting: `X,Y,Z:X,Y,Z`, but got: `" + locationString + "`)");
@@ -76,7 +89,14 @@ public class PortalLocation {
     public PortalLocation() {
     }
 
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public PortalLocation(Vector pos1, Vector pos2, LoadedMultiverseWorld world) {
+        this(pos1, pos2, (MultiverseWorld) world);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public PortalLocation(Vector pos1, Vector pos2, MultiverseWorld world) {
         this.validLocation = this.setLocation(pos1, pos2, world);
     }
 
@@ -87,7 +107,7 @@ public class PortalLocation {
      * @param maxPt
      */
     public PortalLocation(BlockVector3 minPt, BlockVector3 maxPt, LoadedMultiverseWorld world) {
-        this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), world);
+        this(new Vector(minPt.getX(), minPt.getY(), minPt.getZ()), new Vector(maxPt.getX(), maxPt.getY(), maxPt.getZ()), (MultiverseWorld) world);
     }
 
     private static Vector parseVector(String vectorString) {
@@ -104,7 +124,17 @@ public class PortalLocation {
         return new Vector(coords[0], coords[1], coords[2]);
     }
 
+    /**
+     * @deprecated Use {@link #setLocation(Vector, Vector, MultiverseWorld)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public boolean setLocation(Vector v1, Vector v2, LoadedMultiverseWorld world) {
+        return setLocation(v1, v2, (MultiverseWorld) world);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public boolean setLocation(Vector v1, Vector v2, MultiverseWorld world) {
         if (v1 == null || v2 == null || world == null) {
             this.validLocation = false;
             this.region = null;
@@ -115,7 +145,17 @@ public class PortalLocation {
         return this.validLocation;
     }
 
+    /**
+     * @deprecated Use {@link #setLocation(String, String, MultiverseWorld)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public boolean setLocation(String v1, String v2, LoadedMultiverseWorld world) {
+        return setLocation(v1, v2, (MultiverseWorld) world);
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public boolean setLocation(String v1, String v2, MultiverseWorld world) {
         if (v1 == null || v2 == null) {
             this.validLocation = false;
             this.region = null;
@@ -142,11 +182,18 @@ public class PortalLocation {
         return this.region.getMaximumPoint();
     }
 
+    /**
+     * @deprecated Use {@link #getMultiverseWorld()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "5.3")
+    @ApiStatus.ScheduledForRemoval(inVersion = "6.0")
     public @Nullable LoadedMultiverseWorld getMVWorld() {
-        if (this.region == null) {
-            return null;
-        }
-        return this.region.getWorld();
+        return this.region == null ? null : this.region.getWorld();
+    }
+
+    @ApiStatus.AvailableSince("5.3")
+    public @NotNull Option<MultiverseWorld> getMultiverseWorld() {
+        return Option.of(region).map(MultiverseRegion::getMultiverseWorld);
     }
 
     public @Nullable MultiverseRegion getRegion() {

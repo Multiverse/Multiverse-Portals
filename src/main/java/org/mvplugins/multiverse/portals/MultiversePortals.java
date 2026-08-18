@@ -56,7 +56,7 @@ import org.mvplugins.multiverse.portals.utils.PortalManager;
 @Service
 public class MultiversePortals extends MultiverseModule {
 
-    private static final double TARGET_CORE_API_VERSION = 5.1;
+    private static final double TARGET_CORE_API_VERSION = 5.5;
 
     @Inject
     private Provider<PortalManager> portalManager;
@@ -97,6 +97,8 @@ public class MultiversePortals extends MultiverseModule {
         initializeDependencyInjection(new MultiversePortalsPluginBinder(this));
 
         Logging.setDebugLevel(coreConfig.get().getGlobalDebug());
+
+        this.setUpLocales();
 
         // Register our commands
         this.registerCommands();
@@ -213,9 +215,11 @@ public class MultiversePortals extends MultiverseModule {
         for (String pname : keys) {
             MVPortal portal = MVPortal.loadMVPortalFromConfig(this, pname);
             if (portal.getPortalLocation().isValidLocation()) {
-                this.portalManager.get().addPortal(portal);
+                if (!this.portalManager.get().addPortal(portal)) {
+                    Logging.warning("Failed to add portal %s!" + pname);
+                }
             } else {
-                Logging.warning(String.format("Portal '%s' not loaded due to invalid location!", portal.getName()));
+                Logging.warning("Portal '%s' not loaded due to invalid location!", portal.getName());
             }
         }
         Logging.info(this.portalManager.get().getAllPortals().size() + " - Portals(s) loaded");

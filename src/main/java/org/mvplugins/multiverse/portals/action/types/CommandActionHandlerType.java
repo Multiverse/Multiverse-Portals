@@ -8,6 +8,7 @@ import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.action.ActionFailureReason;
 import org.mvplugins.multiverse.portals.action.ActionHandlerType;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +26,7 @@ final class CommandActionHandlerType extends ActionHandlerType<CommandActionHand
                                                                                     @NotNull String action) {
         if (action.isEmpty()) {
             return Attempt.failure(ActionFailureReason.INSTANCE,
-                    Message.of("Please specific a valid command to run as the portal's action."));
+                    Message.of(MVPi18n.ACTION_COMMAND_INVALID));
         }
         return Attempt.success(new CommandActionHandler(this, CommandRunner.fromString(action)));
     }

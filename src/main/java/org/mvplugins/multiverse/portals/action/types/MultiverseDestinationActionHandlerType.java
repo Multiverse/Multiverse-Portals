@@ -10,6 +10,7 @@ import org.mvplugins.multiverse.external.jakarta.inject.Inject;
 import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.portals.action.ActionFailureReason;
 import org.mvplugins.multiverse.portals.action.ActionHandlerType;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 
 import java.util.Collection;
 
@@ -31,7 +32,8 @@ final class MultiverseDestinationActionHandlerType extends ActionHandlerType<Mul
     public @NotNull Attempt<MultiverseDestinationActionHandler, ActionFailureReason> parseHandler(@NotNull CommandSender sender,
                                                                                                   @NotNull String action) {
         if (action.isEmpty()) {
-            return Attempt.failure(ActionFailureReason.INSTANCE, Message.of("Please specific a multiverse destination as the portal's action."));
+            return Attempt.failure(ActionFailureReason.INSTANCE,
+                    Message.of(MVPi18n.ACTION_MULTIVERSEDESTINATION_INVALID));
         }
         return destinationsProvider.parseDestination(sender, action)
                 .transform(ActionFailureReason.INSTANCE)

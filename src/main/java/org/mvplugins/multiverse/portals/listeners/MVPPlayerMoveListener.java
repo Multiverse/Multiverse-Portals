@@ -22,7 +22,6 @@ import org.mvplugins.multiverse.portals.PortalPlayerSession;
 import org.mvplugins.multiverse.portals.config.PortalsConfig;
 import org.mvplugins.multiverse.portals.enums.MoveType;
 import org.mvplugins.multiverse.portals.event.MVPortalEvent;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
@@ -74,7 +73,7 @@ public final class MVPPlayerMoveListener implements DynamicListener {
         player.setFallDistance(0);
 
         if (!portal.isFrameValid(loc)) {
-            player.sendMessage("This portal's frame is made of an " + ChatColor.RED + "incorrect material. You should exit it now.");
+            helper.sendInvalidFrameMessage(player);
             return;
         }
         if (ps.checkAndSendCooldownMessage()) {
@@ -97,6 +96,7 @@ public final class MVPPlayerMoveListener implements DynamicListener {
         }
 
         Logging.fine("[PlayerMoveEvent] Portal action for player: " + player);
-        portal.runActionFor(player);
+        portal.runActionFor(player)
+                .onSuccess(() -> helper.sendActionSuccessMessage(portal, player));
     }
 }

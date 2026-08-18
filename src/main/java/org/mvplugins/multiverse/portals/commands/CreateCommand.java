@@ -1,10 +1,12 @@
 package org.mvplugins.multiverse.portals.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.command.LegacyAliasCommand;
+import org.mvplugins.multiverse.core.command.MVCommandIssuer;
 import org.mvplugins.multiverse.core.destination.DestinationInstance;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
+import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandAlias;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandCompletion;
 import org.mvplugins.multiverse.external.acf.commands.annotation.CommandPermission;
@@ -20,8 +22,10 @@ import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
 import org.mvplugins.multiverse.portals.PortalLocation;
 import org.mvplugins.multiverse.portals.PortalPlayerSession;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.MultiverseRegion;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
+
 
 @Service
 class CreateCommand extends PortalsCommand {
@@ -30,7 +34,8 @@ class CreateCommand extends PortalsCommand {
     private final PortalManager portalManager;
 
     @Inject
-    CreateCommand(@NotNull MultiversePortals plugin, @NotNull PortalManager portalManager) {
+    CreateCommand(@NotNull MultiversePortals plugin,
+                  @NotNull PortalManager portalManager) {
         this.plugin = plugin;
         this.portalManager = portalManager;
     }
@@ -39,8 +44,10 @@ class CreateCommand extends PortalsCommand {
     @CommandPermission("multiverse.portal.create")
     @CommandCompletion("@empty @mvworlds|@destinations")
     @Syntax("<portal-name> [destination]")
-    @Description("Creates a new portal, assuming you have a region selected.")
+    @Description("{@@mv-portals.create.description}")
     void onCreateCommand(
+            @NotNull MVCommandIssuer issuer,
+
             @Flags("resolve=issuerOnly")
             Player player,
 
@@ -48,10 +55,12 @@ class CreateCommand extends PortalsCommand {
             LoadedMultiverseWorld world,
 
             @Syntax("<portal-name>")
+            @Description("{@@mv-portals.create.name.description}")
             String portalName,
 
             @Optional
             @Syntax("[destination]")
+            @Description("{@@mv-portals.create.destination.description}")
             DestinationInstance<?, ?> destination
     ) {
         // todo: maybe make a CommandContext for PortalPlayerSession
@@ -63,21 +72,20 @@ class CreateCommand extends PortalsCommand {
         }
 
         if (!MVPortal.PORTAL_NAME_PATTERN.matcher(portalName).matches()) {
-            player.sendMessage(String.format("%sInvalid portal name. It must not contain dot or special characters.", ChatColor.RED));
+            issuer.sendError(MVPi18n.CREATE_INVALIDNAME);
             return;
         }
 
         MVPortal portal = this.portalManager.getPortal(portalName);
-        PortalLocation location = new PortalLocation(region.getMinimumPoint(), region.getMaximumPoint(), world);
+        PortalLocation location = new PortalLocation(region.getMinimumPoint(), region.getMaximumPoint(), (MultiverseWorld) world);
         if (this.portalManager.addPortal(world, portalName, player.getName(), location)) {
-            player.sendMessage("New portal (" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + ") created and selected!");
+            issuer.sendInfo(MVPi18n.CREATE_SUCCESS, Replace.NAME.with(portalName));
             // If the portal did not exist, ie: we're creating it.
             // we have to re select it, because it would be null
             portal = this.portalManager.getPortal(portalName);
 
         } else {
-            player.sendMessage("New portal (" + ChatColor.DARK_AQUA + portalName + ChatColor.WHITE + ") was NOT created!");
-            player.sendMessage("It already existed and has been selected.");
+            issuer.sendError(MVPi18n.CREATE_ALREADYEXISTS, Replace.NAME.with(portalName));
         }
 
         ps.selectPortal(portal);
@@ -85,7 +93,7 @@ class CreateCommand extends PortalsCommand {
             portal.setAction(destination.toString());
             this.plugin.savePortalsConfig();
         } else {
-            player.sendMessage(ChatColor.RED + "Portal action not set. Use " + ChatColor.DARK_AQUA + "/mvp modify action <value>" + ChatColor.RED + " to set one.");
+            issuer.sendError(MVPi18n.CREATE_ACTIONNOTSET);
         }
 
         // todo: Automatically get exact destination from player location
@@ -101,8 +109,9 @@ class CreateCommand extends PortalsCommand {
 
         @Override
         @CommandAlias("mvpcreate|mvpc")
-        void onCreateCommand(Player player, LoadedMultiverseWorld world, String portalName, DestinationInstance<?, ?> destination) {
-            super.onCreateCommand(player, world, portalName, destination);
+        void onCreateCommand(MVCommandIssuer issuer, Player player, LoadedMultiverseWorld world, String portalName,
+                             DestinationInstance<?, ?> destination) {
+            super.onCreateCommand(issuer, player, world, portalName, destination);
         }
     }
 }

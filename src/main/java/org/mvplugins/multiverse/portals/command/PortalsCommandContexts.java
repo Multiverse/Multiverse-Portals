@@ -2,6 +2,8 @@ package org.mvplugins.multiverse.portals.command;
 
 import org.mvplugins.multiverse.core.command.MVCommandContexts;
 import org.mvplugins.multiverse.core.command.MVCommandManager;
+import org.mvplugins.multiverse.core.locale.message.Message;
+import org.mvplugins.multiverse.core.locale.message.MessageReplacement.Replace;
 import org.mvplugins.multiverse.external.acf.commands.BukkitCommandExecutionContext;
 import org.mvplugins.multiverse.external.acf.commands.InvalidCommandArgument;
 import org.mvplugins.multiverse.external.jakarta.inject.Inject;
@@ -9,7 +11,9 @@ import org.mvplugins.multiverse.external.jetbrains.annotations.NotNull;
 import org.jvnet.hk2.annotations.Service;
 import org.mvplugins.multiverse.portals.MVPortal;
 import org.mvplugins.multiverse.portals.MultiversePortals;
+import org.mvplugins.multiverse.portals.locale.MVPi18n;
 import org.mvplugins.multiverse.portals.utils.PortalManager;
+
 
 @Service
 public class PortalsCommandContexts {
@@ -42,7 +46,8 @@ public class PortalsCommandContexts {
             if (context.isOptional()) {
                 return null;
             }
-            throw new InvalidCommandArgument("This command can only be used by a player that has selected a portal with `/mvp select`.");
+            throw new InvalidCommandArgument(Message.of(MVPi18n.CONTEXT_PORTAL_PLAYERSELECTIONREQUIRED)
+                    .formatted(context.getIssuer()));
         }
 
         String portalName = context.getFirstArg();
@@ -59,7 +64,8 @@ public class PortalsCommandContexts {
             if (context.isOptional()) {
                 return null;
             }
-            throw new InvalidCommandArgument("The portal '" + portalName + "' doesn't exist or you're not allowed to use it!");
+            throw new InvalidCommandArgument(Message.of(MVPi18n.CONTEXT_PORTAL_NOTFOUND, Replace.NAME.with(portalName))
+                    .formatted(context.getIssuer()));
         }
 
         if (portal != null) {
@@ -69,6 +75,7 @@ public class PortalsCommandContexts {
         if (context.isOptional()) {
             return null;
         }
-        throw new InvalidCommandArgument("The portal '" + portalName + "' doesn't exist or you're not allowed to use it!");
+        throw new InvalidCommandArgument(Message.of(MVPi18n.CONTEXT_PORTAL_NOTFOUND, Replace.NAME.with(portalName))
+                .formatted(context.getIssuer()));
     }
 }
